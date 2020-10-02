@@ -1,18 +1,29 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿/* 
+*   NatML
+*   Copyright (c) 2020 Yusuf Olokoba.
+*/
 
-public class Model : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+namespace NatSuite.ML {
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    using System;
+
+    /// <summary>
+    /// </summary>
+    public class Model : IDisposable {
+
+        #region --Client API--
+
+        /// <summary>
+        /// </summary>
+        public Model () {
+
+        }
+
+        /// <summary>
+        /// </summary>
+        public void Dispose () {
+            
+        }
+        #endregion
     }
 }
