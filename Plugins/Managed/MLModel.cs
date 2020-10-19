@@ -9,20 +9,14 @@ namespace NatSuite.ML {
 
     /// <summary>
     /// </summary>
-    public class Model : IDisposable {
+    public static class MLModel {
 
         #region --Client API--
-
         /// <summary>
         /// </summary>
-        public Model () {
-
-        }
-
-        /// <summary>
-        /// </summary>
-        public void Dispose () {
-            
+        /// <param name="modelPath"></param>
+        public static T Create<T> (string modelPath) where T : IMLModel {
+            return default;
         }
         #endregion
     }
