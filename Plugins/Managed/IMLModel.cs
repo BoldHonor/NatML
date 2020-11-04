@@ -11,5 +11,9 @@ namespace NatSuite.ML {
     /// </summary>
     public interface IMLModel : IDisposable {
 
+        /// <summary>
+        /// Get a value in the model's metadata dictionary.
+        /// </summary>
+        string this [string key] { get; }
     }
 }
