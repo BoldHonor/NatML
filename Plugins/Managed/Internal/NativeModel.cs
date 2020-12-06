@@ -8,6 +8,7 @@ namespace NatSuite.ML.Internal {
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
 
@@ -27,15 +28,29 @@ namespace NatSuite.ML.Internal {
 
         public void Dispose () => model.DisposeModel(); // DEPLOY
 
-        public MLFeature[] inputs { // INCOMPLETE
+        public MLFeature[] inputs { // DEPLOY
             get {
-                return default;
+                var nameBuffer = new StringBuilder(2048);
+                var shapeBuffer = new long[10]; // should be large enough for most things
+                var result = Enumerable.Range(0, model.InputFeatureCount()).Select(index => {
+                    nameBuffer.Clear();
+                    model.InputFeature(index, nameBuffer, out var type, shapeBuffer);
+                    return new MLFeature(nameBuffer, type, shapeBuffer);
+                });
+                return result.ToArray();
             }
         }
 
-        public MLFeature[] outputs { // INCOMPLETE
+        public MLFeature[] outputs { // DEPLOY
             get {
-                return default;
+                var nameBuffer = new StringBuilder(2048);
+                var shapeBuffer = new long[10]; // should be large enough for most things
+                var result = Enumerable.Range(0, model.OutputFeatureCount()).Select(index => {
+                    nameBuffer.Clear();
+                    model.OutputFeature(index, nameBuffer, out var type, shapeBuffer);
+                    return new MLFeature(nameBuffer, type, shapeBuffer);
+                });
+                return result.ToArray();
             }
         }
 
@@ -56,15 +71,12 @@ namespace NatSuite.ML.Internal {
         private readonly IntPtr model;
 
         IEnumerator<string> IEnumerable<string>.GetEnumerator () { // DEPLOY
-            var keys = IntPtr.Zero;
-            try {
-                model.MetadataKeys(out keys, out var keyCount);
-                for (var i = 0; i < keyCount; i++) {
-                    var key = Marshal.ReadIntPtr(keys, i * IntPtr.Size);
-                    yield return Marshal.PtrToStringAuto(key);
-                }
-            } finally {
-                Marshal.FreeHGlobal(keys);
+            var count = model.MetadataKeyCount();
+            var buffer = new StringBuilder(2048);
+            for (var i = 0; i < count; i++) {
+                model.MetadataKey(i, buffer);
+                yield return buffer.ToString();
+                buffer.Clear();
             }
         }
 
