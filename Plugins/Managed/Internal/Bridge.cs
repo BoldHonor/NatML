@@ -7,6 +7,7 @@ namespace NatSuite.ML.Internal {
 
     using System;
     using System.Runtime.InteropServices;
+    using System.Text;
 
     public static class Bridge {
 
@@ -24,6 +25,6 @@ namespace NatSuite.ML.Internal {
         [DllImport(Assembly, EntryPoint = @"NMLMetadataKeys")]
         public static extern void MetadataKeys (this IntPtr model, out IntPtr keys, out int keyCount);
         [DllImport(Assembly, EntryPoint = @"NMLMetadataValue")]
-        public static extern void MetadataValue (this IntPtr model, [MarshalAs(UnmanagedType.LPStr)] string key, out IntPtr value);
+        public static extern void MetadataValue (this IntPtr model, [MarshalAs(UnmanagedType.LPStr)] string key, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest);
     }
 }

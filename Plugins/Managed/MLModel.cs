@@ -5,11 +5,11 @@
 
 namespace NatSuite.ML {
 
-    using System;
     using System.IO;
     using System.Threading.Tasks;
     using UnityEngine;
     using UnityEngine.Networking;
+    using Internal;
 
     /// <summary>
     /// </summary>
@@ -19,16 +19,17 @@ namespace NatSuite.ML {
         /// <summary>
         /// </summary>
         /// <param name="modelPath">Model path.</param>
-        /// <returns></returns>
+        /// <returns>Created model.</returns>
         public static T Create<T> (string modelPath) where T : IMLModel {
-            return default;
+            var model = Bridge.CreateModel(modelPath);
+            return (T)(IMLModel)new NativeModel(model);
         }
 
         /// <summary>
         /// Get the path to a model in StreamingAssets.
         /// </summary>
         /// <param name="relativePath">Model path relative to streaming assets.</param>
-        /// <returns></returns>
+        /// <returns>Model path.</returns>
         public static async Task<string> GetModelPath (string relativePath) {
             var absolutePath = Path.Combine(Application.streamingAssetsPath, relativePath);
             var persistentPath = Path.Combine(Application.persistentDataPath, relativePath);

@@ -9,17 +9,17 @@ namespace NatSuite.ML.Internal {
     using System.Collections;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
+    using System.Text;
 
-    public sealed class NativeModel : IMLModel {
+    public sealed class NativeModel : IMLModel, IClassifierModel {
 
         #region --Client API--
 
         public string this [string key] { // DEPLOY
             get {
-                model.MetadataValue(key, out var value);
-                var result = Marshal.PtrToStringAuto(value);
-                Marshal.FreeHGlobal(value); // Make sure to use platform default allocator
-                return result;
+                var result = new StringBuilder(2048);
+                model.MetadataValue(key, result);
+                return result.ToString();
             }
         }
 
@@ -37,6 +37,16 @@ namespace NatSuite.ML.Internal {
             get {
                 return default;
             }
+        }
+
+        public void Classify<T> (T[] pixelBuffer, int width, int height) where T : struct {
+            var handle = GCHandle.Alloc(pixelBuffer, GCHandleType.Pinned);
+            Classify(handle.AddrOfPinnedObject(), width, height);
+            handle.Free();
+        }
+
+        public void Classify (IntPtr nativeBuffer, int width, int height) { // INCOMPLETE
+
         }
         #endregion
 
