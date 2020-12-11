@@ -3,14 +3,14 @@
 *   Copyright (c) 2020 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML {
+namespace NatSuite.ML.Feature {
 
     using System;
 
     /// <summary>
     /// ML dictionary feature.
     /// </summary>
-    public class MLDictionaryFeature : MLFeature {
+    public class MLDictionaryFeature : MLFeature { // INCOMPLETE
 
         #region --Client API--
         /// <summary>
