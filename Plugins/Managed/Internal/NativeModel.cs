@@ -28,27 +28,34 @@ namespace NatSuite.ML.Internal {
 
         public void Dispose () => model.DisposeModel(); // DEPLOY
 
-        public MLFeature[] inputs { // DEPLOY
-            get {
-                var nameBuffer = new StringBuilder(2048);
-                var shapeBuffer = new long[10]; // should be large enough for most things
-                var result = Enumerable.Range(0, model.InputFeatureCount()).Select(index => {
-                    nameBuffer.Clear();
-                    model.InputFeature(index, nameBuffer, out var type, shapeBuffer);
-                    return new MLFeature(nameBuffer, type, shapeBuffer);
-                });
-                return result.ToArray();
+        public MLFeature[] inputs => Enumerable.Range(0, model.InputFeatureCount()).Select(index => {
+            // Fetch
+            var nameBuffer = new StringBuilder(2048);
+            var shapeBuffer = new long[10]; // should be large enough for most things
+            model.InputFeature(index, nameBuffer, out var nativeType, out var dimensions, shapeBuffer);
+            // Parse
+            var name = nameBuffer.ToString();
+            var type = TypeForNativeType(nativeType);
+            var shape = shapeBuffer.Take(dimensions).Select(d => (int)d).ToArray();
+            // Check special types
+            switch (nativeType) {
+                case 0: return null as MLFeature; // undefined
+                case 7: return new MLSequenceFeature(name, type);
+                case 8: return new MLDictionaryFeature(name, type, null);
+                case var _ when shape.Length == 4: return new MLImageFeature(name, type, shape);
+                default: return new MLTensorFeature(name, type, shape);
             }
-        }
+        }).ToArray();
 
         public MLFeature[] outputs { // DEPLOY
             get {
-                var nameBuffer = new StringBuilder(2048);
-                var shapeBuffer = new long[10]; // should be large enough for most things
+                UnityEngine.Debug.Log("Output count: "+model.OutputFeatureCount());
                 var result = Enumerable.Range(0, model.OutputFeatureCount()).Select(index => {
-                    nameBuffer.Clear();
-                    model.OutputFeature(index, nameBuffer, out var type, shapeBuffer);
-                    return new MLFeature(nameBuffer, type, shapeBuffer);
+                    var nameBuffer = new StringBuilder(2048);
+                    var shapeBuffer = new long[10]; // should be large enough for most things
+                    model.OutputFeature(index, nameBuffer, out var type, out var dimensions, shapeBuffer);
+                    UnityEngine.Debug.Log("Got output feature at index: "+index);
+                    return default(MLFeature); //new MLFeature(nameBuffer.ToString(), TypeForNativeType(type), shapeBuffer);
                 });
                 return result.ToArray();
             }
@@ -72,6 +79,7 @@ namespace NatSuite.ML.Internal {
 
         IEnumerator<string> IEnumerable<string>.GetEnumerator () { // DEPLOY
             var count = model.MetadataKeyCount();
+            UnityEngine.Debug.Log($"Metadata key count: {count}");
             var buffer = new StringBuilder(2048);
             for (var i = 0; i < count; i++) {
                 model.MetadataKey(i, buffer);
@@ -81,6 +89,21 @@ namespace NatSuite.ML.Internal {
         }
 
         IEnumerator IEnumerable.GetEnumerator () => (this as IEnumerable<string>).GetEnumerator();
+
+        private static Type TypeForNativeType (int type) {
+            switch (type) {
+                case 0: goto case default;
+                case 1: return typeof(short);
+                case 2: return typeof(int);
+                case 3: return typeof(long);
+                case 4: return typeof(float);
+                case 5: return typeof(double);
+                case 6: return typeof(string);
+                case 7: return typeof(IList);
+                case 8: return typeof(IDictionary);
+                default: return null;
+            }
+        }
         #endregion
     }
 }
