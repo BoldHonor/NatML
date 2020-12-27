@@ -10,6 +10,8 @@ namespace NatSuite.ML {
     using UnityEngine;
     using UnityEngine.Networking;
 
+    /// <summary>
+    /// </summary>
     public static class MLUtility {
 
         #region --Client API--

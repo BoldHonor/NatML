@@ -18,11 +18,8 @@ namespace NatSuite.ML.Internal {
         @"NatML";
         #endif
 
-        [DllImport(Assembly, EntryPoint = @"NMLCreateModel")]
-        public static extern IntPtr CreateModel ([MarshalAs(UnmanagedType.LPStr)] string modelPath);
         [DllImport(Assembly, EntryPoint = @"NMLDisposeModel")]
         public static extern void DisposeModel (this IntPtr model);
-
         [DllImport(Assembly, EntryPoint = @"NMLMetadataKeyCount")]
         public static extern int MetadataKeyCount (this IntPtr model);
         [DllImport(Assembly, EntryPoint = @"NMLMetadataKey")]
@@ -38,5 +35,10 @@ namespace NatSuite.ML.Internal {
         public static extern void InputFeature (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest, out int type, out int dimensions, [In, Out] long[] shape);
         [DllImport(Assembly, EntryPoint = @"NMLOutputFeature")]
         public static extern void OutputFeature (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest, out int type, out int dimensions, [In, Out] long[] shape);
+
+        [DllImport(Assembly, EntryPoint = @"NMLCreateModel")]
+        public static extern IntPtr CreateModel ([MarshalAs(UnmanagedType.LPStr)] string modelPath);
+        [DllImport(Assembly, EntryPoint = @"NMLCreateVisionModel")]
+        public static extern IntPtr CreateVisionModel ([MarshalAs(UnmanagedType.LPStr)] string modelPath);
     }
 }
