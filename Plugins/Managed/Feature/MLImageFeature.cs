@@ -10,7 +10,7 @@ namespace NatSuite.ML.Feature {
     /// <summary>
     /// ML image feature.
     /// </summary>
-    public class MLImageFeature : MLFeature {
+    public sealed class MLImageFeature : MLTensorFeature {
 
         #region --Client API--
         /// <summary>
@@ -32,13 +32,9 @@ namespace NatSuite.ML.Feature {
 
         #region --Operations--
 
-        private readonly int[] shape;
-
-        internal MLImageFeature (string name, Type type, int[] shape) : base(name, type) => this.shape = shape;
+        internal MLImageFeature (string name, Type type, int[] shape) : base(name, type, shape) { }
 
         public override string ToString () => $"{name}: ({width}, {height}, {channels}) {type}";
-
-        public static implicit operator MLTensorFeature (MLImageFeature feature) => new MLTensorFeature(feature.name, feature.type, feature.shape);
         #endregion
     }
 }

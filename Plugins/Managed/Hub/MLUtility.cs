@@ -3,8 +3,9 @@
 *   Copyright (c) 2020 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML {
+namespace NatSuite.ML.Hub {
 
+    using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
     using UnityEngine;
@@ -32,7 +33,7 @@ namespace NatSuite.ML {
                     var request = UnityWebRequest.Get(absolutePath);
                     request.SendWebRequest();
                     while (!request.isDone)
-                        await Task.Delay(10);
+                        await Task.Yield();
                     // Copy to persistent storage
                     new FileInfo(persistentPath).Directory.Create();
                     File.WriteAllBytes(persistentPath, request.downloadHandler.data);
@@ -40,6 +41,13 @@ namespace NatSuite.ML {
                 default:
                     return absolutePath;
             }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="relativePath"></param>
+        public static async Task<IReadOnlyList<string>> GetModelLabels (string relativePath) { // INCOMPLETE
+            return default;
         }
         #endregion
     }

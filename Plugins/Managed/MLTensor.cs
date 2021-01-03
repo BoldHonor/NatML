@@ -5,36 +5,40 @@
 
 namespace NatSuite.ML {
 
+    using System;
+    using System.Runtime.InteropServices;
     using UnityEngine;
-    using Tensors;
+    using Unity.Collections.LowLevel.Unsafe;
+    using Tensor;
 
     /// <summary>
     /// </summary>
     public abstract class MLTensor {
 
-        #region --Client API--
-        
-        #endregion
-
         #region --Operations--
 
-        internal abstract void GetData (MLFeature specification);
+        internal abstract IntPtr LockBuffer (MLFeature specification);
 
-        public static implicit operator MLTensor (Texture2D texture) { // Create MLImageTensor
-            return default;
+        internal abstract void UnlockBuffer ();
+        #endregion
+
+
+        #region --Conversions--
+
+        public static unsafe implicit operator MLTensor (Texture2D texture) { // Create MLImageTensor
+            void* baseAddress = texture.GetRawTextureData<byte>().GetUnsafeReadOnlyPtr();
+            return new MLImageTensor(texture.width, texture.height, (IntPtr)baseAddress);
         }
 
         public static implicit operator MLTensor (WebCamTexture webCamTexture) { // Create MLImageTensor
             return default;
         }
 
-        public static implicit operator MLTensor (float[] array) { // Create MLArrayTensor
-            return default;
-        }
+        public static implicit operator MLTensor (float[] array) => default; // INCOMPLETE
 
-        public static implicit operator MLTensor (int[] array) { // Create MLArrayTensor
-            return default;
-        }
+        public static implicit operator MLTensor (int[] array) => default; // INCOMPLETE
+
+        public static implicit operator MLTensor (string value) => null; // INCOMPLETE
         #endregion
     }
 }

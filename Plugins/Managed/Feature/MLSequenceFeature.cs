@@ -10,9 +10,12 @@ namespace NatSuite.ML.Feature {
     /// <summary>
     /// ML sequence feature.
     /// </summary>
-    public class MLSequenceFeature : MLFeature { // INCOMPLETE
+    public sealed class MLSequenceFeature : MLFeature { // INCOMPLETE
 
         #region --Client API--
+        /// <summary>
+        /// Sequence element feature.
+        /// </summary>
         public readonly MLFeature value;
         #endregion
 

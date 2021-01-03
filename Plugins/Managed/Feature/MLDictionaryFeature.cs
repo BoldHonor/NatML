@@ -10,7 +10,7 @@ namespace NatSuite.ML.Feature {
     /// <summary>
     /// ML dictionary feature.
     /// </summary>
-    public class MLDictionaryFeature : MLFeature { // INCOMPLETE
+    public sealed class MLDictionaryFeature : MLFeature { // INCOMPLETE
 
         #region --Client API--
         /// <summary>

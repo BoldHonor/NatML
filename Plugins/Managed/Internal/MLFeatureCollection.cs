@@ -67,7 +67,7 @@ namespace NatSuite.ML.Internal {
                 model.OutputFeature(index, nameBuffer, out nativeType, out dimensions, shapeBuffer);
         }
 
-        private static Type TypeForNativeType (int type) {
+        internal static Type TypeForNativeType (int type) {
             switch (type) {
                 case 0: goto case default;
                 case 1: return typeof(short);
