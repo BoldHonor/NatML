@@ -1,12 +1,11 @@
 /* 
 *   NatML
-*   Copyright (c) 2020 Yusuf Olokoba.
+*   Copyright (c) 2021 Yusuf Olokoba.
 */
 
 namespace NatSuite.ML {
 
     using System;
-    using System.Runtime.InteropServices;
     using UnityEngine;
     using Unity.Collections.LowLevel.Unsafe;
     using Tensor;

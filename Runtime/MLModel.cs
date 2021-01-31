@@ -1,6 +1,6 @@
 ﻿/* 
 *   NatML
-*   Copyright (c) 2020 Yusuf Olokoba.
+*   Copyright (c) 2021 Yusuf Olokoba.
 */
 
 namespace NatSuite.ML {

@@ -1,6 +1,6 @@
 /* 
 *   NatML
-*   Copyright (c) 2020 Yusuf Olokoba.
+*   Copyright (c) 2021 Yusuf Olokoba.
 */
 
 namespace NatSuite.ML.Tensor {
@@ -9,7 +9,7 @@ namespace NatSuite.ML.Tensor {
 
     /// <summary>
     /// </summary>
-    public sealed class MLImageTensor : MLTensor { // RGBA8888 only. // CHECK // readonly struct?
+    public sealed class MLImageTensor : MLTensor { // RGBA8888 only.
 
         #region --Client API--
         /// <summary>

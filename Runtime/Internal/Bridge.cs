@@ -50,7 +50,6 @@ namespace NatSuite.ML.Internal {
         public static extern IntPtr Predict (this IntPtr model, IntPtr[] inputs, [Out] IntPtr[] outputs);
         #endregion
 
-
         #region --Tensor--
         [DllImport(Assembly, EntryPoint = @"NMLTensorFeature")]
         public static extern IntPtr TensorFeature (this IntPtr tensor, out int type, out int dimensions, [Out] long[] shape);
