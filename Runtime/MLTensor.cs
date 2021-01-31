@@ -9,35 +9,39 @@ namespace NatSuite.ML {
     using UnityEngine;
     using Unity.Collections.LowLevel.Unsafe;
     using Tensor;
+    using Internal;
 
     /// <summary>
     /// </summary>
     public abstract class MLTensor {
 
-        #region --Operations--
+        #region --Client API--
+        /// <summary>
+        /// Tensor type information.
+        /// </summary>
+        public readonly MLFeature type;
 
-        internal abstract IntPtr LockBuffer (MLFeature specification);
+        /// <summary>
+        /// Implicitly convert a Texture2D to a tensor.
+        /// </summary>
+        public static unsafe implicit operator MLTensor (Texture2D texture) => new MLTexture2DTensor(texture);
 
-        internal abstract void UnlockBuffer ();
+        /// <summary>
+        /// Implicitly convert a float array a tensor.
+        /// </summary>
+        public static implicit operator MLTensor (float[] array) => new MLArrayTensor<float>(array);
+
+        /// <summary>
+        /// Implicitly convert a integer array a tensor.
+        /// </summary>
+        public static implicit operator MLTensor (int[] array) => new MLArrayTensor<int>(array);
         #endregion
 
 
-        #region --Conversions--
 
-        public static unsafe implicit operator MLTensor (Texture2D texture) { // Create MLImageTensor
-            void* baseAddress = texture.GetRawTextureData<byte>().GetUnsafeReadOnlyPtr();
-            return new MLImageTensor(texture.width, texture.height, (IntPtr)baseAddress);
-        }
+        #region --Operations--
 
-        public static implicit operator MLTensor (WebCamTexture webCamTexture) { // Create MLImageTensor
-            return default;
-        }
-
-        public static implicit operator MLTensor (float[] array) => default; // INCOMPLETE
-
-        public static implicit operator MLTensor (int[] array) => default; // INCOMPLETE
-
-        public static implicit operator MLTensor (string value) => null; // INCOMPLETE
+        protected MLTensor (MLFeature type) => this.type = type;
         #endregion
     }
 }

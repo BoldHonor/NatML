@@ -13,17 +13,14 @@ namespace NatSuite.ML.Tensor {
 
         #region --Operations--
 
-        internal MLSequenceTensor () {
+        internal MLSequenceTensor () : base(null) {
 
         }
+        #endregion
 
-        internal override IntPtr LockBuffer (MLFeature specification) {
-            return IntPtr.Zero;
-        }
 
-        internal override void UnlockBuffer () {
+        #region --Lock--
 
-        }
         #endregion
     }
 }

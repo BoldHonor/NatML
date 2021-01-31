@@ -9,8 +9,11 @@ namespace NatSuite.ML {
     /// </summary>
     public enum MLImageAspect : int {
         /// <summary>
+        /// </summary>
+        ScaleToFit = 0,
+        /// <summary>
         /// Image will be aspect-filled to the input dimensions of the model.
         /// </summary>
-        AspectFill = 0,
+        AspectFill = 1 << 12,
     }
 }

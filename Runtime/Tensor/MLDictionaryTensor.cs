@@ -1,6 +1,6 @@
 /* 
 *   NatML
-*   Copyright (c) 2020 Yusuf Olokoba.
+*   Copyright (c) 2021 Yusuf Olokoba.
 */
 
 namespace NatSuite.ML.Tensor {
@@ -11,17 +11,9 @@ namespace NatSuite.ML.Tensor {
     /// </summary>
     public sealed class MLDictionaryTensor : MLTensor {
 
-        #region --Operations--
+        #region --Client API--
 
-        internal MLDictionaryTensor () {
-
-        }
-
-        internal override IntPtr LockBuffer (MLFeature specification) {
-            return IntPtr.Zero;
-        }
-
-        internal override void UnlockBuffer () {
+        internal MLDictionaryTensor () : base(null) {
 
         }
         #endregion

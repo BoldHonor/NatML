@@ -53,10 +53,22 @@ namespace NatSuite.ML {
         /// <summary>
         /// </summary>
         /// <param name="inputs"></param>
-        public MLTensor[] Predict (params MLTensor[] inputs) {
+        public unsafe MLTensor[] Predict (params MLTensor[] inputs) {
             // Check input count
             if (inputs.Length != this.inputs.Count)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
+            // Check prediction input
+            foreach (var input in inputs)
+                if (!(input is IMLInputTensor))
+                    throw new ArgumentException($"Feature '{input.type.name}' ccannot be used as prediction input");
+            // Run inference
+            var inputSpecs = inputs.Select(input => (input as IMLInputTensor).Lock()).ToArray();
+            var outputSpecs = new MLTensorSpecification[this.outputs.Count];
+            model.Predict(inputSpecs, outputSpecs);
+            Array.ForEach(inputs, input => (input as IMLInputTensor).Unlock());
+            // Create output tensors
+
+            /*
             // Run inference
             var rawInputs = inputs.Zip(this.inputs, (input, feature) => input.LockBuffer(feature)).ToArray();
             var rawOutputs = new IntPtr[this.outputs.Count];
@@ -79,6 +91,8 @@ namespace NatSuite.ML {
                 result.Add(tensor);
             }
             return result.ToArray();
+            */
+            return default;
         }
 
         /// <summary>

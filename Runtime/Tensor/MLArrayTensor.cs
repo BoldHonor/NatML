@@ -6,36 +6,53 @@
 namespace NatSuite.ML.Tensor {
 
     using System;
+    using System.Runtime.InteropServices;
+    using Feature;
+    using Internal;
 
     /// <summary>
     /// </summary>
-    public abstract class MLArrayTensor : MLTensor {
+    public class MLArrayTensor<T> : MLTensor, IMLInputTensor where T : unmanaged {
 
         #region --Client API--
         /// <summary>
-        /// Feature type.
-        /// This will typically be a numeric type.
+        /// Create an array tensor.
         /// </summary>
-        public readonly Type type;
-
-        /// <summary>
-        /// Tensor shape.
-        /// </summary>
-        public readonly int[] shape;
+        public MLArrayTensor (T[] array) : base(new MLTensorFeature(null, typeof(T), new [] { 1, array.Length })) => this.array = array;
 
         /// <summary>
         /// Copy tensor data to an array.
         /// </summary>
         /// <param name="destination">Destination array.</param>
-        public abstract void CopyTo<T> (T[] destination) where T : unmanaged;
+        public void CopyTo (T[] destination) {
+
+        }
         #endregion
 
 
         #region --Operations--
 
-        internal MLArrayTensor (Type type, int[] shape) {
-            this.type = type;
-            this.shape = shape;
+        private readonly T[] array;
+        private GCHandle dataHandle;
+        private GCHandle shapeHandle;
+
+        unsafe MLTensorSpecification IMLInputTensor.Lock () {
+            var shape = (type as MLTensorFeature).shape;
+            dataHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+            shapeHandle = GCHandle.Alloc(shape, GCHandleType.Pinned);
+            return new MLTensorSpecification(
+                (void*)dataHandle.AddrOfPinnedObject(),
+                (int*)shapeHandle.AddrOfPinnedObject(),
+                shape.Length,
+                typeof(T).NativeType()
+            );
+        }
+
+        void IMLInputTensor.Unlock() {
+            dataHandle.Free();
+            shapeHandle.Free();
+            dataHandle =
+            shapeHandle = default;
         }
         #endregion
     }
