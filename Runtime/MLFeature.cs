@@ -1,37 +1,44 @@
 /* 
 *   NatML
-*   Copyright (c) 2020 Yusuf Olokoba.
+*   Copyright (c) 2021 Yusuf Olokoba.
 */
 
 namespace NatSuite.ML {
 
-    using System;
+    using UnityEngine;
+    using Feature;
 
     /// <summary>
-    /// ML input or output feature.
     /// </summary>
     public abstract class MLFeature {
 
         #region --Client API--
         /// <summary>
-        /// Feature name.
+        /// Tensor type information.
         /// </summary>
-        public readonly string name;
+        public readonly MLFeatureType type;
 
         /// <summary>
-        /// Feature type.
-        /// This will typically be a numeric type.
+        /// Implicitly convert a Texture2D to a tensor.
         /// </summary>
-        public readonly Type type;
+        public static unsafe implicit operator MLFeature (Texture2D texture) => new MLTexture2DFeature(texture);
+
+        /// <summary>
+        /// Implicitly convert a float array a tensor.
+        /// </summary>
+        public static implicit operator MLFeature (float[] array) => new MLArrayFeature<float>(array);
+
+        /// <summary>
+        /// Implicitly convert a integer array a tensor.
+        /// </summary>
+        public static implicit operator MLFeature (int[] array) => new MLArrayFeature<int>(array);
         #endregion
+
 
 
         #region --Operations--
 
-        protected internal MLFeature (string name, Type type) {
-            this.name = name;
-            this.type = type;
-        }
+        protected MLFeature (MLFeatureType type) => this.type = type;
         #endregion
     }
 }

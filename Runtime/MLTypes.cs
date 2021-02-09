@@ -1,11 +1,12 @@
 /* 
 *   NatML
-*   Copyright (c) 2020 Yusuf Olokoba.
+*   Copyright (c) 2021 Yusuf Olokoba.
 */
 
 namespace NatSuite.ML {
 
     /// <summary>
+    /// Image aspect mode for performing inference on images.
     /// </summary>
     public enum MLImageAspect : int {
         /// <summary>

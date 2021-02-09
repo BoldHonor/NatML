@@ -1,6 +1,6 @@
 /* 
 *   NatML
-*   Copyright (c) 2020 Yusuf Olokoba.
+*   Copyright (c) 2021 Yusuf Olokoba.
 */
 
 namespace NatSuite.ML.Feature {
@@ -8,26 +8,14 @@ namespace NatSuite.ML.Feature {
     using System;
 
     /// <summary>
-    /// ML dictionary feature.
     /// </summary>
-    public sealed class MLDictionaryFeature : MLFeature { // INCOMPLETE
+    public sealed class MLDictionaryFeature : MLFeature {
 
         #region --Client API--
-        /// <summary>
-        /// Feature key type.
-        /// </summary>
-        public Type key => type;
 
-        /// <summary>
-        /// Feature value.
-        /// </summary>
-        public readonly MLFeature value;
-        #endregion
+        internal MLDictionaryFeature () : base(null) {
 
-
-        #region --Operations--
-
-        internal MLDictionaryFeature (string name, Type type, MLFeature value) : base(name, type) => this.value = value;
+        }
         #endregion
     }
 }

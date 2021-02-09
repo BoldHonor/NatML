@@ -11,22 +11,21 @@ namespace NatSuite.ML {
     using System.Linq;
     using System.Text;
     using Internal;
-    using Tensor;
 
     /// <summary>
     /// </summary>
-    public class MLModel : IDisposable, IEnumerable<string> {
+    public class MLModel : IDisposable, IEnumerable<string> { // CHECK // IReadonlyDictionary?
 
         #region --Client API--
         /// <summary>
         /// Model inputs.
         /// </summary>
-        public readonly IReadOnlyList<MLFeature> inputs;
+        public readonly IReadOnlyList<MLFeatureType> inputs;
 
         /// <summary>
         /// Model outputs.
         /// </summary>
-        public readonly IReadOnlyList<MLFeature> outputs;
+        public readonly IReadOnlyList<MLFeatureType> outputs;
 
         /// <summary>
         /// Get a value in the model's metadata dictionary.
@@ -53,19 +52,19 @@ namespace NatSuite.ML {
         /// <summary>
         /// </summary>
         /// <param name="inputs"></param>
-        public unsafe MLTensor[] Predict (params MLTensor[] inputs) {
+        public unsafe MLFeature[] Predict (params MLFeature[] inputs) {
             // Check input count
             if (inputs.Length != this.inputs.Count)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
             // Check prediction input
             foreach (var input in inputs)
-                if (!(input is IMLInputTensor))
+                if (!(input is IMLInputFeature))
                     throw new ArgumentException($"Feature '{input.type.name}' ccannot be used as prediction input");
             // Run inference
-            var inputSpecs = inputs.Select(input => (input as IMLInputTensor).Lock()).ToArray();
-            var outputSpecs = new MLTensorSpecification[this.outputs.Count];
+            var inputSpecs = inputs.Select(input => (input as IMLInputFeature).Lock()).ToArray();
+            var outputSpecs = new NMLTensorSpecification[this.outputs.Count];
             model.Predict(inputSpecs, outputSpecs);
-            Array.ForEach(inputs, input => (input as IMLInputTensor).Unlock());
+            Array.ForEach(inputs, input => (input as IMLInputFeature).Unlock());
             // Create output tensors
 
             /*

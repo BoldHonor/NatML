@@ -1,6 +1,6 @@
 /* 
 *   NatML
-*   Copyright (c) 2020 Yusuf Olokoba.
+*   Copyright (c) 2021 Yusuf Olokoba.
 */
 
 namespace NatSuite.ML.Vision {
@@ -20,7 +20,7 @@ namespace NatSuite.ML.Vision {
 
         /// <summary>
         /// </summary>
-        public (string label, float confidence) Classify (MLTensor input) {
+        public (string label, float confidence) Classify (MLFeature input) {
             return default;
         }
         #endregion
