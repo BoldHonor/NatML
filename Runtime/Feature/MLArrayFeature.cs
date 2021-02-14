@@ -5,7 +5,6 @@
 
 namespace NatSuite.ML.Feature {
 
-    using System;
     using System.Runtime.InteropServices;
     using Internal;
     using Types;

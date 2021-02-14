@@ -46,7 +46,7 @@ namespace NatSuite.ML.Hub {
         /// <summary>
         /// </summary>
         /// <param name="relativePath"></param>
-        public static async Task<IReadOnlyList<string>> GetModelLabels (string relativePath) { // INCOMPLETE
+        public static Task<IReadOnlyList<string>> GetModelLabels (string relativePath) { // INCOMPLETE
             return default;
         }
         #endregion

@@ -54,7 +54,7 @@ namespace NatSuite.ML {
         /// <param name="inputs"></param>
         public unsafe MLFeature[] Predict (params MLFeature[] inputs) {
             // Check input count
-            if (inputs.Length != this.inputs.Count)
+            if (false && inputs.Length != this.inputs.Count) // INCOMPLETE // Disabled
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
             // Check prediction input
             foreach (var input in inputs)

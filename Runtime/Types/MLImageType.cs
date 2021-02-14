@@ -33,8 +33,6 @@ namespace NatSuite.ML.Feature.Types {
         #region --Operations--
 
         internal MLImageType (string name, Type type, int[] shape) : base(name, type, shape) { }
-
-        public override string ToString () => $"{name}: ({width}, {height}, {channels}) {type}";
         #endregion
     }
 }

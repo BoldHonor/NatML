@@ -10,7 +10,6 @@ namespace NatSuite.ML.Internal {
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using Feature;
     using Feature.Types;
 
     internal class MLFeatureCollection : IReadOnlyList<MLFeatureType> {
