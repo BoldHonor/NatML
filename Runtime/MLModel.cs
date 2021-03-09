@@ -52,57 +52,30 @@ namespace NatSuite.ML {
         /// <summary>
         /// </summary>
         /// <param name="inputs"></param>
-        public unsafe MLFeature[] Predict (params MLFeature[] inputs) {
+        public unsafe MLFeature[] Predict (params MLFeature[] inputs) { // DEPLOY
             // Check input count
             if (inputs.Length != this.inputs.Count)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
             // Create native input features
-
+            var inputBlitters = inputs.Cast<IBlittableFeature>().Select(i => i.CreateBlitter()).ToArray();
+            var inputFeatures = inputBlitters.Select(i => i.feature).ToArray();
+            var outputFeatures = new NMLFeature[this.outputs.Count];
             // Run inference
-
-            // Create managed output features
-
-            
-            // Run inference
-            /*
-            var inputSpecs = inputs.Select(input => (input as IMLInputFeature).Lock()).ToArray();
-            var outputSpecs = new NMLTensorSpecification[this.outputs.Count];
-            model.Predict(inputSpecs, outputSpecs);
-            Array.ForEach(inputs, input => (input as IMLInputFeature).Unlock());
-            */
-            // Create output tensors
-
-            /*
-            // Run inference
-            var rawInputs = inputs.Zip(this.inputs, (input, feature) => input.LockBuffer(feature)).ToArray();
-            var rawOutputs = new IntPtr[this.outputs.Count];
-            model.Predict(rawInputs, rawOutputs);
-            foreach (var input in inputs)
-                input.UnlockBuffer();
-            // Create output tensors
-            var result = new List<MLTensor>();
-            foreach (var rawOutput in rawOutputs) {
-                MLTensor tensor;
-                var shape = new long[10]; // should be big enough for most things
-                rawOutput.TensorFeature(out var nativeType, out int dims, shape);
-                var type = MLFeatureCollection.TypeForNativeType(nativeType);
-                if (type == typeof(IList))
-                    tensor = new MLSequenceTensor();
-                else if (type == typeof(IDictionary))
-                    tensor = new MLDictionaryTensor();
-                else
-                    tensor = new MLNativeArrayTensor(rawOutput, type, shape.Cast<int>().ToArray());
-                result.Add(tensor);
-            }
-            return result.ToArray();
-            */
-            return default;
+            model.Predict(inputFeatures, outputFeatures);
+            var outputs = outputFeatures.Select(o => o.ManagedFeature()).ToArray();
+            // Cleanup
+            foreach (var blitter in inputBlitters)
+                blitter.Dispose();
+            foreach (var feature in outputFeatures)
+                ((IntPtr)(&feature)).DisposeFeature();
+            // Return
+            return outputs;
         }
 
         /// <summary>
         /// Dispose the model and release resources.
         /// </summary>
-        public void Dispose () => model.DisposeModel(); // DEPLOY
+        public void Dispose () => model.DisposeModel();
         #endregion
 
 
@@ -115,7 +88,7 @@ namespace NatSuite.ML {
                 yield return new KeyValuePair<string, string>(key, this[key]);
         }
 
-        IEnumerable<string> IReadOnlyDictionary<string, string>.Keys {
+        IEnumerable<string> IReadOnlyDictionary<string, string>.Keys { // DEPLOY
             get {
                 var count = model.MetadataKeyCount();
                 var buffer = new StringBuilder(2048);
@@ -139,13 +112,9 @@ namespace NatSuite.ML {
         bool IReadOnlyDictionary<string, string>.ContainsKey (string key) => (this as IReadOnlyDictionary<string, string>).Keys.Contains(key);
 
         bool IReadOnlyDictionary<string, string>.TryGetValue (string key, out string value) {
-            if ((this as IReadOnlyDictionary<string, string>).Keys.Contains(key)) {
-                value = this[key];
-                return true;
-            } else {
-                value = null;
-                return false;
-            }
+            var validKey = (this as IReadOnlyDictionary<string, string>).Keys.Contains(key);
+            value = validKey ? this[key] : default;
+            return validKey;
         }
 
         IEnumerator IEnumerable.GetEnumerator () => (this as IEnumerable<KeyValuePair<string, string>>).GetEnumerator();

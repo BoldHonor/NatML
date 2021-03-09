@@ -25,13 +25,4 @@ namespace NatSuite.ML.Internal {
     public enum NMLFeatureFlag : int { // CHECK // Must match `NatML.h`
         PixelBuffer = 1 << 0
     }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NMLFeature { // Loosely based on DLPack::DLTensor
-        public void* data;
-        public int* shape;
-        public int dimensions;
-        public NMLFeatureType type;
-        public NMLFeatureFlag flags;
-    }
 }

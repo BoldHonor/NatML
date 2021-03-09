@@ -24,6 +24,8 @@ namespace NatSuite.ML.Internal {
         public static extern IntPtr CreateModel ([MarshalAs(UnmanagedType.LPStr)] string modelPath);
         [DllImport(Assembly, EntryPoint = @"NMLDisposeModel")]
         public static extern void DisposeModel (this IntPtr model);
+        [DllImport(Assembly, EntryPoint = @"NMLDisposeFeature")]
+        public static extern void DisposeFeature (this IntPtr feature);
         #endregion
 
 
@@ -51,15 +53,7 @@ namespace NatSuite.ML.Internal {
 
         #region --Inference--
         [DllImport(Assembly, EntryPoint = @"NMLPredict")]
-        public static extern IntPtr Predict (this IntPtr model, NMLFeature[] inputs, [Out] NMLFeature[] outputs);
-        #endregion
-
-
-        #region --Tensor--
-        [DllImport(Assembly, EntryPoint = @"NMLTensorFeature")]
-        public static extern IntPtr TensorFeature (this IntPtr tensor, out int type, out int dimensions, [Out] long[] shape);
-        [DllImport(Assembly, EntryPoint = @"NMLTensorCopy")]
-        public static extern IntPtr TensorCopy (this IntPtr tensor, IntPtr destination);
+        public static extern IntPtr Predict (this IntPtr model, [In] NMLFeature[] inputs, [Out] NMLFeature[] outputs);
         #endregion
     }
 }

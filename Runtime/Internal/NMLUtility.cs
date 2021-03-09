@@ -39,5 +39,9 @@ namespace NatSuite.ML.Internal {
                 default: return null;
             }
         }
+
+        public static MLFeature ManagedFeature (this NMLFeature feature) { // INCOMPLETE
+            return null;
+        }
     }
 }
