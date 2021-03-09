@@ -10,7 +10,7 @@ namespace NatSuite.ML.Internal {
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using Feature.Types;
+    using Features.Types;
 
     internal abstract class MLFeatureMap : IReadOnlyList<MLFeatureType> {
         
@@ -31,7 +31,7 @@ namespace NatSuite.ML.Internal {
                     case NMLFeatureType.Sequence: return new MLSequenceType(name, type);
                     case NMLFeatureType.Dictionary: return new MLDictionaryType(name, type, null);
                     case var _ when shape.Length == 4: return new MLImageType(name, type, shape); // safe assumption
-                    default: return new MLTensorType(name, type, shape);
+                    default: return new MLArrayType(name, type, shape);
                 }
             }
         }

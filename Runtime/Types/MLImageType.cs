@@ -3,14 +3,14 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML.Feature.Types {
+namespace NatSuite.ML.Features.Types {
 
     using System;
 
     /// <summary>
     /// Image feature type.
     /// </summary>
-    public sealed class MLImageType : MLTensorType {
+    public sealed class MLImageType : MLArrayType {
 
         #region --Client API--
         /// <summary>

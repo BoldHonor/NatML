@@ -3,7 +3,7 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML.Feature {
+namespace NatSuite.ML.Features {
 
     using System;
 

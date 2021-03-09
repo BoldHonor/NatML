@@ -3,7 +3,7 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML.Feature {
+namespace NatSuite.ML.Features {
 
     using Types;
     using Internal;
@@ -15,32 +15,35 @@ namespace NatSuite.ML.Feature {
 
         #region --Client API--
         /// <summary>
-        /// Create an array tensor.
         /// </summary>
-        /// <param name="array"></param>
-        public MLArrayFeature (T[] array) : base(new MLTensorType(null, typeof(T), new [] { 1, array.Length })) => this.array = array;
+        public readonly T[] array;
 
         /// <summary>
         /// Create an array tensor.
         /// </summary>
         /// <param name="array"></param>
-        public MLArrayFeature (T[] array, int[] shape) : base(new MLTensorType(null, typeof(T), shape)) => this.array = array;
+        public MLArrayFeature (T[] array) : base(new MLArrayType(null, typeof(T), new [] { 1, array.Length })) => this.array = array;
+
+        /// <summary>
+        /// Create an array tensor.
+        /// </summary>
+        /// <param name="array"></param>
+        public MLArrayFeature (T[] array, int[] shape) : base(new MLArrayType(null, typeof(T), shape)) => this.array = array;
         
         /// <summary>
         /// Create an array tensor.
         /// </summary>
         /// <param name="nativeBuffer"></param>
-        public MLArrayFeature (void* nativeBuffer, int[] shape) : base(new MLTensorType(null, typeof(T), shape)) => this.nativeBuffer = nativeBuffer;
+        public MLArrayFeature (void* nativeBuffer, int[] shape) : base(new MLArrayType(null, typeof(T), shape)) => this.nativeBuffer = nativeBuffer;
         #endregion
 
 
         #region --Operations--
 
-        private readonly T[] array;
         private readonly void* nativeBuffer;
 
         IFeatureBlitter IBlittableFeature.CreateBlitter () {
-            var shape = (type as MLTensorType).shape;
+            var shape = (type as MLArrayType).shape;
             if (array != null)
                 return new ArrayBlitter<T>(array, shape);
             if (nativeBuffer != null)

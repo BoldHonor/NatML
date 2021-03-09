@@ -3,14 +3,14 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML.Feature.Types {
+namespace NatSuite.ML.Features.Types {
 
     using System;
 
     /// <summary>
-    /// Tensor feature type.
+    /// Array feature type.
     /// </summary>
-    public class MLTensorType : MLFeatureType {
+    public class MLArrayType : MLFeatureType {
 
         #region --Client API--
         /// <summary>
@@ -27,7 +27,7 @@ namespace NatSuite.ML.Feature.Types {
 
         #region --Operations--
 
-        public MLTensorType (string name, Type type, int[] shape) : base(name, type) => this.shape = shape;
+        public MLArrayType (string name, Type type, int[] shape) : base(name, type) => this.shape = shape;
 
         public override string ToString () => $"{name}: ({string.Join(", ", shape)}) {dataType}";
         #endregion

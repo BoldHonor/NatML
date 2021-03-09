@@ -6,7 +6,7 @@
 namespace NatSuite.ML {
 
     using UnityEngine;
-    using Feature;
+    using Features;
 
     /// <summary>
     /// </summary>

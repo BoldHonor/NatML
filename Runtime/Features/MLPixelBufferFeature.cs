@@ -3,7 +3,7 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML.Feature {
+namespace NatSuite.ML.Features {
 
     using System;
     using UnityEngine;
@@ -63,14 +63,14 @@ namespace NatSuite.ML.Feature {
 
 
         #region --Operations--
-        public readonly byte[] pixelBuffer;
-        public readonly Color32[] colorBuffer;
+        private readonly byte[] pixelBuffer;
+        private readonly Color32[] colorBuffer;
         private readonly void* nativeBuffer;
-        private readonly MLImageAspect aspect;
+        public readonly MLImageAspect aspect;
 
         IFeatureBlitter IBlittableFeature.CreateBlitter () {
-            var shape = (type as MLTensorType).shape;
-            var dataType = (type as MLTensorType).dataType;
+            var shape = (type as MLArrayType).shape;
+            var dataType = (type as MLArrayType).dataType;
             var flags = NMLFeatureFlag.PixelBuffer | (NMLFeatureFlag)aspect;
             if (pixelBuffer != null)
                 return new ArrayBlitter<byte>(pixelBuffer, shape, flags);
