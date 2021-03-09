@@ -10,13 +10,13 @@ namespace NatSuite.ML.Feature.Types {
     /// <summary>
     /// Dictionary feature type.
     /// </summary>
-    public sealed class MLDictionaryType : MLFeatureType { // INCOMPLETE
+    public sealed class MLDictionaryType : MLFeatureType {
 
         #region --Client API--
         /// <summary>
         /// Feature key type.
         /// </summary>
-        public Type key => type;
+        public Type key => dataType;
 
         /// <summary>
         /// Feature value.
@@ -27,7 +27,7 @@ namespace NatSuite.ML.Feature.Types {
 
         #region --Operations--
 
-        internal MLDictionaryType (string name, Type type, MLFeatureType value) : base(name, type) => this.value = value;
+        public MLDictionaryType (string name, Type type, MLFeatureType value) : base(name, type) => this.value = value;
         #endregion
     }
 }

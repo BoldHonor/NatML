@@ -14,7 +14,7 @@ namespace NatSuite.ML {
 
     /// <summary>
     /// </summary>
-    public class MLModel : IDisposable, IEnumerable<string> { // CHECK // IReadonlyDictionary?
+    public class MLModel : IDisposable, IReadOnlyDictionary<string, string> {
 
         #region --Client API--
         /// <summary>
@@ -45,8 +45,8 @@ namespace NatSuite.ML {
         /// <param name="modelPath">Path to ONNX model.</param>
         public MLModel (string modelPath) {
             this.model = Bridge.CreateModel(modelPath);
-            this.inputs = new MLFeatureCollection(model, true);
-            this.outputs = new MLFeatureCollection(model, false);
+            this.inputs = new MLInputFeatureMap(model);
+            this.outputs = new MLOutputFeatureMap(model);
         }
 
         /// <summary>
@@ -54,17 +54,22 @@ namespace NatSuite.ML {
         /// <param name="inputs"></param>
         public unsafe MLFeature[] Predict (params MLFeature[] inputs) {
             // Check input count
-            if (false && inputs.Length != this.inputs.Count) // INCOMPLETE // Disabled
+            if (inputs.Length != this.inputs.Count)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
-            // Check prediction input
-            foreach (var input in inputs)
-                if (!(input is IMLInputFeature))
-                    throw new ArgumentException($"Feature '{input.type.name}' ccannot be used as prediction input");
+            // Create native input features
+
             // Run inference
+
+            // Create managed output features
+
+            
+            // Run inference
+            /*
             var inputSpecs = inputs.Select(input => (input as IMLInputFeature).Lock()).ToArray();
             var outputSpecs = new NMLTensorSpecification[this.outputs.Count];
             model.Predict(inputSpecs, outputSpecs);
             Array.ForEach(inputs, input => (input as IMLInputFeature).Unlock());
+            */
             // Create output tensors
 
             /*
@@ -105,17 +110,45 @@ namespace NatSuite.ML {
 
         private readonly IntPtr model;
 
-        IEnumerator<string> IEnumerable<string>.GetEnumerator () { // DEPLOY
-            var count = model.MetadataKeyCount();
-            var buffer = new StringBuilder(2048);
-            for (var i = 0; i < count; i++) {
-                model.MetadataKey(i, buffer);
-                yield return buffer.ToString();
-                buffer.Clear();
+        IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator () { // DEPLOY
+            foreach (var key in (this as IReadOnlyDictionary<string, string>).Keys)
+                yield return new KeyValuePair<string, string>(key, this[key]);
+        }
+
+        IEnumerable<string> IReadOnlyDictionary<string, string>.Keys {
+            get {
+                var count = model.MetadataKeyCount();
+                var buffer = new StringBuilder(2048);
+                for (var i = 0; i < count; i++) {
+                    buffer.Clear();
+                    model.MetadataKey(i, buffer);
+                    yield return buffer.ToString();
+                }
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator () => (this as IEnumerable<string>).GetEnumerator();
+        IEnumerable<string> IReadOnlyDictionary<string, string>.Values {
+            get {
+                foreach (var key in (this as IReadOnlyDictionary<string, string>).Keys)
+                    yield return this[key];
+            }
+        }
+
+        int IReadOnlyCollection<KeyValuePair<string, string>>.Count => model.MetadataKeyCount();
+
+        bool IReadOnlyDictionary<string, string>.ContainsKey (string key) => (this as IReadOnlyDictionary<string, string>).Keys.Contains(key);
+
+        bool IReadOnlyDictionary<string, string>.TryGetValue (string key, out string value) {
+            if ((this as IReadOnlyDictionary<string, string>).Keys.Contains(key)) {
+                value = this[key];
+                return true;
+            } else {
+                value = null;
+                return false;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator () => (this as IEnumerable<KeyValuePair<string, string>>).GetEnumerator();
         #endregion
     }
 }

@@ -8,7 +8,7 @@ namespace NatSuite.ML {
     using System;
 
     /// <summary>
-    /// ML input or output feature.
+    /// ML feature type.
     /// </summary>
     public abstract class MLFeatureType {
 
@@ -22,16 +22,13 @@ namespace NatSuite.ML {
         /// Feature data type.
         /// This will typically be a numeric type.
         /// </summary>
-        public readonly Type type;
+        public readonly Type dataType;
         #endregion
 
 
         #region --Operations--
 
-        protected internal MLFeatureType (string name, Type type) {
-            this.name = name;
-            this.type = type;
-        }
+        protected MLFeatureType (string name, Type type) => (this.name, this.dataType) = (name, type);
         #endregion
     }
 }

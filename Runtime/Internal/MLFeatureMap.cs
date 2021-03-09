@@ -12,7 +12,7 @@ namespace NatSuite.ML.Internal {
     using System.Text;
     using Feature.Types;
 
-    internal class MLFeatureCollection : IReadOnlyList<MLFeatureType> {
+    internal abstract class MLFeatureMap : IReadOnlyList<MLFeatureType> {
         
         #region --Client API--
         MLFeatureType IReadOnlyList<MLFeatureType>.this[int index] { // INCOMPLETE // Nested types
@@ -36,11 +36,11 @@ namespace NatSuite.ML.Internal {
             }
         }
 
-        int IReadOnlyCollection<MLFeatureType>.Count => count;
+        int IReadOnlyCollection<MLFeatureType>.Count => size;
 
         IEnumerator<MLFeatureType> IEnumerable<MLFeatureType>.GetEnumerator () {
             var indexer = this as IReadOnlyList<MLFeatureType>;
-            for (var i = 0; i < count; ++i)
+            for (var i = 0; i < size; ++i)
                 yield return indexer[i];
         }
 
@@ -50,22 +50,33 @@ namespace NatSuite.ML.Internal {
 
         #region --Operations--
 
-        private readonly IntPtr model;
-        private readonly int count;
-        private readonly bool input;
+        protected readonly int size;
 
-        internal MLFeatureCollection (IntPtr model, bool input) {
-            this.model = model;
-            this.count = input ? model.InputFeatureCount() : model.OutputFeatureCount();
-            this.input = input;
-        }
+        protected MLFeatureMap (int size) => this.size = size;
 
-        private void Feature (int index, StringBuilder nameBuffer, out NMLFeatureType nativeType, out int dimensions, long[] shapeBuffer) {
-            if (input)
-                model.InputFeature(index, nameBuffer, out nativeType, out dimensions, shapeBuffer);
-            else
-                model.OutputFeature(index, nameBuffer, out nativeType, out dimensions, shapeBuffer);
-        }
+        protected abstract void Feature (int index, StringBuilder nameBuffer, out NMLFeatureType nativeType, out int dimensions, long[] shapeBuffer);
         #endregion
+    }
+
+    internal sealed class MLInputFeatureMap : MLFeatureMap {
+
+        private readonly IntPtr model;
+
+        internal MLInputFeatureMap (IntPtr model) : base(model.InputFeatureCount()) => this.model = model;
+
+        protected override void Feature (int index, StringBuilder nameBuffer, out NMLFeatureType nativeType, out int dimensions, long[] shapeBuffer) {
+            model.InputFeature(index, nameBuffer, out nativeType, out dimensions, shapeBuffer);
+        }
+    }
+
+    internal sealed class MLOutputFeatureMap : MLFeatureMap {
+
+        private readonly IntPtr model;
+
+        internal MLOutputFeatureMap (IntPtr model) : base(model.OutputFeatureCount()) => this.model = model;
+
+        protected override void Feature (int index, StringBuilder nameBuffer, out NMLFeatureType nativeType, out int dimensions, long[] shapeBuffer) {
+            model.OutputFeature(index, nameBuffer, out nativeType, out dimensions, shapeBuffer);
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace NatSuite.ML.Feature {
 
     /// <summary>
     /// </summary>
-    public sealed class MLSequenceFeature : MLFeature {
+    public sealed class MLSequenceFeature : MLFeature { // INCOMPLETE
 
         #region --Operations--
 

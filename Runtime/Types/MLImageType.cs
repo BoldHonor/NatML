@@ -32,7 +32,7 @@ namespace NatSuite.ML.Feature.Types {
 
         #region --Operations--
 
-        internal MLImageType (string name, Type type, int[] shape) : base(name, type, shape) { }
+        public MLImageType (string name, Type type, int[] shape) : base(name, type, shape) { }
         #endregion
     }
 }

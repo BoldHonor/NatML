@@ -9,7 +9,7 @@ namespace NatSuite.ML.Internal {
     using System.Runtime.InteropServices;
     using System.Text;
 
-    public static partial class Bridge {
+    public static class Bridge {
 
         private const string Assembly =
         #if UNITY_IOS && !UNITY_EDITOR
@@ -18,12 +18,14 @@ namespace NatSuite.ML.Internal {
         @"NatML";
         #endif
 
+
         #region --Lifecycle--
         [DllImport(Assembly, EntryPoint = @"NMLCreateModel")]
         public static extern IntPtr CreateModel ([MarshalAs(UnmanagedType.LPStr)] string modelPath);
         [DllImport(Assembly, EntryPoint = @"NMLDisposeModel")]
         public static extern void DisposeModel (this IntPtr model);
         #endregion
+
 
         #region --Metadata--
         [DllImport(Assembly, EntryPoint = @"NMLMetadataKeyCount")]
@@ -33,6 +35,7 @@ namespace NatSuite.ML.Internal {
         [DllImport(Assembly, EntryPoint = @"NMLMetadataValue")]
         public static extern void MetadataValue (this IntPtr model, [MarshalAs(UnmanagedType.LPStr)] string key, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest);
         #endregion
+
 
         #region --Introspection--
         [DllImport(Assembly, EntryPoint = @"NMLInputFeatureCount")]
@@ -45,10 +48,12 @@ namespace NatSuite.ML.Internal {
         public static extern void OutputFeature (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest, out NMLFeatureType type, out int dimensions, [Out] long[] shape);
         #endregion
 
+
         #region --Inference--
         [DllImport(Assembly, EntryPoint = @"NMLPredict")]
-        public static extern IntPtr Predict (this IntPtr model, NMLTensorSpecification[] inputs, [Out] NMLTensorSpecification[] outputs);
+        public static extern IntPtr Predict (this IntPtr model, NMLFeature[] inputs, [Out] NMLFeature[] outputs);
         #endregion
+
 
         #region --Tensor--
         [DllImport(Assembly, EntryPoint = @"NMLTensorFeature")]

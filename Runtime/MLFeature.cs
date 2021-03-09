@@ -19,17 +19,17 @@ namespace NatSuite.ML {
         public readonly MLFeatureType type;
 
         /// <summary>
-        /// Implicitly convert a Texture2D to a tensor.
+        /// Implicitly convert a Texture2D to an ML feature.
         /// </summary>
-        public static unsafe implicit operator MLFeature (Texture2D texture) => new MLTexture2DFeature(texture);
+        public static unsafe implicit operator MLFeature (Texture2D texture) => new MLPixelBufferFeature(texture);
 
         /// <summary>
-        /// Implicitly convert a float array a tensor.
+        /// Implicitly convert a float array an ML feature.
         /// </summary>
         public static implicit operator MLFeature (float[] array) => new MLArrayFeature<float>(array);
 
         /// <summary>
-        /// Implicitly convert a integer array a tensor.
+        /// Implicitly convert a integer array an ML feature.
         /// </summary>
         public static implicit operator MLFeature (int[] array) => new MLArrayFeature<int>(array);
         #endregion

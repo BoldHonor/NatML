@@ -16,7 +16,7 @@ namespace NatSuite.ML.Feature.Types {
         /// <summary>
         /// Tensor shape.
         /// </summary>
-        public readonly int[] shape; // INCOMPLETE // read only list??
+        public readonly int[] shape;
 
         /// <summary>
         /// Tensor dimensions.
@@ -27,9 +27,9 @@ namespace NatSuite.ML.Feature.Types {
 
         #region --Operations--
 
-        internal MLTensorType (string name, Type type, int[] shape) : base(name, type) => this.shape = shape;
+        public MLTensorType (string name, Type type, int[] shape) : base(name, type) => this.shape = shape;
 
-        public override string ToString () => $"{name}: ({string.Join(", ", shape)}) {type}";
+        public override string ToString () => $"{name}: ({string.Join(", ", shape)}) {dataType}";
         #endregion
     }
 }

@@ -16,12 +16,12 @@ namespace NatSuite.ML.Feature.Types {
         /// <summary>
         /// Sequence element feature.
         /// </summary>
-        public readonly MLFeatureType value;
+        public readonly MLFeatureType element;
         #endregion
 
         #region --Operations--
 
-        internal MLSequenceType (string name, Type type) : base(name, type) {
+        public MLSequenceType (string name, Type type) : base(name, type) {
             
         }
         #endregion
