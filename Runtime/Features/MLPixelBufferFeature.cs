@@ -71,7 +71,7 @@ namespace NatSuite.ML.Features {
         IFeatureBlitter IBlittableFeature.CreateBlitter () {
             var shape = (type as MLArrayType).shape;
             var dataType = (type as MLArrayType).dataType;
-            var flags = NMLFeatureFlag.PixelBuffer | (NMLFeatureFlag)aspect;
+            var flags = NMLFeatureFlag.PixelBuffer | NMLFeatureFlag.PixelLayoutInterleaved | (NMLFeatureFlag)aspect;
             if (pixelBuffer != null)
                 return new ArrayBlitter<byte>(pixelBuffer, shape, flags);
             if (colorBuffer != null)
