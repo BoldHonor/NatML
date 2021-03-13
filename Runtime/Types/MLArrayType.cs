@@ -21,7 +21,7 @@ namespace NatSuite.ML.Features.Types {
         /// <summary>
         /// Tensor dimensions.
         /// </summary>
-        public int dimensions => shape?.Length ?? 0; // Mark `readonly` in C# 8
+        public int dims => shape?.Length ?? 0; // Mark `readonly` in C# 8
         #endregion
 
 

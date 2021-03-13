@@ -22,10 +22,10 @@ namespace NatSuite.ML.Internal {
         #region --Lifecycle--
         [DllImport(Assembly, EntryPoint = @"NMLCreateModel")]
         public static extern IntPtr CreateModel ([MarshalAs(UnmanagedType.LPStr)] string modelPath);
-        [DllImport(Assembly, EntryPoint = @"NMLDisposeModel")]
-        public static extern void DisposeModel (this IntPtr model);
-        [DllImport(Assembly, EntryPoint = @"NMLDisposeFeature")]
-        public static extern void DisposeFeature (this IntPtr feature);
+        [DllImport(Assembly, EntryPoint = @"NMLReleaseModel")]
+        public static extern void ReleaseModel (this IntPtr model);
+        [DllImport(Assembly, EntryPoint = @"NMLReleaseFeature")]
+        public static extern void ReleaseFeature (this IntPtr feature);
         #endregion
 
 

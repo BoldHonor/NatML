@@ -6,7 +6,6 @@
 namespace NatSuite.ML.Internal {
 
     using System;
-    using System.Runtime.InteropServices;
 
     public enum NMLDataType : int { // CHECK // Must match `NatML.h`
         Undefined = 0,
@@ -23,7 +22,7 @@ namespace NatSuite.ML.Internal {
 
     [Flags]
     public enum NMLFeatureFlag : int { // CHECK // Must match `NatML.h`
-        PixelBuffer = 1 << 0,
-        PixelLayoutInterleaved = 1 << 1
+        PixelBuffer = 1 << 4,
+        PixelLayoutInterleaved = 1 << 5
     }
 }

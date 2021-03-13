@@ -67,7 +67,7 @@ namespace NatSuite.ML {
             foreach (var blitter in inputBlitters)
                 blitter.Dispose();
             foreach (var feature in outputFeatures)
-                ((IntPtr)(&feature)).DisposeFeature();
+                ((IntPtr)(&feature)).ReleaseFeature();
             // Return
             return outputs;
         }
@@ -75,7 +75,7 @@ namespace NatSuite.ML {
         /// <summary>
         /// Dispose the model and release resources.
         /// </summary>
-        public void Dispose () => model.DisposeModel();
+        public void Dispose () => model.ReleaseModel();
         #endregion
 
 

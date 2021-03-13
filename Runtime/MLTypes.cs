@@ -16,6 +16,6 @@ namespace NatSuite.ML {
         /// <summary>
         /// Image will be aspect-filled to the input dimensions of the model.
         /// </summary>
-        AspectFill = 1 << 4,
+        AspectFill = 1 << 8,
     }
 }

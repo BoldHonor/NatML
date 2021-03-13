@@ -44,7 +44,7 @@ namespace NatSuite.ML.Internal {
         }
 
         public static unsafe MLFeature ManagedFeature (this in NMLFeature feature) { // DEPLOY
-            switch (feature.dataType) {
+            switch (feature.dtype) {
                 case NMLDataType.UInt8: return feature.CopyFeature<byte>();
                 case NMLDataType.Int16: return feature.CopyFeature<short>();
                 case NMLDataType.Int32: return feature.CopyFeature<int>();
@@ -60,8 +60,8 @@ namespace NatSuite.ML.Internal {
 
         private static unsafe MLArrayFeature<T> CopyFeature<T> (this in NMLFeature feature) where T : unmanaged {
             // Get shape
-            var shape = new int[feature.dimensions];
-            Marshal.Copy((IntPtr)feature.shape, shape, 0, feature.dimensions);
+            var shape = new int[feature.dims];
+            Marshal.Copy((IntPtr)feature.shape, shape, 0, feature.dims);
             // Copy data
             var elementCount = shape.Aggregate(1, (a, b) => a * b);
             var byteSize = elementCount * Marshal.SizeOf<T>();

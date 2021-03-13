@@ -11,8 +11,8 @@ namespace NatSuite.ML.Internal {
     public unsafe struct NMLFeature { // Loosely based on DLPack::DLTensor
         public void* data;
         public int* shape;
-        public int dimensions;
-        public NMLDataType dataType;
+        public int dims;
+        public NMLDataType dtype;
         public NMLFeatureFlag flags;
         public void* context;
     }

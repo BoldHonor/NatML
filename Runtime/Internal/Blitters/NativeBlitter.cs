@@ -16,8 +16,8 @@ namespace NatSuite.ML.Internal.Blitters {
         public NMLFeature feature => new NMLFeature {
             data = data,
             shape = (int*)shapeHandle.AddrOfPinnedObject(),
-            dimensions = dimensions,
-            dataType = type,
+            dims = dimensions,
+            dtype = type,
             flags = flags
         };
 
