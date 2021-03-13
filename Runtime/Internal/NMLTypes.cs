@@ -8,7 +8,7 @@ namespace NatSuite.ML.Internal {
     using System;
     using System.Runtime.InteropServices;
 
-    public enum NMLFeatureType : int { // CHECK // Must match `NatML.h`
+    public enum NMLDataType : int { // CHECK // Must match `NatML.h`
         Undefined = 0,
         UInt8 = 1,
         Int16 = 2,

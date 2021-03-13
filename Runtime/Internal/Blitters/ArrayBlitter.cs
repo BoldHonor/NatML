@@ -16,7 +16,7 @@ namespace NatSuite.ML.Internal.Blitters {
             data = (void*)dataHandle.AddrOfPinnedObject(),
             shape = (int*)shapeHandle.AddrOfPinnedObject(),
             dimensions = dimensions,
-            type = typeof(T).NativeType(),
+            dataType = typeof(T).NativeType(),
             flags = flags
         };
 

@@ -17,7 +17,7 @@ namespace NatSuite.ML.Internal.Blitters {
             data = data,
             shape = (int*)shapeHandle.AddrOfPinnedObject(),
             dimensions = dimensions,
-            type = type,
+            dataType = type,
             flags = flags
         };
 
@@ -37,7 +37,7 @@ namespace NatSuite.ML.Internal.Blitters {
         private readonly void* data;
         private readonly GCHandle shapeHandle;
         private readonly int dimensions;
-        private readonly NMLFeatureType type;
+        private readonly NMLDataType type;
         private readonly NMLFeatureFlag flags;
         #endregion
     }

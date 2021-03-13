@@ -13,47 +13,47 @@ namespace NatSuite.ML.Internal {
 
     public static class NMLUtility {
 
-        public static NMLFeatureType NativeType (this Type type) {
+        public static NMLDataType NativeType (this Type type) {
             switch (type) {
-                case var t when t == typeof(byte): return NMLFeatureType.UInt8;
-                case var t when t == typeof(short): return NMLFeatureType.Int16;
-                case var t when t == typeof(int): return NMLFeatureType.Int32;
-                case var t when t == typeof(long): return NMLFeatureType.Int64;
-                case var t when t == typeof(float): return NMLFeatureType.Float;
-                case var t when t == typeof(double): return NMLFeatureType.Double;
-                case var t when t == typeof(string): return NMLFeatureType.String;
-                case var t when t.IsAssignableFrom(typeof(IList)): return NMLFeatureType.Sequence;
-                case var t when t.IsAssignableFrom(typeof(IDictionary)): return NMLFeatureType.Dictionary;
-                default: return NMLFeatureType.Undefined;
+                case var t when t == typeof(byte): return NMLDataType.UInt8;
+                case var t when t == typeof(short): return NMLDataType.Int16;
+                case var t when t == typeof(int): return NMLDataType.Int32;
+                case var t when t == typeof(long): return NMLDataType.Int64;
+                case var t when t == typeof(float): return NMLDataType.Float;
+                case var t when t == typeof(double): return NMLDataType.Double;
+                case var t when t == typeof(string): return NMLDataType.String;
+                case var t when t.IsAssignableFrom(typeof(IList)): return NMLDataType.Sequence;
+                case var t when t.IsAssignableFrom(typeof(IDictionary)): return NMLDataType.Dictionary;
+                default: return NMLDataType.Undefined;
             }
         }
 
-        public static Type ManagedType (this NMLFeatureType type) {
+        public static Type ManagedType (this NMLDataType type) {
             switch (type) {
-                case NMLFeatureType.UInt8: return typeof(byte);
-                case NMLFeatureType.Int16: return typeof(short);
-                case NMLFeatureType.Int32: return typeof(int);
-                case NMLFeatureType.Int64: return typeof(long);
-                case NMLFeatureType.Float: return typeof(float);
-                case NMLFeatureType.Double: return typeof(double);
-                case NMLFeatureType.String: return typeof(string);
-                case NMLFeatureType.Sequence: return typeof(IList);
-                case NMLFeatureType.Dictionary: return typeof(IDictionary);
+                case NMLDataType.UInt8: return typeof(byte);
+                case NMLDataType.Int16: return typeof(short);
+                case NMLDataType.Int32: return typeof(int);
+                case NMLDataType.Int64: return typeof(long);
+                case NMLDataType.Float: return typeof(float);
+                case NMLDataType.Double: return typeof(double);
+                case NMLDataType.String: return typeof(string);
+                case NMLDataType.Sequence: return typeof(IList);
+                case NMLDataType.Dictionary: return typeof(IDictionary);
                 default: return null;
             }
         }
 
         public static unsafe MLFeature ManagedFeature (this in NMLFeature feature) { // DEPLOY
-            switch (feature.type) {
-                case NMLFeatureType.UInt8: return feature.CopyFeature<byte>();
-                case NMLFeatureType.Int16: return feature.CopyFeature<short>();
-                case NMLFeatureType.Int32: return feature.CopyFeature<int>();
-                case NMLFeatureType.Int64: return feature.CopyFeature<long>();
-                case NMLFeatureType.Float: return feature.CopyFeature<float>();
-                case NMLFeatureType.Double: return feature.CopyFeature<double>();
-                case NMLFeatureType.String:
-                case NMLFeatureType.Sequence:
-                case NMLFeatureType.Dictionary: return null;
+            switch (feature.dataType) {
+                case NMLDataType.UInt8: return feature.CopyFeature<byte>();
+                case NMLDataType.Int16: return feature.CopyFeature<short>();
+                case NMLDataType.Int32: return feature.CopyFeature<int>();
+                case NMLDataType.Int64: return feature.CopyFeature<long>();
+                case NMLDataType.Float: return feature.CopyFeature<float>();
+                case NMLDataType.Double: return feature.CopyFeature<double>();
+                case NMLDataType.String:
+                case NMLDataType.Sequence:
+                case NMLDataType.Dictionary: return null;
                 default: return null;
             }
         }

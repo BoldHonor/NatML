@@ -12,7 +12,7 @@ namespace NatSuite.ML.Internal {
         public void* data;
         public int* shape;
         public int dimensions;
-        public NMLFeatureType type;
+        public NMLDataType dataType;
         public NMLFeatureFlag flags;
         public void* context;
     }

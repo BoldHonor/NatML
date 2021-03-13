@@ -28,8 +28,8 @@ namespace NatSuite.ML.Internal {
                 // Check special types
                 switch (nativeType) {
                     case 0: return null as MLFeatureType; // undefined
-                    case NMLFeatureType.Sequence: return new MLSequenceType(name, type);
-                    case NMLFeatureType.Dictionary: return new MLDictionaryType(name, type, null);
+                    case NMLDataType.Sequence: return new MLSequenceType(name, type);
+                    case NMLDataType.Dictionary: return new MLDictionaryType(name, type, null);
                     case var _ when shape.Length == 4: return new MLImageType(name, type, shape); // safe assumption
                     default: return new MLArrayType(name, type, shape);
                 }
@@ -54,7 +54,7 @@ namespace NatSuite.ML.Internal {
 
         protected MLFeatureMap (int size) => this.size = size;
 
-        protected abstract void Feature (int index, StringBuilder nameBuffer, out NMLFeatureType nativeType, out int dimensions, long[] shapeBuffer);
+        protected abstract void Feature (int index, StringBuilder nameBuffer, out NMLDataType nativeType, out int dimensions, long[] shapeBuffer);
         #endregion
     }
 
@@ -64,7 +64,7 @@ namespace NatSuite.ML.Internal {
 
         internal MLInputFeatureMap (IntPtr model) : base(model.InputFeatureCount()) => this.model = model;
 
-        protected override void Feature (int index, StringBuilder nameBuffer, out NMLFeatureType nativeType, out int dimensions, long[] shapeBuffer) {
+        protected override void Feature (int index, StringBuilder nameBuffer, out NMLDataType nativeType, out int dimensions, long[] shapeBuffer) {
             model.InputFeature(index, nameBuffer, out nativeType, out dimensions, shapeBuffer);
         }
     }
@@ -75,7 +75,7 @@ namespace NatSuite.ML.Internal {
 
         internal MLOutputFeatureMap (IntPtr model) : base(model.OutputFeatureCount()) => this.model = model;
 
-        protected override void Feature (int index, StringBuilder nameBuffer, out NMLFeatureType nativeType, out int dimensions, long[] shapeBuffer) {
+        protected override void Feature (int index, StringBuilder nameBuffer, out NMLDataType nativeType, out int dimensions, long[] shapeBuffer) {
             model.OutputFeature(index, nameBuffer, out nativeType, out dimensions, shapeBuffer);
         }
     }

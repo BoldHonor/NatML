@@ -56,7 +56,7 @@ namespace NatSuite.ML {
             // Check input count
             if (inputs.Length != this.inputs.Count)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
-            // Create native input features
+            // Create NML features
             var inputBlitters = inputs.Cast<IBlittableFeature>().Select(i => i.CreateBlitter()).ToArray();
             var inputFeatures = inputBlitters.Select(i => i.feature).ToArray();
             var outputFeatures = new NMLFeature[this.outputs.Count];

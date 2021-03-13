@@ -45,9 +45,9 @@ namespace NatSuite.ML.Internal {
         [DllImport(Assembly, EntryPoint = @"NMLOutputFeatureCount")]
         public static extern int OutputFeatureCount (this IntPtr model);
         [DllImport(Assembly, EntryPoint = @"NMLInputFeature")]
-        public static extern void InputFeature (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest, out NMLFeatureType type, out int dimensions, [Out] long[] shape);
+        public static extern void InputFeature (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest, out NMLDataType type, out int dimensions, [Out] long[] shape);
         [DllImport(Assembly, EntryPoint = @"NMLOutputFeature")]
-        public static extern void OutputFeature (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest, out NMLFeatureType type, out int dimensions, [Out] long[] shape);
+        public static extern void OutputFeature (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest, out NMLDataType type, out int dimensions, [Out] long[] shape);
         #endregion
 
 
