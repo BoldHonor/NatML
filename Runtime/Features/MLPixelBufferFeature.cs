@@ -8,9 +8,10 @@ namespace NatSuite.ML.Features {
     using System;
     using UnityEngine;
     using Unity.Collections.LowLevel.Unsafe;
-    using Types;
     using Internal;
     using Internal.Blitters;
+    using Types;
+    using Vision;
 
     /// <summary>
     /// </summary>

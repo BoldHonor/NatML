@@ -14,7 +14,7 @@ namespace NatSuite.ML {
 
     /// <summary>
     /// </summary>
-    public class MLModel : IDisposable, IReadOnlyDictionary<string, string> {
+    public sealed class MLModel : IDisposable, IReadOnlyDictionary<string, string> {
 
         #region --Client API--
         /// <summary>

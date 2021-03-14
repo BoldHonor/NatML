@@ -7,12 +7,12 @@ namespace NatSuite.ML.Vision {
 
     /// <summary>
     /// </summary>
-    public sealed class MLTranslator {
+    public sealed class MLStyleTransfer {
 
         #region --Client API--
         /// <summary>
         /// </summary>
-        public MLTranslator () {
+        public MLStyleTransfer () {
 
         }
         #endregion

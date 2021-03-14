@@ -3,7 +3,7 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML {
+namespace NatSuite.ML.Vision {
 
     /// <summary>
     /// Image aspect mode for performing inference on images.
