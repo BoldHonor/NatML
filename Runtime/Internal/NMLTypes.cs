@@ -23,6 +23,5 @@ namespace NatSuite.ML.Internal {
     [Flags]
     public enum NMLFeatureFlag : int { // CHECK // Must match `NatML.h`
         PixelBuffer = 1 << 4,
-        PixelLayoutInterleaved = 1 << 5
     }
 }

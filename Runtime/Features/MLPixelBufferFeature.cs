@@ -21,7 +21,11 @@ namespace NatSuite.ML.Features {
         /// </summary>
         /// <param name="texture"></param>
         /// <param name="aspect"></param>
-        public MLPixelBufferFeature (Texture2D texture, MLImageAspect aspect = 0) : base(new MLImageType(null, typeof(byte), new [] { 1, 3, texture.height, texture.width })) {
+        public MLPixelBufferFeature (Texture2D texture, MLImageAspect aspect = 0) : base(new MLImageType(
+            default,
+            typeof(byte),
+            new [] { 1, 3, texture.height, texture.width }
+        )) {
             if (!texture.isReadable)
                 throw new ArgumentException(@"Texture must be readable", nameof(texture));
             this.nativeBuffer = NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(texture.GetRawTextureData<byte>());
@@ -33,7 +37,11 @@ namespace NatSuite.ML.Features {
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="aspect"></param>
-        public MLPixelBufferFeature (byte[] pixelBuffer, int width, int height, MLImageAspect aspect = 0) : base(new MLImageType(null, typeof(byte), new [] { 1, 3, height, width })) {
+        public MLPixelBufferFeature (byte[] pixelBuffer, int width, int height, MLImageAspect aspect = 0) : base(new MLImageType(
+            default,
+            typeof(byte),
+            new [] { 1, 3, height, width }
+        )) {
             this.pixelBuffer = pixelBuffer;
             this.aspect = aspect;
         }
@@ -44,7 +52,11 @@ namespace NatSuite.ML.Features {
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="aspect"></param>
-        public MLPixelBufferFeature (Color32[] pixelBuffer, int width, int height, MLImageAspect aspect = 0) : base(new MLImageType(null, typeof(byte), new [] { 1, 3, height, width })) {
+        public MLPixelBufferFeature (Color32[] pixelBuffer, int width, int height, MLImageAspect aspect = 0) : base(new MLImageType(
+            default,
+            typeof(byte),
+            new [] { 1, 3, height, width }
+        )) {
             this.colorBuffer = pixelBuffer;
             this.aspect = aspect;
         }
@@ -55,7 +67,11 @@ namespace NatSuite.ML.Features {
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="aspect"></param>
-        public MLPixelBufferFeature (void* nativeBuffer, int width, int height, MLImageAspect aspect = 0) : base(new MLImageType(null, typeof(byte), new [] { 1, 3, height, width })) {
+        public MLPixelBufferFeature (void* nativeBuffer, int width, int height, MLImageAspect aspect = 0) : base(new MLImageType(
+            default,
+            typeof(byte),
+            new [] { 1, 3, height, width }
+        )) {
             this.nativeBuffer = nativeBuffer;
             this.aspect = aspect;
         }
@@ -71,7 +87,7 @@ namespace NatSuite.ML.Features {
         IFeatureBlitter IBlittableFeature.CreateBlitter () {
             var shape = (type as MLArrayType).shape;
             var dataType = (type as MLArrayType).dataType;
-            var flags = NMLFeatureFlag.PixelBuffer | NMLFeatureFlag.PixelLayoutInterleaved | (NMLFeatureFlag)aspect;
+            var flags = NMLFeatureFlag.PixelBuffer | (NMLFeatureFlag)aspect;
             if (pixelBuffer != null)
                 return new ArrayBlitter<byte>(pixelBuffer, shape, flags);
             if (colorBuffer != null)
