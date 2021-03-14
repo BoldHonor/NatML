@@ -7,6 +7,7 @@ namespace NatSuite.ML.Vision {
 
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// </summary>
@@ -39,6 +40,13 @@ namespace NatSuite.ML.Vision {
         /// <summary>
         /// </summary>
         public void Dispose () => model.Dispose();
+
+        /// <summary>
+        /// </summary>
+        /// <param name="relativePath"></param>
+        public static Task<IReadOnlyList<string>> GetModelLabels (string relativePath) { // INCOMPLETE
+            return default;
+        }
         #endregion
 
 

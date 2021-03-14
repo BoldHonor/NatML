@@ -21,7 +21,12 @@ namespace NatSuite.ML {
         /// <summary>
         /// Implicitly convert a Texture2D to an ML feature.
         /// </summary>
-        public static implicit operator MLFeature (Texture2D texture) => new MLPixelBufferFeature(texture);
+        public static implicit operator MLFeature (Texture2D texture) => new MLImageFeature(texture);
+
+        /// <summary>
+        /// Implicitly convert a WebCamTexture to an ML feature.
+        /// </summary>
+        public static implicit operator MLFeature (WebCamTexture texture) => new MLImageFeature(texture.GetPixels32(), texture.width, texture.height);
 
         /// <summary>
         /// Implicitly convert a float array an ML feature.

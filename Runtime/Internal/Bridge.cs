@@ -8,6 +8,7 @@ namespace NatSuite.ML.Internal {
     using System;
     using System.Runtime.InteropServices;
     using System.Text;
+    using Vision;
 
     public static class Bridge {
 
@@ -19,11 +20,19 @@ namespace NatSuite.ML.Internal {
         #endif
 
 
-        #region --Lifecycle--
+        #region --Model Lifecycle--
         [DllImport(Assembly, EntryPoint = @"NMLCreateModel")]
-        public static extern IntPtr CreateModel ([MarshalAs(UnmanagedType.LPStr)] string modelPath);
+        public static extern void CreateModel ([MarshalAs(UnmanagedType.LPStr)] string modelPath, out IntPtr model);
         [DllImport(Assembly, EntryPoint = @"NMLReleaseModel")]
         public static extern void ReleaseModel (this IntPtr model);
+        #endregion
+
+
+        #region --Feature Lifecycle--
+        [DllImport(Assembly, EntryPoint = @"NMLCreateFeature")]
+        public static unsafe extern void CreateFeature (void* data, [In] int[] shape, int dims, NMLDataType dtype, out IntPtr feature);
+        [DllImport(Assembly, EntryPoint = @"NMLCreateFeatureFromPixelBuffer")]
+        public static unsafe extern void CreateFeatureFromPixelBuffer (void* pixelBuffer, int width, int height, [In] int[] shape, NMLDataType dtype, MLAspectMode aspect, out IntPtr feature);
         [DllImport(Assembly, EntryPoint = @"NMLReleaseFeature")]
         public static extern void ReleaseFeature (this IntPtr feature);
         #endregion
@@ -53,7 +62,7 @@ namespace NatSuite.ML.Internal {
 
         #region --Inference--
         [DllImport(Assembly, EntryPoint = @"NMLPredict")]
-        public static extern IntPtr Predict (this IntPtr model, [In] NMLFeature[] inputs, [Out] NMLFeature[] outputs);
+        public static extern void Predict (this IntPtr model, [In] IntPtr[] inputs, [Out] IntPtr[] outputs);
         #endregion
     }
 }

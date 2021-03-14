@@ -19,9 +19,4 @@ namespace NatSuite.ML.Internal {
         Sequence = 8,
         Dictionary = 9
     }
-
-    [Flags]
-    public enum NMLFeatureFlag : int { // CHECK // Must match `NatML.h`
-        PixelBuffer = 1 << 4,
-    }
 }

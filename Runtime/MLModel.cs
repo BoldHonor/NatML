@@ -13,6 +13,7 @@ namespace NatSuite.ML {
     using Internal;
 
     /// <summary>
+    /// ML model.
     /// </summary>
     public sealed class MLModel : IDisposable, IReadOnlyDictionary<string, string> {
 
@@ -44,7 +45,7 @@ namespace NatSuite.ML {
         /// </summary>
         /// <param name="modelPath">Path to ONNX model.</param>
         public MLModel (string modelPath) {
-            this.model = Bridge.CreateModel(modelPath);
+            Bridge.CreateModel(modelPath, out this.model);
             this.inputs = new MLInputFeatureMap(model);
             this.outputs = new MLOutputFeatureMap(model);
         }
@@ -57,18 +58,14 @@ namespace NatSuite.ML {
             if (inputs.Length != this.inputs.Count)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
             // Create NML features
-            var inputBlitters = inputs.Cast<IBlittableFeature>().Select(i => i.CreateBlitter()).ToArray();
-            var inputFeatures = inputBlitters.Select(i => i.feature).ToArray();
-            var outputFeatures = new NMLFeature[this.outputs.Count];
+            var inputFeatures = inputs.Cast<INMLFeature>().Select((f, i) => f.CreateFeature(this.inputs[i])).ToArray();
+            var outputFeatures = new IntPtr[this.outputs.Count];
             // Run inference
             model.Predict(inputFeatures, outputFeatures);
             var outputs = outputFeatures.Select(o => o.ManagedFeature()).ToArray();
             // Cleanup
-            foreach (var blitter in inputBlitters)
-                blitter.Dispose();
             foreach (var feature in outputFeatures)
-                ((IntPtr)(&feature)).ReleaseFeature();
-            // Return
+                feature.ReleaseFeature();
             return outputs;
         }
 

@@ -8,7 +8,7 @@ namespace NatSuite.ML.Vision {
     /// <summary>
     /// Image aspect mode for performing inference on images.
     /// </summary>
-    public enum MLImageAspect : int { // CHECK // Must match `NatML.h`
+    public enum MLAspectMode : int { // CHECK // Must match `NatML.h`
         /// <summary>
         // Image will be scaled to fit the input dimensions of the model.
         /// </summary>

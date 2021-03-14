@@ -43,7 +43,8 @@ namespace NatSuite.ML.Internal {
             }
         }
 
-        public static unsafe MLFeature ManagedFeature (this in NMLFeature feature) { // DEPLOY
+        public static unsafe MLFeature ManagedFeature (this in IntPtr feature) { // DEPLOY
+            /*
             switch (feature.dtype) {
                 case NMLDataType.UInt8: return feature.CopyFeature<byte>();
                 case NMLDataType.Int16: return feature.CopyFeature<short>();
@@ -56,8 +57,11 @@ namespace NatSuite.ML.Internal {
                 case NMLDataType.Dictionary: return null;
                 default: return null;
             }
+            */
+            return default;
         }
 
+        /*
         private static unsafe MLArrayFeature<T> CopyFeature<T> (this in NMLFeature feature) where T : unmanaged {
             // Get shape
             var shape = new int[feature.dims];
@@ -70,5 +74,6 @@ namespace NatSuite.ML.Internal {
                 Buffer.MemoryCopy(feature.data, dstAddress, byteSize, byteSize);
             return new MLArrayFeature<T>(destination, shape);
         }
+        */
     }
 }
