@@ -62,10 +62,7 @@ namespace NatSuite.ML {
             var outputFeatures = new IntPtr[this.outputs.Count];
             // Run inference
             model.Predict(inputFeatures, outputFeatures);
-            var outputs = outputFeatures.Select(o => o.ManagedFeature()).ToArray();
-            // Cleanup
-            foreach (var feature in outputFeatures)
-                feature.ReleaseFeature();
+            var outputs = outputFeatures.Select(o => o.MarshalFeature()).ToArray();
             return outputs;
         }
 
@@ -87,7 +84,7 @@ namespace NatSuite.ML {
 
         IEnumerable<string> IReadOnlyDictionary<string, string>.Keys { // DEPLOY
             get {
-                var count = model.MetadataKeyCount();
+                var count = model.MetadataCount();
                 var buffer = new StringBuilder(2048);
                 for (var i = 0; i < count; i++) {
                     buffer.Clear();
@@ -104,7 +101,7 @@ namespace NatSuite.ML {
             }
         }
 
-        int IReadOnlyCollection<KeyValuePair<string, string>>.Count => model.MetadataKeyCount();
+        int IReadOnlyCollection<KeyValuePair<string, string>>.Count => model.MetadataCount();
 
         bool IReadOnlyDictionary<string, string>.ContainsKey (string key) => (this as IReadOnlyDictionary<string, string>).Keys.Contains(key);
 

@@ -15,21 +15,29 @@ namespace NatSuite.ML.Features {
 
         #region --Client API--
         /// <summary>
-        /// Backing array.
+        /// Feature data.
         /// </summary>
-        public readonly T[] array;
+        public readonly T[] data;
+
+        /// <summary>
+        /// Create an array tensor.
+        /// </summary>
+        /// <param name="data"></param>
+        public MLArrayFeature (T[] data) : this(data, null as int[]) { }
+
+        /// <summary>
+        /// Create an array tensor.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="shape"></param>
+        public MLArrayFeature (T[] data, int[] shape) : this(data, new MLArrayType(null, typeof(T), shape)) { }
 
         /// <summary>
         /// Create an array tensor.
         /// </summary>
         /// <param name="array"></param>
-        public MLArrayFeature (T[] array) : this(array, null) { }
-
-        /// <summary>
-        /// Create an array tensor.
-        /// </summary>
-        /// <param name="array"></param>
-        public MLArrayFeature (T[] array, int[] shape) : base(new MLArrayType(null, typeof(T), shape)) => this.array = array;
+        /// <param name="type"></param>
+        public MLArrayFeature (T[] data, MLFeatureType type) : base(type) => this.data = data;
         #endregion
 
 
@@ -42,11 +50,11 @@ namespace NatSuite.ML.Features {
             if (featureType.dataType != bufferType.dataType)
                 throw new ArgumentException($"Model expects {featureType.dataType} feature but was given {bufferType.dataType} feature");
             // Create feature
-            var result = IntPtr.Zero;
             var shape = bufferType.shape ?? featureType.shape;
-            fixed (void* baseAddress = array)
-                Bridge.CreateFeature(baseAddress, shape, shape.Length, featureType.dataType.NativeType(), out result);
-            return result;
+            fixed (void* baseAddress = data) {
+                Bridge.CreateFeature(baseAddress, shape, shape.Length, featureType.dataType.NativeType(), out var result);
+                return result;
+            }
         }
         #endregion
     }

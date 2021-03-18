@@ -20,49 +20,55 @@ namespace NatSuite.ML.Internal {
         #endif
 
 
-        #region --Model Lifecycle--
+        #region --MLModel--
         [DllImport(Assembly, EntryPoint = @"NMLCreateModel")]
         public static extern void CreateModel ([MarshalAs(UnmanagedType.LPStr)] string modelPath, out IntPtr model);
         [DllImport(Assembly, EntryPoint = @"NMLReleaseModel")]
         public static extern void ReleaseModel (this IntPtr model);
+        [DllImport(Assembly, EntryPoint = @"NMLModelGetMetadataCount")]
+        public static extern int MetadataCount (this IntPtr model);
+        [DllImport(Assembly, EntryPoint = @"NMLModelGetMetadataKey")]
+        public static extern void MetadataKey (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest);
+        [DllImport(Assembly, EntryPoint = @"NMLModelGetMetadataValue")]
+        public static extern void MetadataValue (this IntPtr model, [MarshalAs(UnmanagedType.LPStr)] string key, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest);
+        [DllImport(Assembly, EntryPoint = @"NMLModelGetInputFeatureCount")]
+        public static extern int InputFeatureCount (this IntPtr model);
+        [DllImport(Assembly, EntryPoint = @"NMLModelGetInputFeatureType")]
+        public static extern void InputFeatureType (this IntPtr model, int index, out IntPtr type);
+        [DllImport(Assembly, EntryPoint = @"NMLModelGetOutputFeatureCount")]
+        public static extern int OutputFeatureCount (this IntPtr model);
+        [DllImport(Assembly, EntryPoint = @"NMLModelGetOutputFeatureType")]
+        public static extern void OutputFeatureType (this IntPtr model, int index, out IntPtr type);
+        [DllImport(Assembly, EntryPoint = @"NMLModelPredict")]
+        public static extern void Predict (this IntPtr model, [In] IntPtr[] inputs, [Out] IntPtr[] outputs);
         #endregion
 
 
-        #region --Feature Lifecycle--
+        #region --MLFeature--
+        [DllImport(Assembly, EntryPoint = @"NMLReleaseFeature")]
+        public static extern void ReleaseFeature (this IntPtr feature);
+        [DllImport(Assembly, EntryPoint = @"NMLFeatureGetType")]
+        public static extern void FeatureType (this IntPtr feature, out IntPtr type);
+        [DllImport(Assembly, EntryPoint = @"NMLFeatureGetData")]
+        public static extern IntPtr FeatureData (this IntPtr feature);
         [DllImport(Assembly, EntryPoint = @"NMLCreateFeature")]
         public static unsafe extern void CreateFeature (void* data, [In] int[] shape, int dims, NMLDataType dtype, out IntPtr feature);
         [DllImport(Assembly, EntryPoint = @"NMLCreateFeatureFromPixelBuffer")]
         public static unsafe extern void CreateFeatureFromPixelBuffer (void* pixelBuffer, int width, int height, [In] int[] shape, NMLDataType dtype, MLAspectMode aspect, out IntPtr feature);
-        [DllImport(Assembly, EntryPoint = @"NMLReleaseFeature")]
-        public static extern void ReleaseFeature (this IntPtr feature);
         #endregion
 
 
-        #region --Metadata--
-        [DllImport(Assembly, EntryPoint = @"NMLMetadataKeyCount")]
-        public static extern int MetadataKeyCount (this IntPtr model);
-        [DllImport(Assembly, EntryPoint = @"NMLMetadataKey")]
-        public static extern void MetadataKey (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest);
-        [DllImport(Assembly, EntryPoint = @"NMLMetadataValue")]
-        public static extern void MetadataValue (this IntPtr model, [MarshalAs(UnmanagedType.LPStr)] string key, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest);
-        #endregion
-
-
-        #region --Introspection--
-        [DllImport(Assembly, EntryPoint = @"NMLInputFeatureCount")]
-        public static extern int InputFeatureCount (this IntPtr model);
-        [DllImport(Assembly, EntryPoint = @"NMLOutputFeatureCount")]
-        public static extern int OutputFeatureCount (this IntPtr model);
-        [DllImport(Assembly, EntryPoint = @"NMLInputFeature")]
-        public static extern void InputFeature (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest, out NMLDataType type, out int dimensions, [Out] long[] shape);
-        [DllImport(Assembly, EntryPoint = @"NMLOutputFeature")]
-        public static extern void OutputFeature (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest, out NMLDataType type, out int dimensions, [Out] long[] shape);
-        #endregion
-
-
-        #region --Inference--
-        [DllImport(Assembly, EntryPoint = @"NMLPredict")]
-        public static extern void Predict (this IntPtr model, [In] IntPtr[] inputs, [Out] IntPtr[] outputs);
+        #region --MLFeatureType--
+        [DllImport(Assembly, EntryPoint = @"NMLReleaseFeatureType")]
+        public static extern void ReleaseFeatureType (this IntPtr type);
+        [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetName")]
+        public static extern void FeatureTypeName (this IntPtr type, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest);
+        [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetDataType")]
+        public static extern NMLDataType FeatureTypeDataType (this IntPtr type);
+        [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetDimensions")]
+        public static extern int FeatureTypeDimensions (this IntPtr type);
+        [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetShape")]
+        public static extern void FeatureTypeShape (this IntPtr type, [Out] int[] shape, int length);
         #endregion
     }
 }

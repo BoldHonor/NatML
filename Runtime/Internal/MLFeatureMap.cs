@@ -8,31 +8,17 @@ namespace NatSuite.ML.Internal {
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
     using Features.Types;
 
     internal abstract class MLFeatureMap : IReadOnlyList<MLFeatureType> {
         
         #region --Client API--
-        MLFeatureType IReadOnlyList<MLFeatureType>.this[int index] { // INCOMPLETE // Nested types
+
+        MLFeatureType IReadOnlyList<MLFeatureType>.this[int index] {
             get {
-                // Fetch
-                var nameBuffer = new StringBuilder(2048);
-                var shapeBuffer = new long[10]; // should be large enough for most things
-                Feature(index, nameBuffer, out var nativeType, out var dimensions, shapeBuffer);
-                // Parse
-                var name = nameBuffer.ToString();
-                var type = nativeType.ManagedType();
-                var shape = shapeBuffer.Take(dimensions).Select(d => (int)d).ToArray();
-                // Check special types
-                switch (nativeType) {
-                    case 0: return null as MLFeatureType; // undefined
-                    case NMLDataType.Sequence: return new MLSequenceType(name, type);
-                    case NMLDataType.Dictionary: return new MLDictionaryType(name, type, null);
-                    case var _ when shape.Length == 4: return new MLImageType(name, type, shape); // safe assumption
-                    default: return new MLArrayType(name, type, shape);
-                }
+                GetFeatureType(index, out var nativeType);
+                return nativeType.MarshalFeatureType();
             }
         }
 
@@ -54,7 +40,7 @@ namespace NatSuite.ML.Internal {
 
         protected MLFeatureMap (int size) => this.size = size;
 
-        protected abstract void Feature (int index, StringBuilder nameBuffer, out NMLDataType nativeType, out int dimensions, long[] shapeBuffer);
+        protected abstract void GetFeatureType (int index, out IntPtr type);
         #endregion
     }
 
@@ -64,9 +50,7 @@ namespace NatSuite.ML.Internal {
 
         internal MLInputFeatureMap (IntPtr model) : base(model.InputFeatureCount()) => this.model = model;
 
-        protected override void Feature (int index, StringBuilder nameBuffer, out NMLDataType nativeType, out int dimensions, long[] shapeBuffer) {
-            model.InputFeature(index, nameBuffer, out nativeType, out dimensions, shapeBuffer);
-        }
+        protected override void GetFeatureType (int index, out IntPtr type) => model.InputFeatureType(index, out type);
     }
 
     internal sealed class MLOutputFeatureMap : MLFeatureMap {
@@ -75,8 +59,6 @@ namespace NatSuite.ML.Internal {
 
         internal MLOutputFeatureMap (IntPtr model) : base(model.OutputFeatureCount()) => this.model = model;
 
-        protected override void Feature (int index, StringBuilder nameBuffer, out NMLDataType nativeType, out int dimensions, long[] shapeBuffer) {
-            model.OutputFeature(index, nameBuffer, out nativeType, out dimensions, shapeBuffer);
-        }
+        protected override void GetFeatureType (int index, out IntPtr type) => model.OutputFeatureType(index, out type);
     }
 }

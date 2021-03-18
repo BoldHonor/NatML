@@ -6,7 +6,6 @@
 namespace NatSuite.ML.Internal {
 
     using System;
-    using Features.Types;
 
     public interface INMLFeature {
 
