@@ -14,18 +14,18 @@ namespace NatSuite.ML.Vision {
 
     /// <summary>
     /// </summary>
-    public class MLClassifier : MLModel { // INCOMPLETE
+    public class MLClassifier : MLModel {
 
         #region --Client API--
         /// <summary>
         /// </summary>
-        public readonly IReadOnlyList<string> labels;
+        public readonly string[] labels;
 
         /// <summary>
         /// </summary>
         /// <param name="path">Path to ONNX model.</param>
         /// <param name="labels">List of labels which the classifier outputs.</param>
-        public MLClassifier (string path, IReadOnlyList<string> labels) : base(path) => this.labels = labels;
+        public MLClassifier (string path, string[] labels) : base(path) => this.labels = labels;
 
         /// <summary>
         /// </summary>
