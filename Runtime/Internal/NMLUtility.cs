@@ -45,7 +45,7 @@ namespace NatSuite.ML.Internal {
             }
         }
 
-        public static unsafe MLFeature MarshalFeature (this in IntPtr feature) { // INCOMPLETE
+        public static unsafe MLFeature MarshalFeature (this in IntPtr feature) { // INCOMPLETE // OPTIMIZE
             // Get feature type
             feature.FeatureType(out var nativeType);
             var type = nativeType.MarshalFeatureType();

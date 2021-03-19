@@ -11,33 +11,19 @@ namespace NatSuite.ML.Features {
 
     /// <summary>
     /// </summary>
-    public sealed class MLArrayFeature<T> : MLFeature, INMLFeature where T : unmanaged {
+    public sealed unsafe class MLRawFeature : MLFeature, INMLFeature {
 
         #region --Client API--
         /// <summary>
         /// Feature data.
         /// </summary>
-        public readonly T[] data;
+        public readonly void* data;
 
         /// <summary>
-        /// Create an array feature.
         /// </summary>
         /// <param name="data"></param>
-        public MLArrayFeature (T[] data) : this(data, null as int[]) { }
-
-        /// <summary>
-        /// Create an array feature.
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="shape"></param>
-        public MLArrayFeature (T[] data, int[] shape) : this(data, new MLArrayType(null, typeof(T), shape)) { }
-
-        /// <summary>
-        /// Create an array feature.
-        /// </summary>
-        /// <param name="array"></param>
         /// <param name="type"></param>
-        public MLArrayFeature (T[] data, MLFeatureType type) : base(type) => this.data = data;
+        public MLRawFeature (void* data, MLFeatureType type) : base(type) => this.data = data;
         #endregion
 
 
@@ -51,10 +37,8 @@ namespace NatSuite.ML.Features {
                 throw new ArgumentException($"Model expects {featureType.dataType} feature but was given {bufferType.dataType} feature");
             // Create feature
             var shape = bufferType.shape ?? featureType.shape;
-            fixed (void* baseAddress = data) {
-                Bridge.CreateFeature(baseAddress, shape, shape.Length, featureType.dataType.NativeType(), out var result);
-                return result;
-            }
+            Bridge.CreateFeature(data, shape, shape.Length, featureType.dataType.NativeType(), out var result);
+            return result;
         }
         #endregion
     }

@@ -28,9 +28,17 @@ namespace NatSuite.ML.Internal {
         [DllImport(Assembly, EntryPoint = @"NMLModelGetMetadataCount")]
         public static extern int MetadataCount (this IntPtr model);
         [DllImport(Assembly, EntryPoint = @"NMLModelGetMetadataKey")]
-        public static extern void MetadataKey (this IntPtr model, int index, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest);
+        public static extern void MetadataKey (
+            this IntPtr model,
+            int index,
+            [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest
+        );
         [DllImport(Assembly, EntryPoint = @"NMLModelGetMetadataValue")]
-        public static extern void MetadataValue (this IntPtr model, [MarshalAs(UnmanagedType.LPStr)] string key, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest);
+        public static extern void MetadataValue (
+            this IntPtr model,
+            [MarshalAs(UnmanagedType.LPStr)] string key,
+            [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest
+        );
         [DllImport(Assembly, EntryPoint = @"NMLModelGetInputFeatureCount")]
         public static extern int InputFeatureCount (this IntPtr model);
         [DllImport(Assembly, EntryPoint = @"NMLModelGetInputFeatureType")]
@@ -40,7 +48,11 @@ namespace NatSuite.ML.Internal {
         [DllImport(Assembly, EntryPoint = @"NMLModelGetOutputFeatureType")]
         public static extern void OutputFeatureType (this IntPtr model, int index, out IntPtr type);
         [DllImport(Assembly, EntryPoint = @"NMLModelPredict")]
-        public static extern void Predict (this IntPtr model, [In] IntPtr[] inputs, [Out] IntPtr[] outputs);
+        public static extern void Predict (
+            this IntPtr model,
+            [In] IntPtr[] inputs,
+            [Out] IntPtr[] outputs
+        );
         #endregion
 
 
@@ -52,9 +64,27 @@ namespace NatSuite.ML.Internal {
         [DllImport(Assembly, EntryPoint = @"NMLFeatureGetData")]
         public static extern IntPtr FeatureData (this IntPtr feature);
         [DllImport(Assembly, EntryPoint = @"NMLCreateFeature")]
-        public static unsafe extern void CreateFeature (void* data, [In] int[] shape, int dims, NMLDataType dtype, out IntPtr feature);
+        public static unsafe extern void CreateFeature (
+            void* data,
+            [In] int[] shape,
+            int dims,
+            NMLDataType dtype,
+            out IntPtr feature
+        );
         [DllImport(Assembly, EntryPoint = @"NMLCreateFeatureFromPixelBuffer")]
-        public static unsafe extern void CreateFeatureFromPixelBuffer (void* pixelBuffer, int width, int height, [In] int[] shape, NMLDataType dtype, MLAspectMode aspect, out IntPtr feature);
+        public static unsafe extern void CreateFeatureFromPixelBuffer (
+            void* pixelBuffer,
+            int width,
+            int height,
+            [In] int[] shape,
+            NMLDataType dtype,
+            MLAspectMode aspect,
+            [In] float[] mean,
+            [In] float[] std,
+            out IntPtr feature
+        );
+        [DllImport(Assembly, EntryPoint = @"NMLCreateInputFeature")]
+        public static unsafe extern void CreateInputFeature (this IntPtr feature, out IntPtr inputFeature);
         #endregion
 
 

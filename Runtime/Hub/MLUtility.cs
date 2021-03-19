@@ -5,6 +5,7 @@
 
 namespace NatSuite.ML.Hub {
 
+    using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
     using UnityEngine;
@@ -41,6 +42,11 @@ namespace NatSuite.ML.Hub {
                     return absolutePath;
             }
         }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="relativePath"></param>
+        public static async Task<string[]> ReadLabels (string relativePath) => File.ReadAllLines(await GetModelPath(relativePath));
         #endregion
     }
 }

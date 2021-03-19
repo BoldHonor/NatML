@@ -7,7 +7,6 @@ namespace NatSuite.ML.Features {
 
     using System;
     using UnityEngine;
-    using Unity.Collections.LowLevel.Unsafe;
     using Internal;
     using Types;
     using Vision;
@@ -18,63 +17,44 @@ namespace NatSuite.ML.Features {
 
         #region --Client API--
         /// <summary>
+        /// Normalization mean.
+        /// </summary>
+        public Vector3 mean = Vector3.zero;
+
+        /// <summary>
+        /// Normalization standard deviation.
+        /// </summary>
+        public Vector3 std = Vector3.one;
+
+        /// <summary>
+        /// </summary>
+        public MLAspectMode aspectMode = 0;
+
+        /// <summary>
         /// </summary>
         /// <param name="texture"></param>
-        /// <param name="aspect"></param>
-        public MLImageFeature (Texture2D texture, MLAspectMode aspect = 0) : base(new MLImageType(
-            default,
-            typeof(byte),
-            new [] { 1, 3, texture.height, texture.width }
-        )) {
-            if (!texture.isReadable)
-                throw new ArgumentException(@"Texture must be readable", nameof(texture));
-            this.nativeBuffer = NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr(texture.GetRawTextureData<byte>());
-        }
+        public MLImageFeature (Texture2D texture) : this(texture.GetPixels32(), texture.width, texture.height) { }
 
         /// <summary>
         /// </summary>
         /// <param name="pixelBuffer"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        /// <param name="aspect"></param>
-        public MLImageFeature (byte[] pixelBuffer, int width, int height, MLAspectMode aspect = 0) : base(new MLImageType(
-            default,
-            typeof(byte),
-            new [] { 1, 3, height, width }
-        )) {
-            this.pixelBuffer = pixelBuffer;
-            this.aspect = aspect;
-        }
+        public MLImageFeature (Color32[] pixelBuffer, int width, int height) : base(new MLImageType(width, height)) => this.colorBuffer = pixelBuffer;
 
         /// <summary>
         /// </summary>
         /// <param name="pixelBuffer"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        /// <param name="aspect"></param>
-        public MLImageFeature (Color32[] pixelBuffer, int width, int height, MLAspectMode aspect = 0) : base(new MLImageType(
-            default,
-            typeof(byte),
-            new [] { 1, 3, height, width }
-        )) {
-            this.colorBuffer = pixelBuffer;
-            this.aspect = aspect;
-        }
+        public MLImageFeature (byte[] pixelBuffer, int width, int height) : base(new MLImageType(width, height)) => this.pixelBuffer = pixelBuffer;
 
         /// <summary>
         /// </summary>
         /// <param name="nativeBuffer"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        /// <param name="aspect"></param>
-        public MLImageFeature (void* nativeBuffer, int width, int height, MLAspectMode aspect = 0) : base(new MLImageType(
-            default,
-            typeof(byte),
-            new [] { 1, 3, height, width }
-        )) {
-            this.nativeBuffer = nativeBuffer;
-            this.aspect = aspect;
-        }
+        public MLImageFeature (void* nativeBuffer, int width, int height) : base(new MLImageType(width, height)) => this.nativeBuffer = nativeBuffer;
         #endregion
 
 
@@ -83,44 +63,33 @@ namespace NatSuite.ML.Features {
         private readonly byte[] pixelBuffer;
         private readonly Color32[] colorBuffer;
         private readonly void* nativeBuffer;
-        private readonly MLAspectMode aspect;
 
-        unsafe IntPtr INMLFeature.CreateFeature (MLFeatureType type) { // CHECK // Revisit this, very redundant
-            var result = IntPtr.Zero;
+        unsafe IntPtr INMLFeature.CreateFeature (MLFeatureType type) {
+            if (pixelBuffer != null)
+                fixed (void* data = pixelBuffer)
+                    return CreateFeature(type, data);
+            if (colorBuffer != null)
+                fixed (void* data = colorBuffer)
+                    return CreateFeature(type, data);
+            if (nativeBuffer != null)
+                return CreateFeature(type, nativeBuffer);
+            return IntPtr.Zero;
+        }
+
+        private unsafe IntPtr CreateFeature (MLFeatureType type, void* data) {
             var featureType = type as MLArrayType;
             var bufferType = this.type as MLImageType;
-            if (pixelBuffer != null)
-                fixed (void* baseAddress = pixelBuffer)
-                    Bridge.CreateFeatureFromPixelBuffer(
-                        baseAddress,
-                        bufferType.width,
-                        bufferType.height,
-                        featureType.shape,
-                        featureType.dataType.NativeType(),
-                        aspect,
-                        out result
-                    );
-            if (colorBuffer != null)
-                fixed (void* baseAddress = colorBuffer)
-                    Bridge.CreateFeatureFromPixelBuffer(
-                        baseAddress,
-                        bufferType.width,
-                        bufferType.height,
-                        featureType.shape,
-                        featureType.dataType.NativeType(),
-                        aspect,
-                        out result
-                    );
-            if (nativeBuffer != null)
-                Bridge.CreateFeatureFromPixelBuffer(
-                    nativeBuffer,
-                    bufferType.width,
-                    bufferType.height,
-                    featureType.shape,
-                    featureType.dataType.NativeType(),
-                    aspect,
-                    out result
-                );
+            Bridge.CreateFeatureFromPixelBuffer(
+                data,
+                bufferType.width,
+                bufferType.height,
+                featureType.shape,
+                featureType.dataType.NativeType(),
+                aspectMode,
+                new [] { mean.x, mean.y, mean.z },
+                new [] { std.x, std.y, std.z },
+                out var result
+            );
             return result;
         }
         #endregion

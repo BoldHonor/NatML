@@ -15,24 +15,24 @@ namespace NatSuite.ML {
     /// <summary>
     /// ML model.
     /// </summary>
-    public sealed class MLModel : IDisposable, IReadOnlyDictionary<string, string> {
+    public class MLModel : IDisposable, IReadOnlyDictionary<string, string> {
 
         #region --Client API--
         /// <summary>
         /// Model inputs.
         /// </summary>
-        public readonly IReadOnlyList<MLFeatureType> inputs;
+        public readonly MLFeatureType[] inputs;
 
         /// <summary>
         /// Model outputs.
         /// </summary>
-        public readonly IReadOnlyList<MLFeatureType> outputs;
+        public readonly MLFeatureType[] outputs;
 
         /// <summary>
         /// Get a value in the model's metadata dictionary.
         /// </summary>
         /// <param name="key">Metadata key.</param>
-        public string this [string key] { // DEPLOY
+        public string this [string key] {
             get {
                 var result = new StringBuilder(2048);
                 model.MetadataValue(key, result);
@@ -43,46 +43,63 @@ namespace NatSuite.ML {
         /// <summary>
         /// Create an ML model.
         /// </summary>
-        /// <param name="modelPath">Path to ONNX model.</param>
-        public MLModel (string modelPath) {
-            Bridge.CreateModel(modelPath, out this.model);
-            this.inputs = new MLInputFeatureMap(model);
-            this.outputs = new MLOutputFeatureMap(model);
+        /// <param name="path">Path to ONNX model.</param>
+        public MLModel (string path) {
+            // Create model
+            Bridge.CreateModel(path, out this.model);
+            // Marshal inputs
+            this.inputs = new MLFeatureType[model.InputFeatureCount()];
+            for (var i = 0; i < inputs.Length; i++) {
+                model.InputFeatureType(i, out var nativeType);
+                inputs[i] = nativeType.MarshalFeatureType();
+            }
+            // Marshal outputs
+            this.outputs = new MLFeatureType[model.OutputFeatureCount()];
+            for (var i = 0; i < outputs.Length; i++) {
+                model.OutputFeatureType(i, out var nativeType);
+                outputs[i] = nativeType.MarshalFeatureType();
+            }
         }
 
         /// <summary>
         /// </summary>
         /// <param name="inputs"></param>
+        /// <returns></returns>
         public unsafe MLFeature[] Predict (params MLFeature[] inputs) { // DEPLOY
             // Check input count
-            if (inputs.Length != this.inputs.Count)
+            if (inputs.Length != this.inputs.Length)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
             // Create NML features
-            var inputFeatures = inputs.Cast<INMLFeature>().Select((f, i) => f.CreateFeature(this.inputs[i])).ToArray();
-            var outputFeatures = new IntPtr[this.outputs.Count];
+            var inputFeatures = new IntPtr[this.inputs.Length];
+            var outputFeatures = new IntPtr[this.outputs.Length];
+            for (var i = 0; i < inputs.Length; i++)
+                inputFeatures[i] = ((INMLFeature)inputs[i]).CreateFeature(this.inputs[i]);
             // Run inference
             model.Predict(inputFeatures, outputFeatures);
-            var outputs = outputFeatures.Select(o => o.MarshalFeature()).ToArray();
+            // Copy out
+            var outputs = new MLFeature[outputFeatures.Length];
+            for (var i = 0; i < outputs.Length; i++)
+                outputs[i] = outputFeatures[i].MarshalFeature();
             return outputs;
         }
 
         /// <summary>
         /// Dispose the model and release resources.
         /// </summary>
-        public void Dispose () => model.ReleaseModel();
+        public virtual void Dispose () => model.ReleaseModel();
         #endregion
 
 
         #region --Operations--
 
-        private readonly IntPtr model;
+        protected readonly IntPtr model;
 
-        IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator () { // DEPLOY
+        IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator () {
             foreach (var key in (this as IReadOnlyDictionary<string, string>).Keys)
                 yield return new KeyValuePair<string, string>(key, this[key]);
         }
 
-        IEnumerable<string> IReadOnlyDictionary<string, string>.Keys { // DEPLOY
+        IEnumerable<string> IReadOnlyDictionary<string, string>.Keys {
             get {
                 var count = model.MetadataCount();
                 var buffer = new StringBuilder(2048);

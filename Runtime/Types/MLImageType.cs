@@ -32,6 +32,10 @@ namespace NatSuite.ML.Features.Types {
 
         #region --Operations--
 
+        public MLImageType (int width, int height) : this(width, height, typeof(byte)) { }
+
+        public MLImageType (int width, int height, Type type) : this(null, type, new [] { 1, 3, height, width }) { }
+
         public MLImageType (string name, Type type, int[] shape) : base(name, type, shape) { }
         #endregion
     }
