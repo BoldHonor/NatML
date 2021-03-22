@@ -13,7 +13,7 @@ namespace NatSuite.ML.Features {
 
     /// <summary>
     /// </summary>
-    public sealed unsafe class MLImageFeature : MLFeature, INMLFeature { // RGBA8888 only
+    public sealed class MLImageFeature : MLFeature { // RGBA8888 only
 
         #region --Client API--
         /// <summary>
@@ -54,7 +54,7 @@ namespace NatSuite.ML.Features {
         /// <param name="nativeBuffer"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public MLImageFeature (void* nativeBuffer, int width, int height) : base(new MLImageType(width, height)) => this.nativeBuffer = nativeBuffer;
+        public unsafe MLImageFeature (void* nativeBuffer, int width, int height) : base(new MLImageType(width, height)) => this.nativeBuffer = (IntPtr)nativeBuffer;
         #endregion
 
 
@@ -62,9 +62,9 @@ namespace NatSuite.ML.Features {
 
         private readonly byte[] pixelBuffer;
         private readonly Color32[] colorBuffer;
-        private readonly void* nativeBuffer;
+        private readonly IntPtr nativeBuffer;
 
-        unsafe IntPtr INMLFeature.CreateFeature (MLFeatureType type) {
+        protected internal override unsafe IntPtr CreateNMLFeature (MLFeatureType type) {
             if (pixelBuffer != null)
                 fixed (void* data = pixelBuffer)
                     return CreateFeature(type, data);
@@ -72,7 +72,7 @@ namespace NatSuite.ML.Features {
                 fixed (void* data = colorBuffer)
                     return CreateFeature(type, data);
             if (nativeBuffer != null)
-                return CreateFeature(type, nativeBuffer);
+                return CreateFeature(type, (void*)nativeBuffer);
             return IntPtr.Zero;
         }
 

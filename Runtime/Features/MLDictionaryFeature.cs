@@ -11,10 +11,14 @@ namespace NatSuite.ML.Features {
     /// </summary>
     public sealed class MLDictionaryFeature : MLFeature {
 
-        #region --Client API--
+        #region --Operations--
 
         internal MLDictionaryFeature () : base(null) {
 
+        }
+
+        protected internal override IntPtr CreateNMLFeature (MLFeatureType featureType) {
+            return IntPtr.Zero;
         }
         #endregion
     }

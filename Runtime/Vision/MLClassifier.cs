@@ -5,7 +5,6 @@
 
 namespace NatSuite.ML.Vision {
 
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.InteropServices;
@@ -32,17 +31,7 @@ namespace NatSuite.ML.Vision {
         /// <param name="input"></param>
         /// <returns></returns>
         public (string label, float confidence) Classify (MLFeature input) {
-            // Run inference
-            var inputFeatures = new [] { ((INMLFeature)input).CreateFeature(this.inputs[0]) };
-            var outputFeatures = new IntPtr[1];
-            model.Predict(inputFeatures, outputFeatures);
-            // Copy logits
-            var output = outputFeatures[0];
-            var classCount = ((MLArrayType)this.outputs[0]).shape[1];
-            var logits = new float[classCount];
-            Marshal.Copy(output.FeatureData(), logits, 0, logits.Length);
-            output.ReleaseFeature();
-            // Return max
+            var logits = Predict(input);
             return logits
                 .AsParallel()   // CHECK // Benchmark this
                 .Select((l, i) => (labels[i], l))
@@ -54,24 +43,29 @@ namespace NatSuite.ML.Vision {
         /// <param name="input"></param>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public (string label, float confidence)[] ClassifyAll (MLFeature input, int limit = 0) { // DEPLOY
-            // Run inference
-            var inputFeatures = new [] { ((INMLFeature)input).CreateFeature(this.inputs[0]) };
-            var outputFeatures = new IntPtr[1];
-            model.Predict(inputFeatures, outputFeatures);
-            // Copy logits
-            var output = outputFeatures[0];
-            var classCount = ((MLArrayType)this.outputs[0]).shape[1];
-            var logits = new float[classCount];
-            Marshal.Copy(output.FeatureData(), logits, 0, logits.Length);
-            output.ReleaseFeature();
-            // Sort and return
+        public (string label, float confidence)[] ClassifyAll (MLFeature input, int limit = 0) {
+            var logits = Predict(input);
             IEnumerable<(string, float)> result = logits
                 .Select((l, i) => (labels[i], l))
                 .OrderByDescending(c => c.l);
             if (limit > 0)
                 result = result.Take(limit);
             return result.ToArray();
+        }
+        #endregion
+
+
+        #region --Operations--
+
+        private float[] Predict (MLFeature input) {
+            // Copy logits
+            var output = NativePredict(input)[0];
+            var classCount = ((MLArrayType)this.outputs[0]).shape[1];
+            var logits = new float[classCount];
+            Marshal.Copy(output.FeatureData(), logits, 0, logits.Length);
+            output.ReleaseFeature();
+            // Return
+            return logits;
         }
         #endregion
     }

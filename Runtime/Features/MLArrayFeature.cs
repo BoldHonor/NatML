@@ -11,7 +11,7 @@ namespace NatSuite.ML.Features {
 
     /// <summary>
     /// </summary>
-    public sealed class MLArrayFeature<T> : MLFeature, INMLFeature where T : unmanaged {
+    public sealed class MLArrayFeature<T> : MLFeature where T : unmanaged {
 
         #region --Client API--
         /// <summary>
@@ -24,6 +24,12 @@ namespace NatSuite.ML.Features {
         /// </summary>
         /// <param name="data"></param>
         public MLArrayFeature (T[] data) : this(data, null as int[]) { }
+        
+        /// <summary>
+        /// Create an array feature.
+        /// </summary>
+        /// <param name="data"></param>
+        public unsafe MLArrayFeature (T* data) : this(data, null as int[]) { }
 
         /// <summary>
         /// Create an array feature.
@@ -31,19 +37,35 @@ namespace NatSuite.ML.Features {
         /// <param name="data"></param>
         /// <param name="shape"></param>
         public MLArrayFeature (T[] data, int[] shape) : this(data, new MLArrayType(null, typeof(T), shape)) { }
+        
+        /// <summary>
+        /// Create an array feature.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="shape"></param>
+        public unsafe MLArrayFeature (T* data, int[] shape) : this(data, new MLArrayType(null, typeof(T), shape)) { }
 
         /// <summary>
         /// Create an array feature.
         /// </summary>
-        /// <param name="array"></param>
+        /// <param name="data"></param>
         /// <param name="type"></param>
         public MLArrayFeature (T[] data, MLFeatureType type) : base(type) => this.data = data;
+
+        /// <summary>
+        /// Create an array feature.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="type"></param>
+        public unsafe MLArrayFeature (T* data, MLFeatureType type) : base(type) => this.nativeBuffer = (IntPtr)data;
         #endregion
 
 
         #region --Operations--
 
-        unsafe IntPtr INMLFeature.CreateFeature (MLFeatureType type) {
+        private readonly IntPtr nativeBuffer;
+
+        protected internal override unsafe IntPtr CreateNMLFeature (MLFeatureType type) {
             // Check types
             var featureType = type as MLArrayType;
             var bufferType = this.type as MLArrayType;
@@ -51,10 +73,13 @@ namespace NatSuite.ML.Features {
                 throw new ArgumentException($"Model expects {featureType.dataType} feature but was given {bufferType.dataType} feature");
             // Create feature
             var shape = bufferType.shape ?? featureType.shape;
-            fixed (void* baseAddress = data) {
-                Bridge.CreateFeature(baseAddress, shape, shape.Length, featureType.dataType.NativeType(), out var result);
-                return result;
-            }
+            var result = IntPtr.Zero;
+            if (nativeBuffer != IntPtr.Zero)
+                Bridge.CreateFeature((void*)nativeBuffer, shape, shape.Length, featureType.dataType.NativeType(), out result);
+            else
+                fixed (void* baseAddress = data)
+                    Bridge.CreateFeature(baseAddress, shape, shape.Length, featureType.dataType.NativeType(), out result);
+            return result;
         }
         #endregion
     }

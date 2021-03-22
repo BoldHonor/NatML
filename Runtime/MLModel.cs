@@ -65,21 +65,16 @@ namespace NatSuite.ML {
         /// </summary>
         /// <param name="inputs"></param>
         /// <returns></returns>
-        public unsafe MLFeature[] Predict (params MLFeature[] inputs) { // DEPLOY
+        public unsafe MLFeature[] Predict (params MLFeature[] inputs) {
             // Check input count
             if (inputs.Length != this.inputs.Length)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
-            // Create NML features
-            var inputFeatures = new IntPtr[this.inputs.Length];
-            var outputFeatures = new IntPtr[this.outputs.Length];
-            for (var i = 0; i < inputs.Length; i++)
-                inputFeatures[i] = ((INMLFeature)inputs[i]).CreateFeature(this.inputs[i]);
-            // Run inference
-            model.Predict(inputFeatures, outputFeatures);
-            // Copy out
-            var outputs = new MLFeature[outputFeatures.Length];
-            for (var i = 0; i < outputs.Length; i++)
-                outputs[i] = outputFeatures[i].MarshalFeature();
+            // Predict
+            var nativeOutputs = NativePredict(inputs);
+            // Copy outputs
+            var outputs = new MLFeature[nativeOutputs.Length];
+            for (var i = 0; i < outputs.Length; ++i)
+                outputs[i] = nativeOutputs[i].MarshalFeature();
             return outputs;
         }
 
@@ -93,6 +88,21 @@ namespace NatSuite.ML {
         #region --Operations--
 
         protected readonly IntPtr model;
+
+        protected IntPtr[] NativePredict (params MLFeature[] inputs) {
+            // Create NML features
+            var inputFeatures = new IntPtr[this.inputs.Length];
+            var outputFeatures = new IntPtr[this.outputs.Length];
+            for (var i = 0; i < inputs.Length; i++)
+                inputFeatures[i] = inputs[i].CreateNMLFeature(this.inputs[i]);
+            // Run inference
+            model.Predict(inputFeatures, outputFeatures);
+            // Release inputs
+            for (var i = 0; i < inputFeatures.Length; ++i)
+                inputFeatures[i].ReleaseFeature();
+            // Return outputs
+            return outputFeatures;
+        }
 
         IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator () {
             foreach (var key in (this as IReadOnlyDictionary<string, string>).Keys)

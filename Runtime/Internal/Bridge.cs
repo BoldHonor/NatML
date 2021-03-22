@@ -83,8 +83,6 @@ namespace NatSuite.ML.Internal {
             [In] float[] std,
             out IntPtr feature
         );
-        [DllImport(Assembly, EntryPoint = @"NMLCreateInputFeature")]
-        public static unsafe extern void CreateInputFeature (this IntPtr feature, out IntPtr inputFeature);
         #endregion
 
 

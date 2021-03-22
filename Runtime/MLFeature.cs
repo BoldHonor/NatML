@@ -5,6 +5,7 @@
 
 namespace NatSuite.ML {
 
+    using System;
     using UnityEngine;
     using Features;
 
@@ -44,6 +45,8 @@ namespace NatSuite.ML {
         #region --Operations--
 
         protected MLFeature (MLFeatureType type) => this.type = type;
+
+        protected internal abstract IntPtr CreateNMLFeature (MLFeatureType featureType);
         #endregion
     }
 }

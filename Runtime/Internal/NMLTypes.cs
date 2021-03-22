@@ -5,8 +5,6 @@
 
 namespace NatSuite.ML.Internal {
 
-    using System;
-
     public enum NMLDataType : int { // CHECK // Must match `NatML.h`
         Undefined = 0,
         UInt8 = 1,

@@ -13,14 +13,13 @@ namespace NatSuite.ML.Features {
 
         #region --Operations--
 
-        internal MLSequenceFeature () : base(null) {
+        internal MLSequenceFeature () : base(null) { // Can't be created by clients
 
         }
-        #endregion
 
-
-        #region --Lock--
-
+        protected internal override unsafe IntPtr CreateNMLFeature (MLFeatureType type) {
+            return IntPtr.Zero;
+        }
         #endregion
     }
 }
