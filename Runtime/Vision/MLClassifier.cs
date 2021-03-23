@@ -6,14 +6,16 @@
 namespace NatSuite.ML.Vision {
 
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
+    using System.Threading.Tasks;
     using Features.Types;
     using Internal;
 
     /// <summary>
     /// </summary>
-    public class MLClassifier : MLModel {
+    public sealed class MLClassifier : MLModel {
 
         #region --Client API--
         /// <summary>
@@ -52,6 +54,12 @@ namespace NatSuite.ML.Vision {
                 result = result.Take(limit);
             return result.ToArray();
         }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <returns></returns>
+        public static async Task<string[]> LoadLabelsFromStreamingAssets (string relativePath) => File.ReadAllLines(await MLModelUtility.ModelPathFromStreamingAssets(relativePath));
         #endregion
 
 
@@ -59,11 +67,12 @@ namespace NatSuite.ML.Vision {
 
         private float[] Predict (MLFeature input) {
             // Copy logits
-            var output = NativePredict(input)[0];
+            var inputFeature = input.CreateNMLFeature(this.inputs[0]);
+            var outputFeature = Predict(inputFeature)[0];
             var classCount = ((MLArrayType)this.outputs[0]).shape[1];
             var logits = new float[classCount];
-            Marshal.Copy(output.FeatureData(), logits, 0, logits.Length);
-            output.ReleaseFeature();
+            Marshal.Copy(outputFeature.FeatureData(), logits, 0, logits.Length);
+            outputFeature.ReleaseFeature();
             // Return
             return logits;
         }

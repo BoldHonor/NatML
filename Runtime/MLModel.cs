@@ -70,11 +70,10 @@ namespace NatSuite.ML {
             if (inputs.Length != this.inputs.Length)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
             // Predict
-            var nativeOutputs = NativePredict(inputs);
+            var inputFeatures = inputs.Select((f, i) => f.CreateNMLFeature(this.inputs[i])).ToArray();
+            var outputFeatures = Predict(inputFeatures);
             // Copy outputs
-            var outputs = new MLFeature[nativeOutputs.Length];
-            for (var i = 0; i < outputs.Length; ++i)
-                outputs[i] = nativeOutputs[i].MarshalFeature();
+            var outputs = outputFeatures.Select(f => f.MarshalFeature()).ToArray();
             return outputs;
         }
 
@@ -86,22 +85,22 @@ namespace NatSuite.ML {
 
 
         #region --Operations--
-
+        /// <summary>
+        /// </summary>
         protected readonly IntPtr model;
 
-        protected IntPtr[] NativePredict (params MLFeature[] inputs) {
-            // Create NML features
-            var inputFeatures = new IntPtr[this.inputs.Length];
-            var outputFeatures = new IntPtr[this.outputs.Length];
-            for (var i = 0; i < inputs.Length; i++)
-                inputFeatures[i] = inputs[i].CreateNMLFeature(this.inputs[i]);
-            // Run inference
-            model.Predict(inputFeatures, outputFeatures);
-            // Release inputs
-            for (var i = 0; i < inputFeatures.Length; ++i)
-                inputFeatures[i].ReleaseFeature();
-            // Return outputs
-            return outputFeatures;
+        /// <summary>
+        /// </summary>
+        /// <param name="inputs"></param>
+        /// <returns></returns>
+        protected IntPtr[] Predict (params IntPtr[] inputs) { // Inputs are released
+            // Predict
+            var outputs = new IntPtr[this.outputs.Length];
+            model.Predict(inputs, outputs);
+            // Release
+            foreach (var feature in inputs)
+                feature.ReleaseFeature();
+            return outputs;
         }
 
         IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator () {
