@@ -79,7 +79,7 @@ namespace NatSuite.ML.Features {
         private unsafe IntPtr CreateFeature (MLFeatureType type, void* data) {
             var featureType = type as MLArrayType;
             var bufferType = this.type as MLImageType;
-            Bridge.CreateFeatureFromPixelBuffer(
+            Bridge.CreateFeature(
                 data,
                 bufferType.width,
                 bufferType.height,

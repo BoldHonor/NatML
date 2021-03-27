@@ -63,7 +63,7 @@ namespace NatSuite.ML.Internal {
         public static extern void FeatureType (this IntPtr feature, out IntPtr type);
         [DllImport(Assembly, EntryPoint = @"NMLFeatureGetData")]
         public static extern IntPtr FeatureData (this IntPtr feature);
-        [DllImport(Assembly, EntryPoint = @"NMLCreateFeature")]
+        [DllImport(Assembly, EntryPoint = @"NMLCreateArrayFeature")]
         public static unsafe extern void CreateFeature (
             void* data,
             [In] int[] shape,
@@ -71,8 +71,8 @@ namespace NatSuite.ML.Internal {
             NMLDataType dtype,
             out IntPtr feature
         );
-        [DllImport(Assembly, EntryPoint = @"NMLCreateFeatureFromPixelBuffer")]
-        public static unsafe extern void CreateFeatureFromPixelBuffer (
+        [DllImport(Assembly, EntryPoint = @"NMLCreateImageFeature")]
+        public static unsafe extern void CreateFeature (
             void* pixelBuffer,
             int width,
             int height,

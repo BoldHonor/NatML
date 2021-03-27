@@ -4,80 +4,13 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>Headers/NMLFeature.h</key>
-		<data>
-		CoGT2Q78+1pH1WblE9y1zP01oFM=
-		</data>
-		<key>Headers/NMLFeatureType.h</key>
-		<data>
-		zzqJuZ/AFR6wz/Mg5VQV0UNz+Rs=
-		</data>
-		<key>Headers/NMLModel.h</key>
-		<data>
-		q38XYSnv0xMA19QJY7+BnpeNr5o=
-		</data>
-		<key>Headers/NMLTypes.h</key>
-		<data>
-		NY2VxEoZUH9Oo5sWUDAtjh32oyA=
-		</data>
-		<key>Headers/NatML.h</key>
-		<data>
-		a7X8OSTCvb9NS99nmRgr+cP71fM=
-		</data>
 		<key>Info.plist</key>
 		<data>
-		OyZftRl9iqfzoND4jFmILvmSZBc=
-		</data>
-		<key>Modules/module.modulemap</key>
-		<data>
-		RuBggVVF4hg85KHyQ43hu9YiDV0=
+		RbCYEdRncoFghgCOcZQMTs2EXZY=
 		</data>
 	</dict>
 	<key>files2</key>
-	<dict>
-		<key>Headers/NMLFeature.h</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			K/MQ8iJuAniwEYk7JgMCYLIZistW9a6bF5FqXUz+caA=
-			</data>
-		</dict>
-		<key>Headers/NMLFeatureType.h</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			ezUuk10I0tEhnJ6jSJIcUlwWn35Vgm/uts8tjeXx1H0=
-			</data>
-		</dict>
-		<key>Headers/NMLModel.h</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			LPFRf6o0a77NVL5XamRmz8moqQwHYw4sKt6HE6yiPaY=
-			</data>
-		</dict>
-		<key>Headers/NMLTypes.h</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			j1flcSCdevtMtYD3RK1Eqer+KTjWRSf31LKPFMeu8zE=
-			</data>
-		</dict>
-		<key>Headers/NatML.h</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			2+yCpF1L1PJOcBle0+e2Ami2PRhDMWotf/XNgnV2UzE=
-			</data>
-		</dict>
-		<key>Modules/module.modulemap</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			ywl2iDZp58T6vEZxKyXK95yaX4WKD4dbGUxFeYzvBA8=
-			</data>
-		</dict>
-	</dict>
+	<dict/>
 	<key>rules</key>
 	<dict>
 		<key>^.*</key>
