@@ -5,7 +5,6 @@
 
 namespace NatSuite.ML.Vision {
 
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
@@ -15,7 +14,7 @@ namespace NatSuite.ML.Vision {
 
     /// <summary>
     /// </summary>
-    public sealed class MLClassifier : MLModel {
+    public sealed class MLClassifier : MLModel<(string label, float confidence)[]> {
 
         #region --Client API--
         /// <summary>
@@ -32,27 +31,26 @@ namespace NatSuite.ML.Vision {
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public (string label, float confidence) Classify (MLFeature input) {
-            var logits = Predict(input);
-            return logits
-                .AsParallel()   // CHECK // Benchmark this
-                .Select((l, i) => (labels[i], l))
-                .Aggregate((a, b) => a.l > b.l ? a : b);
-        }
+        public (string label, float confidence) Classify (MLFeature input) => Predict(input).First();
 
         /// <summary>
         /// </summary>
-        /// <param name="input"></param>
-        /// <param name="limit"></param>
+        /// <param name="inputs"></param>
         /// <returns></returns>
-        public (string label, float confidence)[] ClassifyAll (MLFeature input, int limit = 0) {
-            var logits = Predict(input);
-            IEnumerable<(string, float)> result = logits
-                .Select((l, i) => (labels[i], l))
-                .OrderByDescending(c => c.l);
-            if (limit > 0)
-                result = result.Take(limit);
-            return result.ToArray();
+        public override (string label, float confidence)[] Predict (params MLFeature[] inputs) {
+            // Predict
+            var inputFeature = inputs[0].CreateNMLFeature(this.inputs[0]);
+            var outputFeature = Predict(inputFeature)[0];
+            // Copy logits
+            var outputShape = ((MLArrayType)this.outputs[0]).shape;
+            var classCount = outputShape.Aggregate(1, (a, b) => a * b);
+            var logits = new float[classCount];
+            Marshal.Copy(outputFeature.FeatureData(), logits, 0, logits.Length);
+            // Release
+            inputFeature.ReleaseFeature();
+            outputFeature.ReleaseFeature();
+            // Order descending
+            return logits.Select((l, i) => (labels[i], l)).OrderByDescending(c => c.l).ToArray();
         }
 
         /// <summary>
@@ -60,22 +58,6 @@ namespace NatSuite.ML.Vision {
         /// <param name="relativePath"></param>
         /// <returns></returns>
         public static async Task<string[]> LoadLabelsFromStreamingAssets (string relativePath) => File.ReadAllLines(await MLModelUtility.ModelPathFromStreamingAssets(relativePath));
-        #endregion
-
-
-        #region --Operations--
-
-        private float[] Predict (MLFeature input) {
-            // Copy logits
-            var inputFeature = input.CreateNMLFeature(this.inputs[0]);
-            var outputFeature = Predict(inputFeature)[0];
-            var classCount = ((MLArrayType)this.outputs[0]).shape[1];
-            var logits = new float[classCount];
-            Marshal.Copy(outputFeature.FeatureData(), logits, 0, logits.Length);
-            outputFeature.ReleaseFeature();
-            // Return
-            return logits;
-        }
         #endregion
     }
 }

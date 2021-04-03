@@ -15,7 +15,7 @@ namespace NatSuite.ML {
 
         #region --Client API--
         /// <summary>
-        /// Tensor type information.
+        /// Feature type information.
         /// </summary>
         public readonly MLFeatureType type;
 

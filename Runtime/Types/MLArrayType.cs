@@ -16,7 +16,7 @@ namespace NatSuite.ML.Features.Types {
         /// <summary>
         /// Tensor shape.
         /// </summary>
-        public readonly int[] shape;
+        public readonly int[] shape; // Can be `null`
 
         /// <summary>
         /// Tensor dimensions.
