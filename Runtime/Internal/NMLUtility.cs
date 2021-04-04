@@ -55,7 +55,6 @@ namespace NatSuite.ML.Internal {
             var shape = new int[nativeType.FeatureTypeDimensions()];
             nativeType.FeatureTypeShape(shape, shape.Length);
             // Return
-            nativeType.ReleaseFeatureType(); // INCOMPLETE // CHECK
             switch (dtype) {
                 case NMLDataType.Sequence:
                     return null;

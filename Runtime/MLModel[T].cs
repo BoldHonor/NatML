@@ -52,12 +52,14 @@ namespace NatSuite.ML {
             for (var i = 0; i < inputs.Length; i++) {
                 model.InputFeatureType(i, out var nativeType);
                 inputs[i] = nativeType.MarshalFeatureType();
+                nativeType.ReleaseFeatureType();
             }
             // Marshal outputs
             this.outputs = new MLFeatureType[model.OutputFeatureCount()];
             for (var i = 0; i < outputs.Length; i++) {
                 model.OutputFeatureType(i, out var nativeType);
                 outputs[i] = nativeType.MarshalFeatureType();
+                nativeType.ReleaseFeatureType();
             }
         }
 
