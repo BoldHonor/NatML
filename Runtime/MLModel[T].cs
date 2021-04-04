@@ -49,14 +49,14 @@ namespace NatSuite.ML {
             Bridge.CreateModel(path, out this.model);
             // Marshal inputs
             this.inputs = new MLFeatureType[model.InputFeatureCount()];
-            for (var i = 0; i < inputs.Length; i++) {
+            for (var i = 0; i < inputs.Length; ++i) {
                 model.InputFeatureType(i, out var nativeType);
                 inputs[i] = nativeType.MarshalFeatureType();
                 nativeType.ReleaseFeatureType();
             }
             // Marshal outputs
             this.outputs = new MLFeatureType[model.OutputFeatureCount()];
-            for (var i = 0; i < outputs.Length; i++) {
+            for (var i = 0; i < outputs.Length; ++i) {
                 model.OutputFeatureType(i, out var nativeType);
                 outputs[i] = nativeType.MarshalFeatureType();
                 nativeType.ReleaseFeatureType();
@@ -95,7 +95,7 @@ namespace NatSuite.ML {
             get {
                 var count = model.MetadataCount();
                 var buffer = new StringBuilder(2048);
-                for (var i = 0; i < count; i++) {
+                for (var i = 0; i < count; ++i) {
                     buffer.Clear();
                     model.MetadataKey(i, buffer);
                     yield return buffer.ToString();
