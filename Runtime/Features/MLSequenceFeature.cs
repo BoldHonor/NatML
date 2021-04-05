@@ -17,7 +17,7 @@ namespace NatSuite.ML.Features {
 
         }
 
-        protected internal override unsafe IntPtr CreateNMLFeature (MLFeatureType type) {
+        protected internal override unsafe IntPtr CreateNativeFeature (MLFeatureType type) {
             return IntPtr.Zero;
         }
         #endregion

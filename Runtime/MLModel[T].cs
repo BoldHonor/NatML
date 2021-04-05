@@ -80,10 +80,16 @@ namespace NatSuite.ML {
 
         private readonly IntPtr model; // We don't want anyone to touch this
 
-        protected IntPtr[] Predict (params IntPtr[] inputs) {
-            var outputs = new IntPtr[this.outputs.Length];
-            model.Predict(inputs, outputs);
-            return outputs;
+        protected IntPtr[] NativePredict (params MLFeature[] inputs) { // Black box
+            // Create features
+            var inputFeatures = inputs.Select((f, i) => f.CreateNativeFeature(this.inputs[i])).ToArray();
+            var outputFeatures = new IntPtr[this.outputs.Length];
+            // Predict
+            model.Predict(inputFeatures, outputFeatures);
+            // Release
+            foreach (var feature in inputFeatures)
+                feature.ReleaseFeature();
+            return outputFeatures;
         }
 
         IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator () {

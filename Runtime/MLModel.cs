@@ -29,19 +29,15 @@ namespace NatSuite.ML {
         /// <param name="inputs"></param>
         /// <returns></returns>
         public override MLFeature[] Predict (params MLFeature[] inputs) {
-            // Check input count
+            // Check
             if (inputs.Length != this.inputs.Length)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
             // Predict
-            var inputFeatures = inputs.Select((f, i) => f.CreateNMLFeature(this.inputs[i])).ToArray();
-            var outputFeatures = Predict(inputFeatures);
+            var outputFeatures = NativePredict(inputs);
             var outputs = outputFeatures.Select(MarshalFeature).ToArray();
             // Release
-            foreach (var feature in inputFeatures)
-                feature.ReleaseFeature();
             foreach (var feature in outputFeatures)
                 feature.ReleaseFeature();
-            // Return
             return outputs;
         }
         #endregion

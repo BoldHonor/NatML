@@ -46,7 +46,7 @@ namespace NatSuite.ML {
 
         protected MLFeature (MLFeatureType type) => this.type = type;
 
-        protected internal abstract IntPtr CreateNMLFeature (MLFeatureType featureType);
+        protected internal abstract IntPtr CreateNativeFeature (MLFeatureType featureType);
         #endregion
     }
 }

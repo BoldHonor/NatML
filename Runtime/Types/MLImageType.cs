@@ -38,7 +38,7 @@ namespace NatSuite.ML.Features.Types {
 
         public MLImageType (int width, int height, Type type) : this(null, type, new [] { 1, 3, height, width }) { }
 
-        public MLImageType (string name, Type type, int[] shape) : base(name, type, shape) => interleaved = shape[1] > shape[3];
+        public MLImageType (string name, Type type, int[] shape) : base(name, type, shape) => interleaved = shape[3] == 3;
         #endregion
     }
 }

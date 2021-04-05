@@ -65,7 +65,7 @@ namespace NatSuite.ML.Features {
 
         private readonly IntPtr nativeBuffer;
 
-        protected internal override unsafe IntPtr CreateNMLFeature (MLFeatureType type) {
+        protected internal override unsafe IntPtr CreateNativeFeature (MLFeatureType type) {
             // Check types
             var featureType = type as MLArrayType;
             var bufferType = this.type as MLArrayType;

@@ -64,19 +64,19 @@ namespace NatSuite.ML.Features {
         private readonly Color32[] colorBuffer;
         private readonly IntPtr nativeBuffer;
 
-        protected internal override unsafe IntPtr CreateNMLFeature (MLFeatureType type) {
+        protected internal override unsafe IntPtr CreateNativeFeature (MLFeatureType type) {
             if (pixelBuffer != null)
                 fixed (void* data = pixelBuffer)
-                    return CreateFeature(type, data);
+                    return CreateNativeFeature(type, data);
             if (colorBuffer != null)
                 fixed (void* data = colorBuffer)
-                    return CreateFeature(type, data);
-            if (nativeBuffer != null)
-                return CreateFeature(type, (void*)nativeBuffer);
+                    return CreateNativeFeature(type, data);
+            if (nativeBuffer != IntPtr.Zero)
+                return CreateNativeFeature(type, (void*)nativeBuffer);
             return IntPtr.Zero;
         }
 
-        private unsafe IntPtr CreateFeature (MLFeatureType type, void* data) {
+        private unsafe IntPtr CreateNativeFeature (MLFeatureType type, void* data) {
             var featureType = type as MLArrayType;
             var bufferType = this.type as MLImageType;
             Bridge.CreateFeature(
