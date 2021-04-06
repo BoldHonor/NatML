@@ -15,7 +15,7 @@ namespace NatSuite.ML {
     /// <summary>
     /// ML model.
     /// </summary>
-    public sealed class MLModel : MLModel<MLFeature[]> {
+    public sealed class MLModel : MLModule<MLFeature[]> {
 
         #region --Client API--
         /// <summary>
@@ -33,9 +33,12 @@ namespace NatSuite.ML {
             if (inputs.Length != this.inputs.Length)
                 throw new ArgumentException(@"Incorrect number of inputs provided", nameof(inputs));
             // Predict
-            var outputFeatures = NativePredict(inputs);
+            var inputFeatures = inputs.Cast<INMLFeature>().Select((f, i) => f.CreateNativeFeature(this.inputs[i])).ToArray();
+            var outputFeatures = Predict(inputFeatures);
             var outputs = outputFeatures.Select(MarshalFeature).ToArray();
             // Release
+            foreach (var feature in inputFeatures)
+                feature.ReleaseFeature();
             foreach (var feature in outputFeatures)
                 feature.ReleaseFeature();
             return outputs;

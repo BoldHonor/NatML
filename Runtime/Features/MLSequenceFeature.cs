@@ -16,10 +16,6 @@ namespace NatSuite.ML.Features {
         internal MLSequenceFeature () : base(null) { // Can't be created by clients
 
         }
-
-        protected internal override unsafe IntPtr CreateNativeFeature (MLFeatureType type) {
-            return IntPtr.Zero;
-        }
         #endregion
     }
 }

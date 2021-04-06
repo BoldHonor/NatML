@@ -11,7 +11,7 @@ namespace NatSuite.ML.Features {
 
     /// <summary>
     /// </summary>
-    public sealed class MLArrayFeature<T> : MLFeature where T : unmanaged {
+    public sealed class MLArrayFeature<T> : MLFeature, INMLFeature where T : unmanaged {
 
         #region --Client API--
         /// <summary>
@@ -65,7 +65,7 @@ namespace NatSuite.ML.Features {
 
         private readonly IntPtr nativeBuffer;
 
-        protected internal override unsafe IntPtr CreateNativeFeature (MLFeatureType type) {
+        unsafe IntPtr INMLFeature.CreateNativeFeature (MLFeatureType type) {
             // Check types
             var featureType = type as MLArrayType;
             var bufferType = this.type as MLArrayType;

@@ -13,7 +13,7 @@ namespace NatSuite.ML.Features {
 
     /// <summary>
     /// </summary>
-    public sealed class MLImageFeature : MLFeature { // RGBA8888 only
+    public sealed class MLImageFeature : MLFeature, INMLFeature { // RGBA8888 only
 
         #region --Client API--
         /// <summary>
@@ -64,7 +64,7 @@ namespace NatSuite.ML.Features {
         private readonly Color32[] colorBuffer;
         private readonly IntPtr nativeBuffer;
 
-        protected internal override unsafe IntPtr CreateNativeFeature (MLFeatureType type) {
+        unsafe IntPtr INMLFeature.CreateNativeFeature (MLFeatureType type) {
             if (pixelBuffer != null)
                 fixed (void* data = pixelBuffer)
                     return CreateNativeFeature(type, data);

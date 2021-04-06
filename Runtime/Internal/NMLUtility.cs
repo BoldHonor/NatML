@@ -66,9 +66,5 @@ namespace NatSuite.ML.Internal {
                     return new MLArrayType(name, dtype.ManagedType(), shape);
             }
         }
-
-        public static IntPtr NativeFeature (this MLFeature feature, MLFeatureType type) { // For debugging
-            return feature.CreateNativeFeature(type);
-        }
     }
 }

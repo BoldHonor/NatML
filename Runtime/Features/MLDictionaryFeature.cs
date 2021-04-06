@@ -16,10 +16,6 @@ namespace NatSuite.ML.Features {
         internal MLDictionaryFeature () : base(null) {
 
         }
-
-        protected internal override IntPtr CreateNativeFeature (MLFeatureType featureType) {
-            return IntPtr.Zero;
-        }
         #endregion
     }
 }

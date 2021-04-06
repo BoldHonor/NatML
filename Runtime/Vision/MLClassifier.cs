@@ -5,6 +5,7 @@
 
 namespace NatSuite.ML.Vision {
 
+    using System;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace NatSuite.ML.Vision {
 
     /// <summary>
     /// </summary>
-    public sealed class MLClassifier : MLModel<(string label, float confidence)[]> {
+    public sealed class MLClassifier : MLModule<(string label, float confidence)[]> {
 
         #region --Client API--
         /// <summary>
@@ -41,7 +42,8 @@ namespace NatSuite.ML.Vision {
         /// <returns>Output label along with unnormalized confidence value.</returns>
         public unsafe (string label, float confidence) Classify (MLFeature input) {
             // Predict
-            var outputFeature = NativePredict(input).First();
+            var inputFeature = (input as INMLFeature).CreateNativeFeature(this.inputs[0]);
+            var outputFeature = Predict(inputFeature).First();
             // Find label
             var logits = (float*)outputFeature.FeatureData();
             var argMax = 0;
@@ -49,6 +51,7 @@ namespace NatSuite.ML.Vision {
                 if (logits[i] > logits[argMax])
                     argMax = i;
             // Release
+            inputFeature.ReleaseFeature();
             outputFeature.ReleaseFeature();
             return (labels[argMax], logits[argMax]);
         }
@@ -58,8 +61,12 @@ namespace NatSuite.ML.Vision {
         /// <param name="inputs">Input features.</param>
         /// <returns></returns>
         public unsafe override (string label, float confidence)[] Predict (params MLFeature[] inputs) { // Slower than ::Classify
+            // Check
+            if (inputs.Length != 1)
+                throw new ArgumentException(@"MLClassifier expects a single feature", nameof(inputs));
             // Predict
-            var outputFeature = NativePredict(inputs[0]).First();
+            var inputFeature = (inputs[0] as INMLFeature).CreateNativeFeature(this.inputs[0]);
+            var outputFeature = Predict(inputFeature).First();
             // Copy logits
             var logits = (float*)outputFeature.FeatureData();
             var pairs = new (string, float l)[classes];
@@ -68,6 +75,7 @@ namespace NatSuite.ML.Vision {
             // Order descending
             var result = pairs.OrderByDescending(c => c.l).ToArray();
             // Release
+            inputFeature.ReleaseFeature();
             outputFeature.ReleaseFeature();
             return result;
         }

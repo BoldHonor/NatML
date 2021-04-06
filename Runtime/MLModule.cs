@@ -15,7 +15,7 @@ namespace NatSuite.ML {
     /// <summary>
     /// ML model.
     /// </summary>
-    public abstract class MLModel<TOutput> : IDisposable, IReadOnlyDictionary<string, string> {
+    public abstract class MLModule<TOutput> : IDisposable, IReadOnlyDictionary<string, string> {
 
         #region --Client API--
         /// <summary>
@@ -44,7 +44,7 @@ namespace NatSuite.ML {
         /// Create an ML model.
         /// </summary>
         /// <param name="path">Path to ONNX model.</param>
-        public MLModel (string path) {
+        public MLModule (string path) {
             // Create model
             Bridge.CreateModel(path, out this.model);
             // Marshal inputs
@@ -80,16 +80,10 @@ namespace NatSuite.ML {
 
         private readonly IntPtr model; // We don't want anyone to touch this
 
-        protected IntPtr[] NativePredict (params MLFeature[] inputs) { // Black box
-            // Create features
-            var inputFeatures = inputs.Select((f, i) => f.CreateNativeFeature(this.inputs[i])).ToArray();
-            var outputFeatures = new IntPtr[this.outputs.Length];
-            // Predict
-            model.Predict(inputFeatures, outputFeatures);
-            // Release
-            foreach (var feature in inputFeatures)
-                feature.ReleaseFeature();
-            return outputFeatures;
+        protected IntPtr[] Predict (params IntPtr[] inputs) { // Black box
+            var outputs = new IntPtr[this.outputs.Length];
+            model.Predict(inputs, outputs);
+            return outputs;
         }
 
         IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator () {
