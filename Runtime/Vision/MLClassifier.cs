@@ -23,7 +23,7 @@ namespace NatSuite.ML.Vision {
         public readonly string[] labels;
 
         /// <summary>
-        /// Create an ML classifier.
+        /// Create a classifier.
         /// </summary>
         /// <param name="path">Path to ONNX model.</param>
         /// <param name="labels">List of labels which the classifier outputs.</param>

@@ -15,7 +15,7 @@ namespace NatSuite.ML {
 
         #region --Client API--
         /// <summary>
-        /// Feature type information.
+        /// Feature type.
         /// </summary>
         public readonly MLFeatureType type;
 

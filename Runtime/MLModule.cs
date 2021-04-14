@@ -19,47 +19,26 @@ namespace NatSuite.ML {
 
         #region --Client API--
         /// <summary>
-        /// Model inputs.
+        /// Model input feature types.
         /// </summary>
         public readonly MLFeatureType[] inputs;
 
         /// <summary>
-        /// Model outputs.
+        /// Model output feature types.
         /// </summary>
         public readonly MLFeatureType[] outputs;
 
         /// <summary>
-        /// Get a value in the model's metadata dictionary.
+        /// Get a value in the model metadata.
         /// </summary>
         /// <param name="key">Metadata key.</param>
+        /// <returns>Metadata value or `null` if key is not present.</returns>
         public string this [string key] {
             get {
-                var result = new StringBuilder(2048);
-                model.MetadataValue(key, result);
-                return result.ToString();
-            }
-        }
-
-        /// <summary>
-        /// Create an ML model.
-        /// </summary>
-        /// <param name="path">Path to ONNX model.</param>
-        public MLModule (string path) {
-            // Create model
-            Bridge.CreateModel(path, out this.model);
-            // Marshal inputs
-            this.inputs = new MLFeatureType[model.InputFeatureCount()];
-            for (var i = 0; i < inputs.Length; ++i) {
-                model.InputFeatureType(i, out var nativeType);
-                inputs[i] = nativeType.MarshalFeatureType();
-                nativeType.ReleaseFeatureType();
-            }
-            // Marshal outputs
-            this.outputs = new MLFeatureType[model.OutputFeatureCount()];
-            for (var i = 0; i < outputs.Length; ++i) {
-                model.OutputFeatureType(i, out var nativeType);
-                outputs[i] = nativeType.MarshalFeatureType();
-                nativeType.ReleaseFeatureType();
+                var buffer = new StringBuilder(2048);
+                model.MetadataValue(key, buffer);
+                var result = buffer.ToString();
+                return !string.IsNullOrEmpty(result) ? result : null;
             }
         }
 
@@ -79,6 +58,25 @@ namespace NatSuite.ML {
         #region --Operations--
 
         private readonly IntPtr model; // We don't want anyone to touch this
+
+        protected MLModule (string path) {
+            // Create model
+            Bridge.CreateModel(path, out this.model);
+            // Marshal inputs
+            this.inputs = new MLFeatureType[model.InputFeatureCount()];
+            for (var i = 0; i < inputs.Length; ++i) {
+                model.InputFeatureType(i, out var nativeType);
+                inputs[i] = nativeType.MarshalFeatureType();
+                nativeType.ReleaseFeatureType();
+            }
+            // Marshal outputs
+            this.outputs = new MLFeatureType[model.OutputFeatureCount()];
+            for (var i = 0; i < outputs.Length; ++i) {
+                model.OutputFeatureType(i, out var nativeType);
+                outputs[i] = nativeType.MarshalFeatureType();
+                nativeType.ReleaseFeatureType();
+            }
+        }
 
         protected IntPtr[] Predict (params IntPtr[] inputs) { // Black box
             var outputs = new IntPtr[this.outputs.Length];
