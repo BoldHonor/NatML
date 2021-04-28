@@ -13,9 +13,23 @@ namespace NatSuite.ML.Features {
 
     /// <summary>
     /// </summary>
-    public sealed class MLImageFeature : MLFeature, INMLFeature { // RGBA8888 only
+    public sealed class MLImageFeature : MLFeature, IMLFeature { // RGBA8888 only
 
         #region --Client API--
+        /// <summary>
+        /// Image aspect mode for performing inference on images.
+        /// </summary>
+        public enum AspectMode : int { // CHECK // Must match `NatML.h`
+            /// <summary>
+            // Image will be scaled to fit the input dimensions of the model.
+            /// </summary>
+            ScaleToFit = 0,
+            /// <summary>
+            /// Image will be aspect-filled to the input dimensions of the model.
+            /// </summary>
+            AspectFill = 1 << 8,
+        }
+
         /// <summary>
         /// Normalization mean.
         /// </summary>
@@ -28,7 +42,7 @@ namespace NatSuite.ML.Features {
 
         /// <summary>
         /// </summary>
-        public MLAspectMode aspectMode = 0;
+        public AspectMode aspectMode = 0;
 
         /// <summary>
         /// </summary>
@@ -64,7 +78,7 @@ namespace NatSuite.ML.Features {
         private readonly Color32[] colorBuffer;
         private readonly IntPtr nativeBuffer;
 
-        unsafe IntPtr INMLFeature.CreateNativeFeature (MLFeatureType type) {
+        unsafe IntPtr IMLFeature.Create (MLFeatureType type) {
             if (pixelBuffer != null)
                 fixed (void* data = pixelBuffer)
                     return CreateNativeFeature(type, data);

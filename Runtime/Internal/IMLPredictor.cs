@@ -6,15 +6,15 @@
 namespace NatSuite.ML.Internal {
 
     using System;
-    
+
     /// <summary>
     /// </summary>
-    public interface INMLFeature {
+    public interface IMLPredictor<TOutput> : IDisposable {
 
         /// <summary>
         /// </summary>
-        /// <param name="featureType"></param>
+        /// <param name="inputs"></param>
         /// <returns></returns>
-        IntPtr CreateNativeFeature (MLFeatureType featureType);
+        TOutput Predict (params MLFeature[] inputs);
     }
 }

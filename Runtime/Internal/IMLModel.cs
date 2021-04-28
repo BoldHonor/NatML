@@ -10,7 +10,7 @@ namespace NatSuite.ML.Internal {
 
     /// <summary>
     /// </summary>
-    public interface IMLModule : IDisposable, IReadOnlyDictionary<string, string> {
+    public interface IMLModel : IDisposable, IReadOnlyDictionary<string, string> {
 
         /// <summary>
         /// Model input feature types.
@@ -21,5 +21,10 @@ namespace NatSuite.ML.Internal {
         /// Model output feature types.
         /// </summary>
         MLFeatureType[] outputs { get; }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="inputs"></param>
+        IntPtr[] Predict (params IntPtr[] inputs);
     }
 }

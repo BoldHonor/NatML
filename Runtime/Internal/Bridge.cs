@@ -8,7 +8,7 @@ namespace NatSuite.ML.Internal {
     using System;
     using System.Runtime.InteropServices;
     using System.Text;
-    using Vision;
+    using Features;
 
     public static class Bridge {
 
@@ -78,7 +78,7 @@ namespace NatSuite.ML.Internal {
             int height,
             [In] int[] shape,
             NMLDataType dtype,
-            MLAspectMode aspect,
+            MLImageFeature.AspectMode aspect,
             [In] float[] mean,
             [In] float[] std,
             out IntPtr feature

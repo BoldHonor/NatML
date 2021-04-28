@@ -3,9 +3,8 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML {
+namespace NatSuite.ML.Predictors {
 
-    using System;
     using System.Collections.Concurrent;
     using System.Runtime.CompilerServices;
     using System.Threading;
@@ -14,20 +13,16 @@ namespace NatSuite.ML {
 
     /// <summary>
     /// </summary>
-    public class MLAsyncModule<TOutput> : MLModule<Task<TOutput>> {
+    public sealed class MLAsyncPredictor<TOutput> : IMLPredictor<Task<TOutput>> {
 
         #region --Client API--
         /// <summary>
-        /// Model input feature types.
+        /// Backing predictor used by the async predictor.
         /// </summary>
-        public override MLFeatureType[] inputs => module.inputs;
+        public readonly IMLPredictor<TOutput> predictor;
 
         /// <summary>
-        /// Model output feature types.
-        /// </summary>
-        public override MLFeatureType[] outputs => module.outputs;
-
-        /// <summary>
+        /// Whether the predictor is ready to process new requests immediately.
         /// </summary>
         public bool readyForPrediction {
             [MethodImpl(MethodImplOptions.Synchronized)] get;
@@ -35,27 +30,23 @@ namespace NatSuite.ML {
         }
 
         /// <summary>
+        /// Create an async predictor.
         /// </summary>
-        /// <param name="module"></param>
-        public MLAsyncModule (MLModule<TOutput> module) : this(module.Predict) { }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="predictor"></param>
-        public MLAsyncModule (Func<MLFeature[], TOutput> predictor) : base("") {
-            // Check
-            
+        /// <param name="predictor">Backing predictor used to make predictions.</param>
+        public MLAsyncPredictor (IMLPredictor<TOutput> predictor) {            
             // Save
-            this.module = predictor.Target as IMLModule;
+            this.predictor = predictor;
             this.queue = new ConcurrentQueue<(MLFeature[], TaskCompletionSource<TOutput>)>();
             this.cts = new CancellationTokenSource();
             this.task = new Task(() => {
                 while (!cts.Token.IsCancellationRequested)
                     if (queue.TryDequeue(out var request)) {
                         readyForPrediction = false;
-                        request.Item2.SetResult(predictor(request.Item1));
+                        request.Item2.SetResult(predictor.Predict(request.Item1));
                         readyForPrediction = true;
                     }
+                while (queue.TryDequeue(out var request))
+                    request.Item2.SetCanceled();
             }, cts.Token, TaskCreationOptions.LongRunning);
             // Start
             task.Start();
@@ -66,24 +57,25 @@ namespace NatSuite.ML {
         /// </summary>
         /// <param name="inputs"></param>
         /// <returns></returns>
-        public override Task<TOutput> Predict (params MLFeature[] inputs) {
+        public Task<TOutput> Predict (params MLFeature[] inputs) {
             var tcs = new TaskCompletionSource<TOutput>();
             queue.Enqueue((inputs, tcs));
             return tcs.Task;
         }
 
         /// <summary>
+        /// Dispose the predictor and release resources.
+        /// When this is called, all outstanding prediction requests are cancelled.
         /// </summary>
-        public override void Dispose () {
+        public void Dispose () {
             cts.Cancel();
             task.Wait();
-            module.Dispose();
+            predictor.Dispose();
         }
         #endregion
 
 
         #region --Operations--
-        private readonly IMLModule module;
         private readonly ConcurrentQueue<(MLFeature[], TaskCompletionSource<TOutput>)> queue;
         private readonly CancellationTokenSource cts;
         private readonly Task task;
