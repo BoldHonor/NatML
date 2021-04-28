@@ -60,7 +60,7 @@ namespace NatSuite.ML.Vision {
         /// </summary>
         /// <param name="inputs">Input features.</param>
         /// <returns></returns>
-        public unsafe override (string label, float confidence)[] Predict (params MLFeature[] inputs) { // Slower than ::Classify
+        public unsafe override (string label, float confidence)[] Predict (params MLFeature[] inputs) { // Slower than `Classify`
             // Check
             if (inputs.Length != 1)
                 throw new ArgumentException(@"MLClassifier expects a single feature", nameof(inputs));

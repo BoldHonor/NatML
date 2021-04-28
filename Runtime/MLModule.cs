@@ -15,18 +15,18 @@ namespace NatSuite.ML {
     /// <summary>
     /// ML model.
     /// </summary>
-    public abstract class MLModule<TOutput> : IDisposable, IReadOnlyDictionary<string, string> {
+    public abstract class MLModule<TOutput> : IMLModule {
 
         #region --Client API--
         /// <summary>
         /// Model input feature types.
         /// </summary>
-        public readonly MLFeatureType[] inputs;
+        public virtual MLFeatureType[] inputs { get; private set; }
 
         /// <summary>
         /// Model output feature types.
         /// </summary>
-        public readonly MLFeatureType[] outputs;
+        public virtual MLFeatureType[] outputs { get; private set; }
 
         /// <summary>
         /// Get a value in the model metadata.
