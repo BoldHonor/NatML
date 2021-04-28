@@ -78,42 +78,4 @@ namespace NatSuite.ML.Vision {
         void IDisposable.Dispose () { } // Nop
         #endregion
     }
-
-    /*
-    /// <summary>
-    /// </summary>
-    public sealed class MLClassifier : MLModule<(string label, float confidence)[]> {
-
-        #region --Client API--
-        /// <summary>
-        /// Classification labels.
-        /// </summary>
-        public readonly string[] labels;
-
-        /// <summary>
-        /// Create a classifier.
-        /// </summary>
-        /// <param name="path">Path to ONNX model.</param>
-        /// <param name="labels">List of labels which the classifier outputs.</param>
-        public MLClassifier (string path, string[] labels) : base(path) {
-            this.labels = labels;
-            // Allocate logits
-            var outputShape = ((MLArrayType)this.outputs.First()).shape;
-            this.classes = outputShape.Aggregate(1, (a, b) => a * b);
-        }
-
-        
-
-        
-
-        
-        #endregion
-
-
-        #region --Operations--
-
-        private readonly int classes;
-        #endregion
-    }
-    */
 }
