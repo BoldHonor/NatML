@@ -12,6 +12,8 @@ namespace NatSuite.ML.Predictors {
     using Internal;
 
     /// <summary>
+    /// Asynchronous preditor which runs predictions on a worker thread.
+    /// This predictor wraps an existing predictor and uses it to make predictions.
     /// </summary>
     public sealed class MLAsyncPredictor<TOutput> : IMLPredictor<Task<TOutput>> {
 
@@ -37,14 +39,20 @@ namespace NatSuite.ML.Predictors {
             // Save
             this.predictor = predictor;
             this.queue = new ConcurrentQueue<(MLFeature[], TaskCompletionSource<TOutput>)>();
+            this.fence = new AutoResetEvent(false);
             this.cts = new CancellationTokenSource();
             this.task = new Task(() => {
-                while (!cts.Token.IsCancellationRequested)
-                    if (queue.TryDequeue(out var request)) {
-                        readyForPrediction = false;
-                        request.Item2.SetResult(predictor.Predict(request.Item1));
-                        readyForPrediction = true;
+                while (!cts.Token.IsCancellationRequested) {
+                    // Check for dispose
+                    if (!queue.TryDequeue(out var request)) {
+                        fence.WaitOne();
+                        continue;
                     }
+                    // Predict
+                    readyForPrediction = false;
+                    request.Item2.SetResult(predictor.Predict(request.Item1));
+                    readyForPrediction = true;
+                }
                 while (queue.TryDequeue(out var request))
                     request.Item2.SetCanceled();
             }, cts.Token, TaskCreationOptions.LongRunning);
@@ -60,6 +68,7 @@ namespace NatSuite.ML.Predictors {
         public Task<TOutput> Predict (params MLFeature[] inputs) {
             var tcs = new TaskCompletionSource<TOutput>();
             queue.Enqueue((inputs, tcs));
+            fence.Set();
             return tcs.Task;
         }
 
@@ -68,8 +77,13 @@ namespace NatSuite.ML.Predictors {
         /// When this is called, all outstanding prediction requests are cancelled.
         /// </summary>
         public void Dispose () {
+            // Stop worker
             cts.Cancel();
+            fence.Set();
             task.Wait();
+            // Dispose
+            cts.Dispose();
+            fence.Dispose();
             predictor.Dispose();
         }
         #endregion
@@ -77,6 +91,7 @@ namespace NatSuite.ML.Predictors {
 
         #region --Operations--
         private readonly ConcurrentQueue<(MLFeature[], TaskCompletionSource<TOutput>)> queue;
+        private readonly AutoResetEvent fence;
         private readonly CancellationTokenSource cts;
         private readonly Task task;
         #endregion

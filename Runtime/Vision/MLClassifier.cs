@@ -28,9 +28,13 @@ namespace NatSuite.ML.Vision {
         /// <param name="path">Path to ONNX model.</param>
         /// <param name="labels">List of labels which the classifier outputs.</param>
         public MLClassifier (MLModel model, string[] labels) {
+            // Save
             this.model = model;
             this.labels = labels;
             this.classes = ((MLArrayType)model.outputs.First()).shape.Aggregate(1, (a, b) => a * b);
+            // Check
+            if (labels.Length != classes)
+                throw new ArgumentOutOfRangeException(nameof(labels), $"Classifier predcitor received {labels.Length} labels but expected {classes}");
         }
 
         /// <summary>
