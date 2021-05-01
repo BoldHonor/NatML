@@ -33,11 +33,6 @@ namespace NatSuite.ML {
         /// Implicitly convert a float array an ML feature.
         /// </summary>
         public static implicit operator MLFeature (float[] array) => new MLArrayFeature<float>(array);
-
-        /// <summary>
-        /// Implicitly convert a integer array an ML feature.
-        /// </summary>
-        public static implicit operator MLFeature (int[] array) => new MLArrayFeature<int>(array);
         #endregion
 
 

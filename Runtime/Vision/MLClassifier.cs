@@ -61,16 +61,6 @@ namespace NatSuite.ML.Vision {
             outputFeature.ReleaseFeature();
             return (labels[argMax], logits[argMax]);
         }
-
-        /// <summary>
-        /// Load classification labels from a plain text file.
-        /// </summary>
-        /// <param name="relativePath">Relative path to label file in `StreamingAssets` folder.</param>
-        /// <returns>Array of class labels read from file.</returns>
-        public static async Task<string[]> LoadLabelsFromStreamingAssets (string relativePath) {
-            var absolutePath = await MLModelUtility.StreamingAssetsToAbsolute(relativePath);
-            return File.ReadAllLines(absolutePath);
-        }
         #endregion
 
 

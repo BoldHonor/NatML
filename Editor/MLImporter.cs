@@ -16,11 +16,10 @@ namespace NatSuite.ML.Editor {
     public class MLImporter : ScriptedImporter {
 
         public override void OnImportAsset (AssetImportContext ctx) {
-            var modelData = File.ReadAllBytes(ctx.assetPath);
-            var serializedModel = ScriptableObject.CreateInstance<MLSerializedModel>();
-            serializedModel.data = modelData;
-            ctx.AddObjectToAsset("MLModel", serializedModel);
-            ctx.SetMainObject(serializedModel);
+            var modelData = ScriptableObject.CreateInstance<MLModelData>();
+            modelData.data = File.ReadAllBytes(ctx.assetPath);
+            ctx.AddObjectToAsset("MLModelDaa", modelData);
+            ctx.SetMainObject(modelData);
         }
     }
 }
