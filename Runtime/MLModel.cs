@@ -46,9 +46,24 @@ namespace NatSuite.ML {
         /// Create an ML model.
         /// </summary>
         /// <param name="path">Path to ONNX model.</param>
-        public MLModel (string path) {
-            // Create model
-            Bridge.CreateModel(path, out this.model);
+        public MLModel (string path) : this(Create(path)) { }
+
+        /// <summary>
+        /// Dispose the model and release resources.
+        /// </summary>
+        public void Dispose () => model.ReleaseModel();
+        #endregion
+
+
+        #region --Operations--
+
+        private readonly IntPtr model;
+
+        internal MLModel (byte[] modelData) : this(Create(modelData)) { } // Users don't need access to this just yet
+
+        private MLModel (IntPtr model) {
+            // Save
+            this.model = model;
             // Marshal inputs
             this.inputs = new MLFeatureType[model.InputFeatureCount()];
             for (var i = 0; i < inputs.Length; ++i) {
@@ -65,16 +80,21 @@ namespace NatSuite.ML {
             }
         }
 
-        /// <summary>
-        /// Dispose the model and release resources.
-        /// </summary>
-        public void Dispose () => model.ReleaseModel();
-        #endregion
+        private static IntPtr Create (string path) {
+            Bridge.CreateModel(path, out var model);
+            if (model != IntPtr.Zero)
+                return model;
+            else
+                throw new ArgumentException($"Failed to create MLModel from path: {path}", nameof(path));
+        }
 
-
-        #region --Operations--
-
-        private readonly IntPtr model;
+        private static IntPtr Create (byte[] data) {
+            Bridge.CreateModel(data, data.Length, out var model);
+            if (model != IntPtr.Zero)
+                return model;
+            else
+                throw new ArgumentException(@"Failed to create MLModel from data", nameof(data));
+        }
 
         IntPtr[] IMLModel.Predict (params IntPtr[] inputs) {
             var outputs = new IntPtr[this.outputs.Length];
