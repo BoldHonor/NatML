@@ -8,7 +8,6 @@ namespace NatSuite.ML.Internal {
     using System;
     using System.Runtime.InteropServices;
     using System.Text;
-    using Features;
 
     public static class Bridge {
 
@@ -87,9 +86,9 @@ namespace NatSuite.ML.Internal {
             int height,
             [In] int[] shape,
             NMLDataType dtype,
-            MLImageFeature.AspectMode aspect,
             [In] float[] mean,
             [In] float[] std,
+            int flags,
             out IntPtr feature
         );
         #endregion
@@ -99,13 +98,20 @@ namespace NatSuite.ML.Internal {
         [DllImport(Assembly, EntryPoint = @"NMLReleaseFeatureType")]
         public static extern void ReleaseFeatureType (this IntPtr type);
         [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetName")]
-        public static extern void FeatureTypeName (this IntPtr type, [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest);
+        public static extern void FeatureTypeName (
+            this IntPtr type,
+            [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest
+        );
         [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetDataType")]
         public static extern NMLDataType FeatureTypeDataType (this IntPtr type);
         [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetDimensions")]
         public static extern int FeatureTypeDimensions (this IntPtr type);
         [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetShape")]
-        public static extern void FeatureTypeShape (this IntPtr type, [Out] int[] shape, int length);
+        public static extern void FeatureTypeShape (
+            this IntPtr type,
+            [Out] int[] shape,
+            int length
+        );
         #endregion
     }
 }

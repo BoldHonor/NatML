@@ -17,7 +17,7 @@ namespace NatSuite.ML.Features {
 
         #region --Client API--
         /// <summary>
-        /// Image aspect mode for performing inference on images.
+        /// Image aspect mode for scaling image features for prediction.
         /// </summary>
         public enum AspectMode : int { // CHECK // Must match `NatML.h`
             /// <summary>
@@ -28,11 +28,30 @@ namespace NatSuite.ML.Features {
             /// <summary>
             /// Image will be aspect-filled to the required size.
             /// </summary>
-            AspectFill = 1 << 8,
+            AspectFill = 1,
             /// <summary>
             /// Image will be aspect-fit (letterboxed) to the required size.
             /// </summary>
-            AspectFit = 1 << 9
+            AspectFit = 2
+        }
+
+        /// <summary>
+        /// Image reflection mode for prediction.
+        /// </summary>
+        [Flags]
+        public enum ReflectionMode : int { // CHECK // Must match `NatML.h`
+            /// <summary>
+            /// No reflection
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// Reflect the image vertically.
+            /// </summary>
+            Vertical = 1 << 2,
+            /// <summary>
+            /// Reflect the image horizontally.
+            /// </summary>
+            Horizontal = 1 << 3
         }
 
         /// <summary>
@@ -46,8 +65,14 @@ namespace NatSuite.ML.Features {
         public Vector3 std = Vector3.one;
 
         /// <summary>
+        /// Aspect mode.
         /// </summary>
         public AspectMode aspectMode = 0;
+
+        /// <summary>
+        /// Reflection mode.
+        /// </summary>
+        public ReflectionMode reflectionMode = 0;
 
         /// <summary>
         /// </summary>
@@ -104,9 +129,9 @@ namespace NatSuite.ML.Features {
                 bufferType.height,
                 featureType.shape,
                 featureType.dataType.NativeType(),
-                aspectMode,
                 new [] { mean.x, mean.y, mean.z },
                 new [] { std.x, std.y, std.z },
+                (int)aspectMode | (int)reflectionMode,
                 out var result
             );
             return result;

@@ -11,6 +11,7 @@ namespace NatSuite.ML {
     using System.Threading.Tasks;
     using UnityEngine;
     using UnityEngine.Networking;
+    using Features;
 
     /// <summary>
     /// </summary>
@@ -18,25 +19,39 @@ namespace NatSuite.ML {
         
         #region --Client API--
         /// <summary>
-        /// Classification labels.
+        /// Model classification labels.
+        /// This is `null` if the model does not have any classification data available.
         /// </summary>
         public string[] labels => classLabels;
 
         /// <summary>
-        /// Expected image normalization when making predictions with this model.
+        /// Expected image feature normalization for predictions with this model.
         /// </summary>
         public (Vector3 mean, Vector3 std) normalization => (imageNormalization.mean, imageNormalization.std);
+
+        /// <summary>
+        /// Expected image aspect mode for predictions with this model.
+        /// </summary>
+        public MLImageFeature.AspectMode aspectMode => imageAspectMode;
+
+        /// <summary>
+        /// Expected image reflection mode for predictions with this model.
+        /// </summary>
+        public MLImageFeature.ReflectionMode reflectionMode => imageReflectionMode;
         
         /// <summary>
+        /// Deserialize the model data to create an ML model that can be used for prediction.
+        /// You MUST dispose the model once you are done with it.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>ML model.</returns>
         public MLModel Deserialize () => new MLModel(data);
 
         /// <summary>
+        /// Fetch ML model data from a local file.
         /// </summary>
         /// <param name="path">Path to ONNX model file. This method supports laoding from StreamingAssets.</param>
-        /// <returns></returns>
-        public static async Task<MLModelData> FromPath (string path) { // DEPLOY
+        /// <returns>ML model data.</returns>
+        public static async Task<MLModelData> FromPath (string path) {
             // On Android, we need to extract from StreamingAssets
             if (Application.platform == RuntimePlatform.Android && path.Contains(Application.streamingAssetsPath))
                 return await FromURL(path);
@@ -50,10 +65,11 @@ namespace NatSuite.ML {
         }
 
         /// <summary>
+        /// Fetch ML model data from a remote URL.
         /// </summary>
         /// <param name="url">URL to ONNX model file.</param>
-        /// <returns></returns>
-        public static async Task<MLModelData> FromURL (string url) { // DEPLOY
+        /// <returns>ML model data.</returns>
+        public static async Task<MLModelData> FromURL (string url) {
             using (var request = UnityWebRequest.Get(url)) {
                 // Download from APK/AAB
                 request.SendWebRequest();
@@ -69,10 +85,11 @@ namespace NatSuite.ML {
         }
 
         /// <summary>
+        /// Fetch ML model data from the Muna ML marketplace.
         /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="accessKey"></param>
-        /// <returns></returns>
+        /// <param name="tag">Model tag.</param>
+        /// <param name="accessKey">Muna access key for fetching private models.</param>
+        /// <returns>ML model data.</returns>
         public static Task<MLModelData> FromMuna (string tag, string accessKey = null) { // INCOMPLETE
             return default;
         }
@@ -83,6 +100,8 @@ namespace NatSuite.ML {
         [SerializeField, HideInInspector] internal byte[] data;
         [SerializeField, HideInInspector] internal string[] classLabels;
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
+        [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;
+        [SerializeField, HideInInspector] internal MLImageFeature.ReflectionMode imageReflectionMode;
         [Serializable] internal struct Normalization { public Vector3 mean; public Vector3 std; }
         #endregion
     }
