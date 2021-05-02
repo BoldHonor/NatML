@@ -21,13 +21,18 @@ namespace NatSuite.ML.Features {
         /// </summary>
         public enum AspectMode : int { // CHECK // Must match `NatML.h`
             /// <summary>
-            // Image will be scaled to fit the input dimensions of the model.
+            /// Image will be scaled to fit the required size.
+            /// This scale mode DOES NOT preserve the aspect ratio of the image.
             /// </summary>
             ScaleToFit = 0,
             /// <summary>
-            /// Image will be aspect-filled to the input dimensions of the model.
+            /// Image will be aspect-filled to the required size.
             /// </summary>
             AspectFill = 1 << 8,
+            /// <summary>
+            /// Image will be aspect-fit (letterboxed) to the required size.
+            /// </summary>
+            AspectFit = 1 << 9
         }
 
         /// <summary>

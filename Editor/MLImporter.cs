@@ -16,6 +16,7 @@ namespace NatSuite.ML.Editor {
     [ScriptedImporter(1, "onnx")]
     public class MLImporter : ScriptedImporter {
 
+        [Header("Classification")]
         public TextAsset classLabels;
 
         public override void OnImportAsset (AssetImportContext ctx) {
