@@ -43,15 +43,13 @@ namespace NatSuite.ML.Predictors {
             this.cts = new CancellationTokenSource();
             this.task = new Task(() => {
                 while (!cts.Token.IsCancellationRequested) {
-                    // Check for dispose
-                    if (!queue.TryDequeue(out var request)) {
-                        fence.WaitOne();
-                        continue;
+                    if (queue.TryDequeue(out var request)) {
+                        readyForPrediction = false;
+                        request.Item2.SetResult(predictor.Predict(request.Item1));
+                        readyForPrediction = true;
                     }
-                    // Predict
-                    readyForPrediction = false;
-                    request.Item2.SetResult(predictor.Predict(request.Item1));
-                    readyForPrediction = true;
+                    else
+                        fence.WaitOne();                    
                 }
                 while (queue.TryDequeue(out var request))
                     request.Item2.SetCanceled();

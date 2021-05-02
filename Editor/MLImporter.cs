@@ -5,20 +5,27 @@
 
 namespace NatSuite.ML.Editor {
 
+    using System;
+    using System.IO;
     using UnityEngine;
     using UnityEditor.Experimental.AssetImporters;
-    using System.IO;
 
     /// <summary>
-    /// ONNX model importer.
+    /// NatML model importer.
     /// </summary>
     [ScriptedImporter(1, "onnx")]
     public class MLImporter : ScriptedImporter {
 
+        public TextAsset classLabels;
+
         public override void OnImportAsset (AssetImportContext ctx) {
+            // Populate model data
             var modelData = ScriptableObject.CreateInstance<MLModelData>();
             modelData.data = File.ReadAllBytes(ctx.assetPath);
-            ctx.AddObjectToAsset("MLModelDaa", modelData);
+            if (classLabels)
+                modelData.classLabels = classLabels.text.Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            // Import
+            ctx.AddObjectToAsset("MLModelData", modelData);
             ctx.SetMainObject(modelData);
         }
     }

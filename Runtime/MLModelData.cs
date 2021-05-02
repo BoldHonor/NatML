@@ -18,6 +18,16 @@ namespace NatSuite.ML {
         
         #region --Client API--
         /// <summary>
+        /// Classification labels.
+        /// </summary>
+        public string[] labels => classLabels;
+
+        /// <summary>
+        /// Expected image normalization when making predictions with this model.
+        /// </summary>
+        public (Vector3 mean, Vector3 std) normalization => (imageNormalization.mean, imageNormalization.std);
+        
+        /// <summary>
         /// </summary>
         /// <returns></returns>
         public MLModel Deserialize () => new MLModel(data);
@@ -59,45 +69,21 @@ namespace NatSuite.ML {
         }
 
         /// <summary>
-        /// Load classification labels from a plain text file.
         /// </summary>
-        /// <param name="path">Path to labels file. This method supports loading from StreamingAssets.</param>
-        /// <returns>Array of class labels read from file.</returns>
-        public static async Task<string[]> ReadLabels (string path) { // DEPLOY
-            // On Android, we need to extract from StreamingAssets
-            if (Application.platform == RuntimePlatform.Android && path.Contains(Application.streamingAssetsPath)) {
-                using (var request = UnityWebRequest.Get(path)) {
-                    // Download from APK/AAB
-                    request.SendWebRequest();
-                    while (!request.isDone)
-                        await Task.Yield();
-                    if (request.isNetworkError || request.isHttpError)
-                        throw new ArgumentException($"Failed to read labels from StreamingAssets path: {path}", nameof(path));
-                    // Read
-                    return request.downloadHandler.text.Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                }
-            }
-            // Check
-            if (!File.Exists(path))
-                throw new ArgumentException($"Failed to create MLModelData from path: {path}", nameof(path));
-            // Read
-            var labels = File.ReadAllLines(path);
-            return labels;
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="textAsset"></param>
+        /// <param name="tag"></param>
+        /// <param name="accessKey"></param>
         /// <returns></returns>
-        public static Task<string[]> ReadLabels (TextAsset textAsset) {
-            var labels = textAsset.text.Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            return Task.FromResult(labels);
+        public static Task<MLModelData> FromMuna (string tag, string accessKey = null) { // INCOMPLETE
+            return default;
         }
         #endregion
         
 
         #region --Operations--
         [SerializeField, HideInInspector] internal byte[] data;
+        [SerializeField, HideInInspector] internal string[] classLabels;
+        [SerializeField, HideInInspector] internal Normalization imageNormalization;
+        [Serializable] internal struct Normalization { public Vector3 mean; public Vector3 std; }
         #endregion
     }
 }
