@@ -12,7 +12,7 @@ namespace NatSuite.ML.Vision {
 
     /// <summary>
     /// </summary>
-    public class MLDenseClassifier : IMLPredictor<(string label, float confidence)[]> { // DOC // Slower than `MLClassifier`
+    public class MLClassificationPredictor : IMLPredictor<(string label, float confidence)> {
 
         #region --Client API--
         /// <summary>
@@ -21,50 +21,49 @@ namespace NatSuite.ML.Vision {
         public readonly string[] labels;
 
         /// <summary>
-        /// Create a classifier.
+        /// Create a classification predictor.
         /// </summary>
         /// <param name="path">Path to ONNX model.</param>
         /// <param name="labels">List of labels which the classifier outputs.</param>
-        public MLDenseClassifier (MLModel model, string[] labels) {
+        public MLClassificationPredictor (MLModel model, string[] labels) {
             // Save
             this.model = model;
             this.labels = labels;
-            this.classes = ((MLArrayType)model.outputs.First()).shape.Aggregate(1, (a, b) => a * b);
+            this.classes = (model.outputs.First() as MLArrayType).shape.Aggregate(1, (a, b) => a * b);
             // Check
             if (labels.Length != classes)
                 throw new ArgumentOutOfRangeException(nameof(labels), $"Classifier predcitor received {labels.Length} labels but expected {classes}");
         }
 
         /// <summary>
-        /// Predict all classes on a features.
-        /// This will return the predicted labels in descending order of confidence scores.
+        /// Classify a feature.
+        /// This will return the most-likely label along with the confidence score.
         /// </summary>
         /// <param name="inputs">Input features.</param>
-        /// <returns></returns>
-        public unsafe (string label, float confidence)[] Predict (params MLFeature[] inputs) {
+        /// <returns>Output label along with unnormalized confidence value.</returns>
+        public unsafe (string label, float confidence) Predict (params MLFeature[] inputs) {
             // Check
             if (inputs.Length != 1)
-                throw new ArgumentException(@"MLDenseClassifier expects a single feature", nameof(inputs));
+                throw new ArgumentException(@"Classifier predictor expects a single feature", nameof(inputs));
             // Predict
             var inputFeature = (inputs.First() as IMLFeature).Create(model.inputs.First());
             var outputFeature = model.Predict(inputFeature).First();
-            // Copy logits
+            // Find label
             var logits = (float*)outputFeature.FeatureData();
-            var pairs = new (string, float l)[classes];
-            for (var i = 0; i < classes; ++i)
-                pairs[i] = (labels[i], logits[i]);
-            // Order descending
-            var result = pairs.OrderByDescending(c => c.l).ToArray();
+            var argMax = 0;
+            for (var i = 1; i < classes; ++i)
+                if (logits[i] > logits[argMax])
+                    argMax = i;
             // Release
             inputFeature.ReleaseFeature();
             outputFeature.ReleaseFeature();
-            return result;
+            return (labels[argMax], logits[argMax]);
         }
         #endregion
 
 
         #region --Operations--
-        
+
         private readonly IMLModel model;
         private readonly int classes;
 

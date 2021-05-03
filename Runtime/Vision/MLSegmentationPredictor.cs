@@ -7,7 +7,7 @@ namespace NatSuite.ML.Vision {
 
     /// <summary>
     /// </summary>
-    public sealed class MLSegmenter {
+    public sealed class MLSegmentationPredictor {
 
         
     }

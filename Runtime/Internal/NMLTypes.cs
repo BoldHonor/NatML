@@ -17,4 +17,8 @@ namespace NatSuite.ML.Internal {
         Sequence = 8,
         Dictionary = 9
     }
+
+    public enum NMLFeatureFlag : int { // CHECK // Must match `NatML.h`
+
+    }
 }

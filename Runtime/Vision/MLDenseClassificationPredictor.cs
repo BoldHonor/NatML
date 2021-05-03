@@ -6,15 +6,13 @@
 namespace NatSuite.ML.Vision {
 
     using System;
-    using System.IO;
     using System.Linq;
-    using System.Threading.Tasks;
     using Features.Types;
     using Internal;
 
     /// <summary>
     /// </summary>
-    public class MLClassifier : IMLPredictor<(string label, float confidence)> {
+    public class MLDenseClassificationPredictor : IMLPredictor<(string label, float confidence)[]> {
 
         #region --Client API--
         /// <summary>
@@ -23,11 +21,11 @@ namespace NatSuite.ML.Vision {
         public readonly string[] labels;
 
         /// <summary>
-        /// Create a classifier.
+        /// Create a dense classification predictor.
         /// </summary>
         /// <param name="path">Path to ONNX model.</param>
         /// <param name="labels">List of labels which the classifier outputs.</param>
-        public MLClassifier (MLModel model, string[] labels) {
+        public MLDenseClassificationPredictor (MLModel model, string[] labels) {
             // Save
             this.model = model;
             this.labels = labels;
@@ -38,34 +36,34 @@ namespace NatSuite.ML.Vision {
         }
 
         /// <summary>
-        /// Classify a feature.
-        /// This will return the most-likely label along with the confidence score.
+        /// Predict all classes on a features.
+        /// This will return the predicted labels in descending order of confidence scores.
         /// </summary>
         /// <param name="inputs">Input features.</param>
-        /// <returns>Output label along with unnormalized confidence value.</returns>
-        public unsafe (string label, float confidence) Predict (params MLFeature[] inputs) {
+        /// <returns></returns>
+        public unsafe (string label, float confidence)[] Predict (params MLFeature[] inputs) {
             // Check
             if (inputs.Length != 1)
-                throw new ArgumentException(@"MLClassifier expects a single feature", nameof(inputs));
+                throw new ArgumentException(@"Classifier predictor expects a single feature", nameof(inputs));
             // Predict
             var inputFeature = (inputs.First() as IMLFeature).Create(model.inputs.First());
             var outputFeature = model.Predict(inputFeature).First();
-            // Find label
-            var logits = (float*)outputFeature.FeatureData();
-            var argMax = 0;
-            for (var i = 1; i < classes; ++i)
-                if (logits[i] > logits[argMax])
-                    argMax = i;
-            // Release
             inputFeature.ReleaseFeature();
+            // Copy logits
+            var logits = (float*)outputFeature.FeatureData();
+            var pairs = new (string, float l)[classes];
+            for (var i = 0; i < classes; ++i)
+                pairs[i] = (labels[i], logits[i]);
             outputFeature.ReleaseFeature();
-            return (labels[argMax], logits[argMax]);
+            // Order descending
+            var result = pairs.OrderByDescending(c => c.l).ToArray();            
+            return result;
         }
         #endregion
 
 
         #region --Operations--
-
+        
         private readonly IMLModel model;
         private readonly int classes;
 
