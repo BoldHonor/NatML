@@ -19,6 +19,17 @@ namespace NatSuite.ML {
         
         #region --Client API--
         /// <summary>
+        /// </summary>
+        [Serializable]
+        public struct Normalization { // We need to support null checks, but Unity's serialization won't allow us prosper
+            [SerializeField] internal Vector3 mean;
+            [SerializeField] internal Vector3 std;
+            [SerializeField] internal bool valid;
+            public void Deconstruct (out Vector3 mean, out Vector3 std) => (mean, std) = (this.mean, this.std);
+            public static implicit operator bool (Normalization n) => n.valid;
+        }
+
+        /// <summary>
         /// Model classification labels.
         /// This is `null` if the model does not have any classification data available.
         /// </summary>
@@ -27,7 +38,7 @@ namespace NatSuite.ML {
         /// <summary>
         /// Expected image feature normalization for predictions with this model.
         /// </summary>
-        public (Vector3 mean, Vector3 std) normalization => (imageNormalization.mean, imageNormalization.std);
+        public Normalization normalization => imageNormalization;
 
         /// <summary>
         /// Expected image aspect mode for predictions with this model.
@@ -102,7 +113,6 @@ namespace NatSuite.ML {
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
         [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;
         [SerializeField, HideInInspector] internal MLImageFeature.ReflectionMode imageReflectionMode;
-        [Serializable] internal struct Normalization { public Vector3 mean; public Vector3 std; }
         #endregion
     }
 }
