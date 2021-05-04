@@ -44,11 +44,6 @@ namespace NatSuite.ML {
         /// Expected image aspect mode for predictions with this model.
         /// </summary>
         public MLImageFeature.AspectMode aspectMode => imageAspectMode;
-
-        /// <summary>
-        /// Expected image reflection mode for predictions with this model.
-        /// </summary>
-        public MLImageFeature.ReflectionMode reflectionMode => imageReflectionMode;
         
         /// <summary>
         /// Deserialize the model data to create an ML model that can be used for prediction.
@@ -112,7 +107,6 @@ namespace NatSuite.ML {
         [SerializeField, HideInInspector] internal string[] classLabels;
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
         [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;
-        [SerializeField, HideInInspector] internal MLImageFeature.ReflectionMode imageReflectionMode;
         #endregion
     }
 }

@@ -9,7 +9,6 @@ namespace NatSuite.ML.Features {
     using UnityEngine;
     using Internal;
     using Types;
-    using Vision;
 
     /// <summary>
     /// </summary>
@@ -36,25 +35,6 @@ namespace NatSuite.ML.Features {
         }
 
         /// <summary>
-        /// Image reflection mode for prediction.
-        /// </summary>
-        [Flags]
-        public enum ReflectionMode : int { // CHECK // Must match `NatML.h`
-            /// <summary>
-            /// No reflection
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// Reflect the image vertically.
-            /// </summary>
-            Vertical = 1 << 2,
-            /// <summary>
-            /// Reflect the image horizontally.
-            /// </summary>
-            Horizontal = 1 << 3
-        }
-
-        /// <summary>
         /// Normalization mean.
         /// </summary>
         public Vector3 mean = Vector3.zero;
@@ -68,11 +48,6 @@ namespace NatSuite.ML.Features {
         /// Aspect mode.
         /// </summary>
         public AspectMode aspectMode = 0;
-
-        /// <summary>
-        /// Reflection mode.
-        /// </summary>
-        public ReflectionMode reflectionMode = 0;
 
         /// <summary>
         /// </summary>
@@ -131,7 +106,7 @@ namespace NatSuite.ML.Features {
                 featureType.dataType.NativeType(),
                 new [] { mean.x, mean.y, mean.z },
                 new [] { std.x, std.y, std.z },
-                (NMLFeatureFlags)aspectMode | (NMLFeatureFlags)reflectionMode,
+                (NMLFeatureFlags)aspectMode,
                 out var feature
             );
             return feature;
