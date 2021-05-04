@@ -70,16 +70,27 @@ namespace NatSuite.ML.Features {
             var featureType = type as MLArrayType;
             var bufferType = this.type as MLArrayType;
             if (featureType.dataType != bufferType.dataType)
-                throw new ArgumentException($"Model expects {featureType.dataType} feature but was given {bufferType.dataType} feature");
+                throw new ArgumentException($"MLModel expects {featureType.dataType} feature but was given {bufferType.dataType} feature");
             // Create feature
             var shape = bufferType.shape ?? featureType.shape;
-            var result = IntPtr.Zero;
-            if (nativeBuffer != IntPtr.Zero)
-                Bridge.CreateFeature((void*)nativeBuffer, shape, shape.Length, featureType.dataType.NativeType(), out result);
-            else
+            if (data != null)
                 fixed (void* baseAddress = data)
-                    Bridge.CreateFeature(baseAddress, shape, shape.Length, featureType.dataType.NativeType(), out result);
-            return result;
+                    return CreateNativeFeature(baseAddress, shape);
+            if (nativeBuffer != IntPtr.Zero)
+                return CreateNativeFeature((void*)nativeBuffer, shape);
+            return IntPtr.Zero;
+        }
+
+        private unsafe IntPtr CreateNativeFeature (void* data, int[] shape) {
+            Bridge.CreateFeature(
+                data,
+                shape,
+                shape.Length,
+                type.dataType.NativeType(),
+                0,
+                out var feature
+            );
+            return feature;
         }
         #endregion
     }

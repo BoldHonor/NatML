@@ -111,16 +111,16 @@ namespace NatSuite.ML.Features {
         unsafe IntPtr IMLFeature.Create (MLFeatureType type) {
             if (pixelBuffer != null)
                 fixed (void* data = pixelBuffer)
-                    return CreateNativeFeature(type, data);
+                    return CreateNativeFeature(data, type);
             if (colorBuffer != null)
                 fixed (void* data = colorBuffer)
-                    return CreateNativeFeature(type, data);
+                    return CreateNativeFeature(data, type);
             if (nativeBuffer != IntPtr.Zero)
-                return CreateNativeFeature(type, (void*)nativeBuffer);
+                return CreateNativeFeature((void*)nativeBuffer, type);
             return IntPtr.Zero;
         }
 
-        private unsafe IntPtr CreateNativeFeature (MLFeatureType type, void* data) {
+        private unsafe IntPtr CreateNativeFeature (void* data, MLFeatureType type) {
             var featureType = type as MLArrayType;
             var bufferType = this.type as MLImageType;
             Bridge.CreateFeature(
@@ -131,10 +131,10 @@ namespace NatSuite.ML.Features {
                 featureType.dataType.NativeType(),
                 new [] { mean.x, mean.y, mean.z },
                 new [] { std.x, std.y, std.z },
-                (int)aspectMode | (int)reflectionMode,
-                out var result
+                (NMLFeatureFlags)aspectMode | (NMLFeatureFlags)reflectionMode,
+                out var feature
             );
-            return result;
+            return feature;
         }
         #endregion
     }

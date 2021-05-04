@@ -23,8 +23,8 @@ namespace NatSuite.ML.Vision {
         /// <summary>
         /// Create a classification predictor.
         /// </summary>
-        /// <param name="path">Path to ONNX model.</param>
-        /// <param name="labels">List of labels which the classifier outputs.</param>
+        /// <param name="model"></param>
+        /// <param name="labels">Classification labels.</param>
         public MLClassificationPredictor (MLModel model, string[] labels) {
             // Save
             this.model = model;
@@ -39,7 +39,7 @@ namespace NatSuite.ML.Vision {
         /// Classify a feature.
         /// This will return the most-likely label along with the confidence score.
         /// </summary>
-        /// <param name="inputs">Input features.</param>
+        /// <param name="inputs">Input feature.</param>
         /// <returns>Output label along with unnormalized confidence value.</returns>
         public unsafe (string label, float confidence) Predict (params MLFeature[] inputs) {
             // Check

@@ -23,7 +23,7 @@ namespace NatSuite.ML.Vision {
         /// <summary>
         /// Create a dense classification predictor.
         /// </summary>
-        /// <param name="path">Path to ONNX model.</param>
+        /// <param name="model"></param>
         /// <param name="labels">List of labels which the classifier outputs.</param>
         public MLDenseClassificationPredictor (MLModel model, string[] labels) {
             // Save
@@ -36,10 +36,10 @@ namespace NatSuite.ML.Vision {
         }
 
         /// <summary>
-        /// Predict all classes on a features.
+        /// Predict all classes on a feature.
         /// This will return the predicted labels in descending order of confidence scores.
         /// </summary>
-        /// <param name="inputs">Input features.</param>
+        /// <param name="inputs">Input feature.</param>
         /// <returns></returns>
         public unsafe (string label, float confidence)[] Predict (params MLFeature[] inputs) {
             // Check

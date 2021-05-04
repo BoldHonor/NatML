@@ -77,6 +77,7 @@ namespace NatSuite.ML.Internal {
             [In] int[] shape,
             int dims,
             NMLDataType dtype,
+            NMLFeatureFlags flags,
             out IntPtr feature
         );
         [DllImport(Assembly, EntryPoint = @"NMLCreateImageFeature")]
@@ -88,7 +89,7 @@ namespace NatSuite.ML.Internal {
             NMLDataType dtype,
             [In] float[] mean,
             [In] float[] std,
-            int flags,
+            NMLFeatureFlags flags,
             out IntPtr feature
         );
         #endregion
