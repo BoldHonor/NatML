@@ -8,9 +8,21 @@
 		<data>
 		21SDOljbWerbZBYCelPMbpyoAbQ=
 		</data>
+		<key>Modules/module.modulemap</key>
+		<data>
+		RuBggVVF4hg85KHyQ43hu9YiDV0=
+		</data>
 	</dict>
 	<key>files2</key>
-	<dict/>
+	<dict>
+		<key>Modules/module.modulemap</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ywl2iDZp58T6vEZxKyXK95yaX4WKD4dbGUxFeYzvBA8=
+			</data>
+		</dict>
+	</dict>
 	<key>rules</key>
 	<dict>
 		<key>^.*</key>
