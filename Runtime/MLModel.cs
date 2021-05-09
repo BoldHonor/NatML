@@ -59,7 +59,7 @@ namespace NatSuite.ML {
 
         private readonly IntPtr model;
 
-        internal MLModel (byte[] modelData) : this(Create(modelData)) { } // Users don't need access to this just yet
+        internal MLModel (byte[] modelData) : this(Create(modelData)) { } // Devs don't need access to this just yet
 
         private MLModel (IntPtr model) {
             // Save
@@ -88,8 +88,10 @@ namespace NatSuite.ML {
                 throw new ArgumentException($"Failed to create MLModel from path: {path}", nameof(path));
         }
 
-        private static IntPtr Create (byte[] data) {
-            Bridge.CreateModel(data, data.Length, out var model);
+        private static unsafe IntPtr Create (byte[] data) {
+            var model = IntPtr.Zero;
+            fixed (void* buffer = data)
+                Bridge.CreateModel(buffer, data.Length, out model);
             if (model != IntPtr.Zero)
                 return model;
             else

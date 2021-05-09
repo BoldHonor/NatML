@@ -26,8 +26,8 @@ namespace NatSuite.ML.Internal {
             out IntPtr model
         );
         [DllImport(Assembly, EntryPoint = @"NMLCreateModelFromBuffer")]
-        public static extern void CreateModel (
-            [In] byte[] buffer,
+        public static unsafe extern void CreateModel (
+            void* buffer,
             int bufferSize,
             out IntPtr model
         );
