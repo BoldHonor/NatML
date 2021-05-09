@@ -64,14 +64,14 @@ namespace NatSuite.ML {
         private MLModel (IntPtr model) {
             // Save
             this.model = model;
-            // Marshal inputs
+            // Marshal input types
             this.inputs = new MLFeatureType[model.InputFeatureCount()];
             for (var i = 0; i < inputs.Length; ++i) {
                 model.InputFeatureType(i, out var nativeType);
                 inputs[i] = nativeType.MarshalFeatureType();
                 nativeType.ReleaseFeatureType();
             }
-            // Marshal outputs
+            // Marshal output types
             this.outputs = new MLFeatureType[model.OutputFeatureCount()];
             for (var i = 0; i < outputs.Length; ++i) {
                 model.OutputFeatureType(i, out var nativeType);
