@@ -55,19 +55,25 @@ namespace NatSuite.ML {
         /// <summary>
         /// Fetch ML model data from a local file.
         /// </summary>
-        /// <param name="path">Path to ONNX model file. This method supports laoding from StreamingAssets.</param>
+        /// <param name="path">Path to ONNX model file.</param>
         /// <returns>ML model data.</returns>
-        public static async Task<MLModelData> FromPath (string path) {
-            // On Android, we need to extract from StreamingAssets
-            if (Application.platform == RuntimePlatform.Android && path.Contains(Application.streamingAssetsPath))
-                return await FromURL(path);
-            // Check
-            if (!File.Exists(path))
-                throw new ArgumentException($"Failed to create MLModelData from path: {path}", nameof(path));
-            // Create
+        public static Task<MLModelData> FromPath (string path) {
             var modelData = ScriptableObject.CreateInstance<MLModelData>();
             modelData.data = File.ReadAllBytes(path);
-            return modelData;
+            return Task.FromResult(modelData);
+        }
+
+        /// <summary>
+        /// Fetch ML model data from StreamingAssets.
+        /// </summary>
+        /// <param name="path">Relative path to ONNX model file in `StreamingAssets` folder.</param>
+        /// <returns>ML model data.</returns>
+        public static async Task<MLModelData> FromStreamingAssets (string relativePath) {
+            var fullPath = Path.Combine(Application.streamingAssetsPath, relativePath);
+            if (Application.platform == RuntimePlatform.Android)
+                return await FromURL(fullPath);
+            else
+                return await FromPath(fullPath);                
         }
 
         /// <summary>
