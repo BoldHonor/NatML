@@ -47,9 +47,9 @@ namespace NatSuite.ML.Internal {
             var dtype = nativeType.FeatureTypeDataType();
             if (dtype == NMLDataType.Undefined)
                 return null;
-            // Get name 
+            // Get name
             var nameBuffer = new StringBuilder(2048);
-            //nativeType.FeatureTypeName(nameBuffer); // INCOMPLETE // CRASHES ON WIN10
+            nativeType.FeatureTypeName(nameBuffer, nameBuffer.Capacity);
             var name = nameBuffer.ToString();
             // Get shape
             var shape = new int[nativeType.FeatureTypeDimensions()];

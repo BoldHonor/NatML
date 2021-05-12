@@ -39,13 +39,15 @@ namespace NatSuite.ML.Internal {
         public static extern void MetadataKey (
             this IntPtr model,
             int index,
-            [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest
+            [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest,
+            int size
         );
         [DllImport(Assembly, EntryPoint = @"NMLModelGetMetadataValue")]
         public static extern void MetadataValue (
             this IntPtr model,
             [MarshalAs(UnmanagedType.LPStr)] string key,
-            [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest
+            [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest,
+            int size
         );
         [DllImport(Assembly, EntryPoint = @"NMLModelGetInputFeatureCount")]
         public static extern int InputFeatureCount (this IntPtr model);
@@ -101,7 +103,8 @@ namespace NatSuite.ML.Internal {
         [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetName")]
         public static extern void FeatureTypeName (
             this IntPtr type,
-            [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest
+            [MarshalAs(UnmanagedType.LPStr)] StringBuilder dest,
+            int size
         );
         [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetDataType")]
         public static extern NMLDataType FeatureTypeDataType (this IntPtr type);

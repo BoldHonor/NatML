@@ -36,7 +36,7 @@ namespace NatSuite.ML {
         public string this [string key] {
             get {
                 var buffer = new StringBuilder(2048);
-                model.MetadataValue(key, buffer);
+                model.MetadataValue(key, buffer, buffer.Capacity);
                 var result = buffer.ToString();
                 return !string.IsNullOrEmpty(result) ? result : null;
             }
@@ -115,7 +115,7 @@ namespace NatSuite.ML {
                 var buffer = new StringBuilder(2048);
                 for (var i = 0; i < count; ++i) {
                     buffer.Clear();
-                    model.MetadataKey(i, buffer);
+                    model.MetadataKey(i, buffer, buffer.Capacity);
                     yield return buffer.ToString();
                 }
             }
