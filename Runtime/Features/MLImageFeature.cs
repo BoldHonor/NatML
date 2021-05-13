@@ -50,29 +50,33 @@ namespace NatSuite.ML.Features {
         public AspectMode aspectMode = 0;
 
         /// <summary>
+        /// Create an image feature.
         /// </summary>
         /// <param name="texture"></param>
         public MLImageFeature (Texture2D texture) : this(texture.GetPixels32(), texture.width, texture.height) { }
 
         /// <summary>
+        /// Create an image feature.
         /// </summary>
-        /// <param name="pixelBuffer"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
+        /// <param name="pixelBuffer">Pixel buffer to create image feature from.</param>
+        /// <param name="width">Pixel buffer width.</param>
+        /// <param name="height">Pixel buffer height.</param>
         public MLImageFeature (Color32[] pixelBuffer, int width, int height) : base(new MLImageType(width, height)) => this.colorBuffer = pixelBuffer;
 
         /// <summary>
+        /// Create an image feature.
         /// </summary>
-        /// <param name="pixelBuffer"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
+        /// <param name="pixelBuffer">Pixel buffer to create image feature from. MUST have an RGBA8888 layout.</param>
+        /// <param name="width">Pixel buffer width.</param>
+        /// <param name="height">Pixel buffer height.</param>
         public MLImageFeature (byte[] pixelBuffer, int width, int height) : base(new MLImageType(width, height)) => this.pixelBuffer = pixelBuffer;
 
         /// <summary>
+        /// Create an image feature.
         /// </summary>
-        /// <param name="nativeBuffer"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
+        /// <param name="nativeBuffer">Pixel buffer. MUST have an RGBA8888 layout.</param>
+        /// <param name="width">Pixel buffer width.</param>
+        /// <param name="height">Pixel buffer height.</param>
         public unsafe MLImageFeature (void* nativeBuffer, int width, int height) : base(new MLImageType(width, height)) => this.nativeBuffer = (IntPtr)nativeBuffer;
         #endregion
 

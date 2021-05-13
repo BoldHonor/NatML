@@ -22,41 +22,41 @@ namespace NatSuite.ML.Features {
         /// <summary>
         /// Create an array feature.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">Feature data.</param>
         public MLArrayFeature (T[] data) : this(data, null as int[]) { }
         
         /// <summary>
         /// Create an array feature.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">Feature data.</param>
         public unsafe MLArrayFeature (T* data) : this(data, null as int[]) { }
 
         /// <summary>
         /// Create an array feature.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="shape"></param>
+        /// <param name="data">Feature data.</param>
+        /// <param name="shape">Feature shape.</param>
         public MLArrayFeature (T[] data, int[] shape) : this(data, new MLArrayType(null, typeof(T), shape)) { }
         
         /// <summary>
         /// Create an array feature.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="shape"></param>
+        /// <param name="data">Feature data.</param>
+        /// <param name="shape">Feature shape.</param>
         public unsafe MLArrayFeature (T* data, int[] shape) : this(data, new MLArrayType(null, typeof(T), shape)) { }
 
         /// <summary>
         /// Create an array feature.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="type"></param>
+        /// <param name="data">Feature data.</param>
+        /// <param name="type">Feature type.</param>
         public MLArrayFeature (T[] data, MLFeatureType type) : base(type) => this.data = data;
 
         /// <summary>
         /// Create an array feature.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="type"></param>
+        /// <param name="data">Feature data.</param>
+        /// <param name="type">Feature shape.</param>
         public unsafe MLArrayFeature (T* data, MLFeatureType type) : base(type) => this.nativeBuffer = (IntPtr)data;
         #endregion
 
