@@ -1,2 +1,2 @@
-## NatML 1.0.0
-+ First release.
+## NatML 1.0.0b3
++ First open beta release.
