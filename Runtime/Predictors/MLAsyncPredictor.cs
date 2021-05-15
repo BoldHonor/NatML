@@ -65,8 +65,12 @@ namespace NatSuite.ML.Predictors {
         /// <returns></returns>
         public Task<TOutput> Predict (params MLFeature[] inputs) {
             var tcs = new TaskCompletionSource<TOutput>();
-            queue.Enqueue((inputs, tcs));
-            fence.Set();
+            if (!fence.SafeWaitHandle.IsClosed) {
+                queue.Enqueue((inputs, tcs));
+                fence.Set();
+            }
+            else
+                tcs.SetCanceled();
             return tcs.Task;
         }
 
