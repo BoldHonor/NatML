@@ -101,9 +101,9 @@ namespace NatSuite.ML {
         /// Fetch ML model data from NatML hub.
         /// </summary>
         /// <param name="tag">Model tag.</param>
-        /// <param name="accessKey">Access key for fetching private models.</param>
+        /// <param name="accessKey">Hub access key.</param>
         /// <returns>ML model data.</returns>
-        public static async Task<MLModelData> FromHub (string tag, string accessKey = null) { // INCOMPLETE
+        public static async Task<MLModelData> FromHub (string tag, string accessKey) { // INCOMPLETE
             // Check if cached
             var cachePath = Path.Combine(Application.persistentDataPath, "ML", $"{tag.Replace('/', '_')}.mldata");
             if (File.Exists(cachePath)) {
