@@ -8,6 +8,7 @@ namespace NatSuite.ML {
 
     using System;
     using System.IO;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using UnityEngine;
     using UnityEngine.Networking;
@@ -97,22 +98,44 @@ namespace NatSuite.ML {
         }
 
         /// <summary>
-        /// Fetch ML model data from the Muna ML marketplace.
+        /// Fetch ML model data from NatML hub.
         /// </summary>
         /// <param name="tag">Model tag.</param>
-        /// <param name="accessKey">Muna access key for fetching private models.</param>
+        /// <param name="accessKey">Access key for fetching private models.</param>
         /// <returns>ML model data.</returns>
-        public static Task<MLModelData> FromMuna (string tag, string accessKey = null) { // INCOMPLETE
+        public static async Task<MLModelData> FromHub (string tag, string accessKey = null) { // INCOMPLETE
+            // Check if cached
+            var cachePath = Path.Combine(Application.persistentDataPath, "ML", $"{tag.Replace('/', '_')}.mldata");
+            if (File.Exists(cachePath)) {
+                var cachedData = JsonUtility.FromJson<MLCachedData>(File.ReadAllText(cachePath));
+                var modelData = ScriptableObject.CreateInstance<MLModelData>();
+                modelData.data = File.ReadAllBytes(cachedData.data);
+                modelData.classLabels = cachedData.labels.Length != 0 ? cachedData.labels : null;
+                modelData.imageNormalization = cachedData.normalization;
+                modelData.imageAspectMode = cachedData.aspectMode;
+                return modelData;
+            }
+            // Fetch from Hub
+
+            // Cache locally
             return default;
         }
         #endregion
-        
+
 
         #region --Operations--
         [SerializeField, HideInInspector] internal byte[] data;
         [SerializeField, HideInInspector] internal string[] classLabels;
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
         [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;
+
+        [Serializable]
+        private struct MLCachedData {
+            public string data;
+            public string[] labels;
+            public Normalization normalization;
+            public MLImageFeature.AspectMode aspectMode;
+        }
         #endregion
     }
 }
