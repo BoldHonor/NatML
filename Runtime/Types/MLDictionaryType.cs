@@ -10,16 +10,16 @@ namespace NatSuite.ML.Types {
     /// <summary>
     /// ML dictionary feature type.
     /// </summary>
-    public sealed class MLDictionaryType : MLFeatureType {
+    public sealed class MLDictionaryType : MLFeatureType { // INCOMPLETE
 
         #region --Client API--
         /// <summary>
-        /// Feature key type.
+        /// Dictionary key data type.
         /// </summary>
         public Type key => dataType;
 
         /// <summary>
-        /// Feature value.
+        /// Dictionary value type.
         /// </summary>
         public readonly MLFeatureType value;
 

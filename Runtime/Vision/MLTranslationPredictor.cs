@@ -17,7 +17,7 @@ namespace NatSuite.ML.Vision {
         /// <summary>
         /// Create an image translation predictor.
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="model">Image translation ML model.</param>
         public MLTranslationPredictor (MLModel model) {
             this.model = model;
         }

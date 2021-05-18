@@ -23,7 +23,7 @@ namespace NatSuite.ML.Vision {
         /// <summary>
         /// Create a classification predictor.
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="model">Classification ML model.</param>
         /// <param name="labels">Classification labels.</param>
         public MLClassificationPredictor (MLModel model, string[] labels) {
             // Save
@@ -40,7 +40,7 @@ namespace NatSuite.ML.Vision {
         /// This will return the most-likely label along with the confidence score.
         /// </summary>
         /// <param name="inputs">Input feature.</param>
-        /// <returns>Output label along with unnormalized confidence value.</returns>
+        /// <returns>Output label with unnormalized confidence value.</returns>
         public unsafe (string label, float confidence) Predict (params MLFeature[] inputs) {
             // Check
             if (inputs.Length != 1)

@@ -15,11 +15,13 @@ namespace NatSuite.ML {
     using Features;
 
     /// <summary>
+    /// Self-contained archive with ML model and supplemental data needed to make predictions with the model.
     /// </summary>
     public sealed class MLModelData : ScriptableObject {
         
         #region --Client API--
         /// <summary>
+        /// Image normalization (mean and standard deviation).
         /// </summary>
         [Serializable]
         public struct Normalization {

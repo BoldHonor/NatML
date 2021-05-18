@@ -10,7 +10,7 @@ namespace NatSuite.ML.Features {
     using Internal;
 
     /// <summary>
-    /// Array feature.
+    /// ML array feature.
     /// </summary>
     public sealed class MLArrayFeature<T> : MLFeature, IMLFeature where T : unmanaged {
 

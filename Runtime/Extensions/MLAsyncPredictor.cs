@@ -60,9 +60,10 @@ namespace NatSuite.ML.Extensions {
         }
 
         /// <summary>
+        /// Make a prediction on one or more input features.
         /// </summary>
-        /// <param name="inputs"></param>
-        /// <returns></returns>
+        /// <param name="inputs">Input features.</param>
+        /// <returns>Prediction output.</returns>
         public Task<TOutput> Predict (params MLFeature[] inputs) {
             var tcs = new TaskCompletionSource<TOutput>();
             if (!fence.SafeWaitHandle.IsClosed) {

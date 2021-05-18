@@ -8,6 +8,7 @@ namespace NatSuite.ML.Features {
     using System;
 
     /// <summary>
+    /// ML dictionary feature.
     /// </summary>
     public sealed class MLDictionaryFeature : MLFeature { // INCOMPLETE
 
