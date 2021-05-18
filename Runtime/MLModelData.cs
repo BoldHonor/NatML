@@ -93,7 +93,7 @@ namespace NatSuite.ML {
         /// <returns>ML model data.</returns>
         public static async Task<MLModelData> FromHub (string tag, string accessKey) { // INCOMPLETE
             // Check if cached
-            var cachePath = Path.Combine(Application.persistentDataPath, "ML", $"{tag.Replace('/', '_')}.mldata");
+            var cachePath = Path.Combine(Application.persistentDataPath, "ML", $"{tag.Replace('/', '_')}.nml");
             if (File.Exists(cachePath)) {
                 var cachedData = JsonUtility.FromJson<MLCachedData>(File.ReadAllText(cachePath));
                 var modelData = ScriptableObject.CreateInstance<MLModelData>();

@@ -8,7 +8,7 @@ namespace NatSuite.ML.Internal {
     using System;
     using System.Collections;
     using System.Text;
-    using Features.Types;
+    using Types;
 
     public static class NMLUtility {
 

@@ -32,13 +32,21 @@ namespace NatSuite.ML {
         /// Get a value in the model metadata.
         /// </summary>
         /// <param name="key">Metadata key.</param>
-        /// <returns>Metadata value or `null` if key is not present.</returns>
+        /// <returns>Metadata value. Throws exception if key is not present.</returns>
         public string this [string key] {
             get {
+                // Check
+                if (key == null)
+                    throw new ArgumentNullException(nameof(key));
+                // Fetch
                 var buffer = new StringBuilder(2048);
                 model.MetadataValue(key, buffer, buffer.Capacity);
                 var result = buffer.ToString();
-                return !string.IsNullOrEmpty(result) ? result : null;
+                // Return
+                if (!string.IsNullOrEmpty(result))
+                    return result;
+                else
+                    throw new KeyNotFoundException($"MLModel does not contain the requested key: {key}");
             }
         }
 

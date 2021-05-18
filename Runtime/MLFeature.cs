@@ -5,11 +5,11 @@
 
 namespace NatSuite.ML {
 
-    using System;
     using UnityEngine;
     using Features;
 
     /// <summary>
+    /// ML feature.
     /// </summary>
     public abstract class MLFeature {
 

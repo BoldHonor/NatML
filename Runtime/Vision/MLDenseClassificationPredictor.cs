@@ -7,8 +7,8 @@ namespace NatSuite.ML.Vision {
 
     using System;
     using System.Linq;
-    using Features.Types;
     using Internal;
+    using Types;
 
     /// <summary>
     /// </summary>
