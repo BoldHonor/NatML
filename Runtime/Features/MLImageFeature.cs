@@ -11,8 +11,11 @@ namespace NatSuite.ML.Features {
     using Types;
 
     /// <summary>
+    /// Image feature.
+    /// This feature will perform any necessary conversions to a model's desired input.
+    /// Image features created from a pixel buffer MUST have an RGBA8888 pixel layout.
     /// </summary>
-    public sealed class MLImageFeature : MLFeature, IMLFeature { // RGBA8888 only
+    public sealed class MLImageFeature : MLFeature, IMLFeature {
 
         #region --Client API--
         /// <summary>

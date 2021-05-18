@@ -22,19 +22,17 @@ namespace NatSuite.ML {
         /// <summary>
         /// </summary>
         [Serializable]
-        public struct Normalization { // We need to support null checks, but Unity's serialization won't allow us prosper
+        public struct Normalization {
             [SerializeField] internal Vector3 mean;
             [SerializeField] internal Vector3 std;
-            [SerializeField] internal bool valid;
             public void Deconstruct (out Vector3 mean, out Vector3 std) => (mean, std) = (this.mean, this.std);
-            public static implicit operator bool (Normalization n) => n.valid;
         }
 
         /// <summary>
         /// Model classification labels.
         /// This is `null` if the model does not have any classification data available.
         /// </summary>
-        public string[] labels => classLabels;
+        public string[] labels => classLabels?.Length > 0 ? classLabels : default;
 
         /// <summary>
         /// Expected image feature normalization for predictions with this model.
@@ -70,33 +68,23 @@ namespace NatSuite.ML {
         /// <param name="path">Relative path to ONNX model file in `StreamingAssets` folder.</param>
         /// <returns>ML model data.</returns>
         public static async Task<MLModelData> FromStreamingAssets (string relativePath) {
+            // Check for direct extraction
             var fullPath = Path.Combine(Application.streamingAssetsPath, relativePath);
-            if (Application.platform == RuntimePlatform.Android)
-                return await FromURL(fullPath);
-            else
-                return await FromPath(fullPath);                
-        }
-
-        /// <summary>
-        /// Fetch ML model data from a remote URL.
-        /// </summary>
-        /// <param name="url">URL to ONNX model file.</param>
-        /// <returns>ML model data.</returns>
-        public static async Task<MLModelData> FromURL (string url) {
-            using (var request = UnityWebRequest.Get(url)) {
-                // Download from APK/AAB
+            if (Application.platform != RuntimePlatform.Android)
+                return await FromPath(fullPath);
+            // Extract from app archive
+            using (var request = UnityWebRequest.Get(fullPath)) {
                 request.SendWebRequest();
                 while (!request.isDone)
                     await Task.Yield();
                 if (request.isNetworkError || request.isHttpError)
-                    throw new ArgumentException($"Failed to create MLModelData from URL: {url}", nameof(url));
-                // Create
+                    throw new ArgumentException($"Failed to create MLModelData from StreamingAssets: {relativePath}");
                 var modelData = ScriptableObject.CreateInstance<MLModelData>();
                 modelData.data = request.downloadHandler.data;
                 return modelData;
             }
         }
-
+        
         /// <summary>
         /// Fetch ML model data from NatML hub.
         /// </summary>

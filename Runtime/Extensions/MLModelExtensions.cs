@@ -3,13 +3,12 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML {
+namespace NatSuite.ML.Extensions {
 
     using Internal;
-    using Predictors;
 
     /// <summary>
-    /// Common utilities for working with MLModels.
+    /// Common utilities for working with MLModel instances.
     /// </summary>
     public static class MLModelExtensions {
 

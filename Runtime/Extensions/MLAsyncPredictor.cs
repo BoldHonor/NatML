@@ -3,7 +3,7 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML.Predictors {
+namespace NatSuite.ML.Extensions {
 
     using System.Collections.Concurrent;
     using System.Runtime.CompilerServices;
