@@ -1,11 +1,10 @@
 /* 
-*   NatML Extensions
+*   NatML
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
 namespace NatSuite.ML.Visualizers {
 
-    using System.Collections;
     using UnityEngine;
     using UnityEngine.UI;
 
