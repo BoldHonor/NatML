@@ -49,7 +49,7 @@ namespace NatSuite.ML.Types {
         /// <param name="name">Feature name.</param>
         /// <param name="type">Image data type.</param>
         /// <param name="shape">Image feature shape.</param>
-        public MLImageType (string name, Type type, int[] shape) : base(name, type, shape) => interleaved = shape[3] == 3;
+        public MLImageType (string name, Type type, int[] shape) : base(name, type, shape) => interleaved = shape[1] > shape[3];
         #endregion
 
 

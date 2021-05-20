@@ -32,7 +32,7 @@ namespace NatSuite.ML.Vision {
             this.classes = (model.outputs.First() as MLArrayType).shape.Aggregate(1, (a, b) => a * b);
             // Check
             if (labels.Length != classes)
-                throw new ArgumentOutOfRangeException(nameof(labels), $"Classifier predcitor received {labels.Length} labels but expected {classes}");
+                throw new ArgumentOutOfRangeException(nameof(labels), $"Classifier received {labels.Length} labels but expected {classes}");
         }
 
         /// <summary>
@@ -44,19 +44,24 @@ namespace NatSuite.ML.Vision {
         public unsafe (string label, float confidence) Predict (params MLFeature[] inputs) {
             // Check
             if (inputs.Length != 1)
-                throw new ArgumentException(@"Classifier predictor expects a single feature", nameof(inputs));
+                throw new ArgumentException(@"Classifier expects a single feature", nameof(inputs));
+            // Check type
+            var input = inputs[0];
+            if (!(input.type is MLArrayType))
+                throw new ArgumentException(@"Classifier expects an an array or image feature", nameof(inputs));
             // Predict
-            var inputFeature = (inputs.First() as IMLFeature).Create(model.inputs.First());
-            var outputFeature = model.Predict(inputFeature).First();
+            var inputType = model.inputs[0];
+            var inputFeature = (input as IMLFeature).Create(inputType);
+            var outputFeature = model.Predict(inputFeature)[0];
+            inputFeature.ReleaseFeature();
             // Find label
             var logits = (float*)outputFeature.FeatureData();
             var argMax = 0;
             for (var i = 1; i < classes; ++i)
                 if (logits[i] > logits[argMax])
                     argMax = i;
-            // Release
-            inputFeature.ReleaseFeature();
             outputFeature.ReleaseFeature();
+            // Return
             return (labels[argMax], logits[argMax]);
         }
         #endregion
