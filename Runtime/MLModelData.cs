@@ -32,7 +32,7 @@ namespace NatSuite.ML {
 
         /// <summary>
         /// Model classification labels.
-        /// This is `null` if the model does not have any classification data available.
+        /// This is `null` if the model does not have any classification labels.
         /// </summary>
         public string[] labels => classLabels?.Length > 0 ? classLabels : default;
 
