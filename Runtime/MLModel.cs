@@ -46,7 +46,7 @@ namespace NatSuite.ML {
                 if (!string.IsNullOrEmpty(result))
                     return result;
                 else
-                    throw new KeyNotFoundException($"MLModel does not contain the requested key: {key}");
+                    throw new KeyNotFoundException($"MLModel metadata does not contain the requested key: {key}");
             }
         }
 

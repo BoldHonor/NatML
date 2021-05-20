@@ -106,6 +106,7 @@ namespace NatSuite.ML {
                 return modelData;
             }
             // Fetch from Hub
+            await Task.Yield(); // Silece warning
 
             // Cache locally
             return default;
