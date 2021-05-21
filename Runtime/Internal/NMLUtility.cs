@@ -50,7 +50,7 @@ namespace NatSuite.ML.Internal {
             // Get name
             var nameBuffer = new StringBuilder(2048);
             nativeType.FeatureTypeName(nameBuffer, nameBuffer.Capacity);
-            var name = nameBuffer.ToString();
+            var name = nameBuffer.Length > 0 ? nameBuffer.ToString() : null;
             // Get shape
             var shape = new int[nativeType.FeatureTypeDimensions()];
             nativeType.FeatureTypeShape(shape, shape.Length);

@@ -32,7 +32,10 @@ namespace NatSuite.ML.Vision {
             this.classes = (model.outputs.First() as MLArrayType).shape.Aggregate(1, (a, b) => a * b);
             // Check
             if (labels.Length != classes)
-                throw new ArgumentOutOfRangeException(nameof(labels), $"Classifier received {labels.Length} labels but expected {classes}");
+                throw new ArgumentOutOfRangeException(
+                    nameof(labels),
+                    $"Classification predictor received {labels.Length} labels but expected {classes}"
+                );
         }
 
         /// <summary>
@@ -44,11 +47,11 @@ namespace NatSuite.ML.Vision {
         public unsafe (string label, float confidence) Predict (params MLFeature[] inputs) {
             // Check
             if (inputs.Length != 1)
-                throw new ArgumentException(@"Classifier expects a single feature", nameof(inputs));
+                throw new ArgumentException(@"Classification predictor expects a single feature", nameof(inputs));
             // Check type
             var input = inputs[0];
             if (!(input.type is MLArrayType))
-                throw new ArgumentException(@"Classifier expects an an array or image feature", nameof(inputs));
+                throw new ArgumentException(@"Classification predictor expects an an array or image feature", nameof(inputs));
             // Predict
             var inputType = model.inputs[0];
             var inputFeature = (input as IMLFeature).Create(inputType);

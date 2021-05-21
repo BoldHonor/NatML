@@ -16,6 +16,7 @@ namespace NatSuite.ML.Visualizers {
 
         #region --Client API--
         /// <summary>
+        /// Render a set of object detections.
         /// </summary>
         /// <param name="image">Image which detections are made on.</param>
         /// <param name="detections">Detections to render.</param>

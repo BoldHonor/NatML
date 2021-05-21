@@ -1,0 +1,22 @@
+﻿// 
+//   NatML
+//   Copyright (c) 2021 Yusuf Olokoba.
+//
+
+#pragma kernel CSMain
+
+StructuredBuffer<int> Map;
+StructuredBuffer<float4> Palette;
+RWTexture2D<float4> Result;
+
+[numthreads(16, 16, 1)]
+void CSMain (uint3 id : SV_DispatchThreadID) {
+    // Check
+    uint width, height;
+    Result.GetDimensions(width, height);
+    if (id.x * id.y >= width * height)
+        return;
+    // Colorize
+    int index = Map[id.x + width * (height - id.y - 1)];
+    Result[id.xy] = Palette[index];
+}

@@ -12,12 +12,13 @@ namespace NatSuite.ML.Visualizers {
     /// <summary>
     /// </summary>
     [RequireComponent(typeof(RawImage), typeof(AspectRatioFitter))]
-    public sealed class MLBodyPoseVisualizer : MonoBehaviour {
+    public sealed class MLBodyPoseVisualizer : MonoBehaviour { // INCOMPLETE
 
         #region --Client API--
         /// <summary>
+        /// Render a body pose.
         /// </summary>
-        /// <param name="image">Image which detections are made on.</param>
+        /// <param name="image">Image which body pose is generated from.</param>
         /// <param name="pose">Body pose to render.</param>
         public void Render (Texture image, IMLBodyPose pose) {
 

@@ -32,7 +32,10 @@ namespace NatSuite.ML.Vision {
             this.classes = ((MLArrayType)model.outputs.First()).shape.Aggregate(1, (a, b) => a * b);
             // Check
             if (labels.Length != classes)
-                throw new ArgumentOutOfRangeException(nameof(labels), $"Classifier predcitor received {labels.Length} labels but expected {classes}");
+                throw new ArgumentOutOfRangeException(
+                    nameof(labels),
+                    $"Classification predcitor received {labels.Length} labels but expected {classes}"
+                );
         }
 
         /// <summary>
@@ -44,10 +47,15 @@ namespace NatSuite.ML.Vision {
         public unsafe (string label, float confidence)[] Predict (params MLFeature[] inputs) {
             // Check
             if (inputs.Length != 1)
-                throw new ArgumentException(@"Classifier predictor expects a single feature", nameof(inputs));
+                throw new ArgumentException(@"Classification predictor expects a single feature", nameof(inputs));
+            // Check type
+            var input = inputs[0];
+            if (!(input.type is MLArrayType))
+                throw new ArgumentException(@"Classification predictor expects an an array or image feature", nameof(inputs));
             // Predict
-            var inputFeature = (inputs.First() as IMLFeature).Create(model.inputs.First());
-            var outputFeature = model.Predict(inputFeature).First();
+            var inputType = model.inputs[0];
+            var inputFeature = (input as IMLFeature).Create(inputType);
+            var outputFeature = model.Predict(inputFeature)[0];
             inputFeature.ReleaseFeature();
             // Copy logits
             var logits = (float*)outputFeature.FeatureData();
