@@ -5,9 +5,9 @@
 
 namespace NatSuite.ML.Visualizers {
 
-    using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.UI;
+    using Vision;
 
     /// <summary>
     /// </summary>
@@ -20,7 +20,7 @@ namespace NatSuite.ML.Visualizers {
         /// </summary>
         /// <param name="image">Image which body pose is generated from.</param>
         /// <param name="pose">Body pose to render.</param>
-        public void Render (Texture image, IMLBodyPose pose) {
+        public void Render (Texture image, MLBodyPose pose) {
 
         }
         #endregion

@@ -8,9 +8,9 @@ namespace NatSuite.ML.Extensions {
     using Internal;
 
     /// <summary>
-    /// Common utilities for working with MLModel instances.
+    /// Common utilities for working with predictors.
     /// </summary>
-    public static class MLModelExtensions {
+    public static class MLPredictorExtensions {
 
         #region --Client API--
         /// <summary>

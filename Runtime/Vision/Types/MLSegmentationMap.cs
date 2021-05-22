@@ -3,7 +3,7 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-namespace NatSuite.ML.Visualizers {
+namespace NatSuite.ML.Vision {
 
     /// <summary>
     /// </summary>

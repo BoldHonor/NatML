@@ -9,6 +9,7 @@ namespace NatSuite.ML.Visualizers {
     using System.Linq;
     using UnityEngine;
     using UnityEngine.UI;
+    using Vision;
 
     /// <summary>
     /// </summary>
@@ -30,7 +31,7 @@ namespace NatSuite.ML.Visualizers {
                 }
             // Colorize
             palette = palette ?? CreateRandomPalette(32); // Should be large enough for most things
-            segmentationImage = ConvertToImage(map, palette, segmentationImage);
+            segmentationImage = CreateImage(map, palette, segmentationImage);
             // Display image
             var rawImage = GetComponent<RawImage>();
             var aspectFitter = GetComponent<AspectRatioFitter>();
@@ -39,13 +40,13 @@ namespace NatSuite.ML.Visualizers {
         }
 
         /// <summary>
-        /// Convert a segmentation map to an image which can be rendered.
+        /// Create a segmentation image from a segmentation map.
         /// </summary>
         /// <param name="map">Segmentation map.</param>
         /// <param name="palette">Color palette for visualizing different classes in the image.</param>
         /// <param name="destination">Destination texture to render into. If `null`, a texture is created.</param>
         /// <returns>Converted RenderTexture.</returns>
-        public static unsafe RenderTexture ConvertToImage (MLSegmentationMap map, Color[] palette, RenderTexture destination = null) {
+        public static unsafe RenderTexture CreateImage (MLSegmentationMap map, Color[] palette, RenderTexture destination = null) {
             // Create texture
             if (!destination) {
                 destination = new RenderTexture(
