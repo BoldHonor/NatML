@@ -41,10 +41,9 @@ namespace NatSuite.ML {
                 // Fetch
                 var buffer = new StringBuilder(2048);
                 model.MetadataValue(key, buffer, buffer.Capacity);
-                var result = buffer.ToString();
                 // Return
-                if (!string.IsNullOrEmpty(result))
-                    return result;
+                if (buffer.Length > 0)
+                    return buffer.ToString();
                 else
                     throw new KeyNotFoundException($"MLModel metadata does not contain the requested key: {key}");
             }
