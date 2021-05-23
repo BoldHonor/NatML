@@ -8,6 +8,9 @@ namespace NatSuite.ML.Vision {
     using UnityEngine;
 
     /// <summary>
+    /// Detected body pose.
+    /// The xy coordinates are the normalized position of the keypoint, in range [0, 1].
+    /// The z coordinate is the confidence score of the keypoint, in range [0, 1].
     /// </summary>
     public class MLBodyPose { // Once we have C# 9, we'll use `init` properties
         public Vector3 nose;

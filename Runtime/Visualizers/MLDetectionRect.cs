@@ -21,7 +21,7 @@ namespace NatSuite.ML.Visualizers {
         /// <param name="rect">Normalized detection rect.</param>
         /// <param name="label">Detection label</param>
         public virtual void Render (RawImage image, Rect rect, string label) {
-            // Set anchors
+            // Position
             var transform = this.transform as RectTransform;
             var imageTransform = image.transform as RectTransform;
             transform.anchorMin = 0.5f * Vector2.one;
