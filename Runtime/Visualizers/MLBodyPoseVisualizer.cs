@@ -33,6 +33,9 @@ namespace NatSuite.ML.Visualizers {
             var aspectFitter = GetComponent<AspectRatioFitter>();
             rawImage.texture = image;
             aspectFitter.aspectRatio = (float)image.width / image.height;
+            // Check
+            if (pose == null)
+                return;
             // Render keypoints
             foreach (var point in new [] {
                 pose.nose, pose.leftEye, pose.rightEye, pose.leftEar, pose.rightEar, 
