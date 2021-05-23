@@ -12,7 +12,7 @@ namespace NatSuite.ML.Vision {
     /// The xy coordinates are the normalized position of the keypoint, in range [0, 1].
     /// The z coordinate is the confidence score of the keypoint, in range [0, 1].
     /// </summary>
-    public class MLBodyPose { // Once we have C# 9, we'll use `init` properties
+    public sealed class MLBodyPose { // Once we have C# 9, we'll use `init` properties
         public Vector3 nose;
         public Vector3 leftEye;
         public Vector3 rightEye;

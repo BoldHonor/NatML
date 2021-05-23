@@ -6,6 +6,8 @@
 namespace NatSuite.ML.Vision {
 
     /// <summary>
+    /// Segmentation map.
+    /// Each pixel in the map contains an integer label indicating what class the pixel belongs to.
     /// </summary>
     public sealed class MLSegmentationMap {
         
