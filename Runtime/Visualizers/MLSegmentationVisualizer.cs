@@ -22,63 +22,62 @@ namespace NatSuite.ML.Visualizers {
         /// </summary>
         /// <param name="map">Segmentation map.</param>
         /// <param name="palette">Color palette for visualization. If `null`, a random palette is generated.</param>
-        public void Render (MLSegmentationMap map, Color[] palette = null) {
-            // Check
-            if (segmentationImage)
-                if (segmentationImage.width != map.width || segmentationImage.height != map.height) {
-                    segmentationImage.Release();
-                    segmentationImage = null;
-                }
-            // Colorize
+        public void Render (MLSegmentationMap map, Color[] palette = null, int width = 0, int height = 0) {
+            // Create image
+            image?.Release();
+            var frameSize = width > 0 && height > 0 ? (width, height) : (map.width, map.height);
+            image = new RenderTexture(frameSize.width, frameSize.height, 0);
+            // Render
             palette = palette ?? CreateRandomPalette(32); // Should be large enough for most things
-            segmentationImage = CreateImage(map, palette, segmentationImage);
+            Render(map, palette, image);
             // Display image
             var rawImage = GetComponent<RawImage>();
             var aspectFitter = GetComponent<AspectRatioFitter>();
-            rawImage.texture = segmentationImage;
-            aspectFitter.aspectRatio = (float)map.width / map.height;
+            rawImage.texture = image;
+            aspectFitter.aspectRatio = (float)frameSize.width / frameSize.height;
         }
 
         /// <summary>
-        /// Create a segmentation image from a segmentation map.
+        /// Render a segmentation map to a texture.
         /// </summary>
         /// <param name="map">Segmentation map.</param>
         /// <param name="palette">Color palette for visualizing different classes in the image.</param>
-        /// <param name="destination">Destination texture to render into. If `null`, a texture is created.</param>
-        /// <returns>Converted RenderTexture.</returns>
-        public static unsafe RenderTexture CreateImage (MLSegmentationMap map, Color[] palette, RenderTexture destination = null) { // INCOMPLETE // Allow arbitrary scaling w temp ReTex
-            // Create texture
-            if (!destination) {
-                destination = new RenderTexture(
-                    map.width,
-                    map.height,
-                    0,
-                    RenderTextureFormat.ARGB32,
-                    RenderTextureReadWrite.Default
-                ) { enableRandomWrite = true };
-                destination.Create();
-            }
-            // Check
-            if (map.width != destination.width || map.height != destination.height)
-                throw new ArgumentException(@"Destination texture must have the same size as the segmentation map", nameof(destination));
+        /// <param name="destination">Destination texture.</param>
+        public static unsafe void Render (MLSegmentationMap map, Color[] palette, RenderTexture destination) {
+            // Check map
+            if (map == null)
+                throw new ArgumentNullException(nameof(map));
+            // Check palette
+            if (palette == null)
+                throw new ArgumentNullException(nameof(palette));
+            // Check texture
+            if (!destination)
+                throw new ArgumentNullException(nameof(destination));
             // Create buffer
             using (
                 ComputeBuffer mapBuffer = new ComputeBuffer(map.width * map.height, sizeof(int)),
                 paletteBuffer = new ComputeBuffer(palette.Length, sizeof(Vector4))
             ) {
-                // Fill buffers
+                // Upload
                 mapBuffer.SetData(map.data);
                 paletteBuffer.SetData(FlattenPalette(palette));
-                // Colorize
-                colorizer = colorizer ?? (ComputeShader)Resources.Load(@"MLSegmentationColorizer");
-                colorizer.SetBuffer(0, "Map", mapBuffer);
-                colorizer.SetBuffer(0, "Palette", paletteBuffer);
-                colorizer.SetTexture(0, "Result", destination);
-                colorizer.GetKernelThreadGroupSizes(0, out var gx, out var gy, out var _);
-                colorizer.Dispatch(0, Mathf.CeilToInt((float)map.width / gx), Mathf.CeilToInt((float)map.height / gy), 1);
+                // Create temporary                
+                var descriptor = new RenderTextureDescriptor(map.width, map.height, RenderTextureFormat.ARGB32, 0) {
+                    enableRandomWrite = true
+                };
+                var tempBuffer = RenderTexture.GetTemporary(descriptor);
+                tempBuffer.Create();
+                // Render
+                renderer =renderer ?? (ComputeShader)Resources.Load(@"MLSegmentationRenderer");
+                renderer.SetBuffer(0, "Map", mapBuffer);
+                renderer.SetBuffer(0, "Palette", paletteBuffer);
+                renderer.SetTexture(0, "Result", tempBuffer);
+                renderer.GetKernelThreadGroupSizes(0, out var gx, out var gy, out var _);
+                renderer.Dispatch(0, Mathf.CeilToInt((float)map.width / gx), Mathf.CeilToInt((float)map.height / gy), 1);
+                // Blit to destination
+                Graphics.Blit(tempBuffer, destination);
+                RenderTexture.ReleaseTemporary(tempBuffer);
             }
-            // Return
-            return destination;
         }
 
         /// <summary>
@@ -95,8 +94,8 @@ namespace NatSuite.ML.Visualizers {
 
         #region --Operations--
 
-        private RenderTexture segmentationImage;
-        private static ComputeShader colorizer;
+        private RenderTexture image;
+        private static new ComputeShader renderer;
 
         private static float[] FlattenPalette (Color[] palette) {
             float[] result = new float[palette.Length * 4];
