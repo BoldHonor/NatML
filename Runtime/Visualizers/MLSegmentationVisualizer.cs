@@ -22,6 +22,8 @@ namespace NatSuite.ML.Visualizers {
         /// </summary>
         /// <param name="map">Segmentation map.</param>
         /// <param name="palette">Color palette for visualization. If `null`, a random palette is generated.</param>
+        /// <param name="width">Desired image width.</param>
+        /// <param name="width">Desired image height.</param>
         public void Render (MLSegmentationMap map, Color[] palette = null, int width = 0, int height = 0) {
             // Create image
             image?.Release();
@@ -68,7 +70,7 @@ namespace NatSuite.ML.Visualizers {
                 var tempBuffer = RenderTexture.GetTemporary(descriptor);
                 tempBuffer.Create();
                 // Render
-                renderer =renderer ?? (ComputeShader)Resources.Load(@"MLSegmentationRenderer");
+                renderer = renderer ?? (ComputeShader)Resources.Load(@"MLSegmentationRenderer");
                 renderer.SetBuffer(0, "Map", mapBuffer);
                 renderer.SetBuffer(0, "Palette", paletteBuffer);
                 renderer.SetTexture(0, "Result", tempBuffer);

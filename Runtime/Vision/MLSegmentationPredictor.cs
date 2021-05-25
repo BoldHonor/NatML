@@ -6,10 +6,9 @@
 namespace NatSuite.ML.Vision {
 
     using System;
-    using System.Runtime.InteropServices;
+    using Unity.Collections.LowLevel.Unsafe;
     using Internal;
     using Types;
-    using Visualizers;
 
     /// <summary>
     /// </summary>
@@ -44,11 +43,15 @@ namespace NatSuite.ML.Vision {
             var outputType = type.MarshalFeatureType() as MLImageType;
             type.ReleaseFeatureType();
             // Marshal
-            var mapData = new int[outputType.width * outputType.height];
-            Marshal.Copy(outputFeature.FeatureData(), mapData, 0, mapData.Length);
+            var (width, height) = (outputType.width, outputType.height);
+            var mapData = new int[width * height];
+            var srcBuffer = (int*)outputFeature.FeatureData();
+            fixed (int* dstBuffer = mapData)
+                for (var i = 0; i < height; ++i)
+                    UnsafeUtility.MemCpy(&dstBuffer[i * width], &srcBuffer[(height - i - 1) * width], width * sizeof(int));
             outputFeature.ReleaseFeature();
             // Return
-            var result = new MLSegmentationMap(outputType.width, outputType.height, mapData);
+            var result = new MLSegmentationMap(width, height, mapData);
             return result;
         }
         #endregion

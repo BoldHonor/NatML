@@ -17,6 +17,6 @@ void CSMain (uint3 id : SV_DispatchThreadID) {
     if (id.x * id.y >= width * height)
         return;
     // Colorize
-    int index = Map[id.x + width * (height - id.y - 1)];
+    int index = Map[id.x + width * id.y];
     Result[id.xy] = Palette[index];
 }
