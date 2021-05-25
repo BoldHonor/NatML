@@ -15,7 +15,7 @@ namespace NatSuite.ML {
     /// <summary>
     /// ML model.
     /// </summary>
-    public sealed class MLModel : IMLModel {
+    public class MLModel : IMLModel {
 
         #region --Client API--
         /// <summary>
@@ -105,7 +105,9 @@ namespace NatSuite.ML {
                 throw new ArgumentException(@"Failed to create MLModel from data", nameof(data));
         }
 
-        IntPtr[] IMLModel.Predict (params IntPtr[] inputs) {
+        IntPtr[] IMLModel.Predict (params IntPtr[] inputs) => Predict(inputs);
+
+        private protected virtual IntPtr[] Predict (params IntPtr[] inputs) {
             var outputs = new IntPtr[this.outputs.Length];
             model.Predict(inputs, outputs);
             return outputs;

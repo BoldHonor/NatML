@@ -8,11 +8,11 @@ namespace NatSuite.ML {
 
     using System;
     using System.IO;
-    using System.Net.Http;
     using System.Threading.Tasks;
     using UnityEngine;
     using UnityEngine.Networking;
     using Features;
+    using Hub;
 
     /// <summary>
     /// Self-contained archive with ML model and supplemental data needed to make predictions with the model.
@@ -51,7 +51,13 @@ namespace NatSuite.ML {
         /// You MUST dispose the model once you are done with it.
         /// </summary>
         /// <returns>ML model.</returns>
-        public MLModel Deserialize () => new MLModel(data);
+        public MLModel Deserialize () {
+            // Check for Hub model
+            if (hubInfo != default)
+                return new MLHubModel(this);
+            // Create model
+            return new MLModel(data);
+        }
 
         /// <summary>
         /// Fetch ML model data from a local file.
@@ -93,23 +99,16 @@ namespace NatSuite.ML {
         /// <param name="tag">Model tag.</param>
         /// <param name="accessKey">Hub access key.</param>
         /// <returns>ML model data.</returns>
-        public static async Task<MLModelData> FromHub (string tag, string accessKey) { // INCOMPLETE
-            // Check if cached
-            var cachePath = Path.Combine(Application.persistentDataPath, "ML", $"{tag.Replace('/', '_')}.nml");
-            if (File.Exists(cachePath)) {
-                var cachedData = JsonUtility.FromJson<MLCachedData>(File.ReadAllText(cachePath));
-                var modelData = ScriptableObject.CreateInstance<MLModelData>();
-                modelData.data = File.ReadAllBytes(cachedData.data);
-                modelData.classLabels = cachedData.labels.Length != 0 ? cachedData.labels : null;
-                modelData.imageNormalization = cachedData.normalization;
-                modelData.imageAspectMode = cachedData.aspectMode;
+        public static async Task<MLModelData> FromHub (string tag, string accessKey) {
+            // Check cache
+            var modelData = MLHubCache.LoadModelData(tag);
+            if (modelData != null)
                 return modelData;
-            }
             // Fetch from Hub
-            await Task.Yield(); // Silece warning
-
-            // Cache locally
-            return default;
+            modelData = await MLHubModel.LoadModelData(tag, accessKey);
+            MLHubCache.SaveModelData(modelData);
+            // Return
+            return modelData;
         }
         #endregion
 
@@ -119,14 +118,7 @@ namespace NatSuite.ML {
         [SerializeField, HideInInspector] internal string[] classLabels;
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
         [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;
-
-        [Serializable]
-        private struct MLCachedData {
-            public string data;
-            public string[] labels;
-            public Normalization normalization;
-            public MLImageFeature.AspectMode aspectMode;
-        }
+        internal (string tag, string accessKey) hubInfo;
         #endregion
     }
 }
