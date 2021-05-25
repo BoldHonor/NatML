@@ -46,7 +46,7 @@ namespace NatSuite.ML.Visualizers {
         /// <param name="palette">Color palette for visualizing different classes in the image.</param>
         /// <param name="destination">Destination texture to render into. If `null`, a texture is created.</param>
         /// <returns>Converted RenderTexture.</returns>
-        public static unsafe RenderTexture CreateImage (MLSegmentationMap map, Color[] palette, RenderTexture destination = null) {
+        public static unsafe RenderTexture CreateImage (MLSegmentationMap map, Color[] palette, RenderTexture destination = null) { // INCOMPLETE // Allow arbitrary scaling w temp ReTex
             // Create texture
             if (!destination) {
                 destination = new RenderTexture(
@@ -74,7 +74,8 @@ namespace NatSuite.ML.Visualizers {
                 colorizer.SetBuffer(0, "Map", mapBuffer);
                 colorizer.SetBuffer(0, "Palette", paletteBuffer);
                 colorizer.SetTexture(0, "Result", destination);
-                colorizer.Dispatch(0, Mathf.CeilToInt(map.width / 16), Mathf.CeilToInt(map.height / 16), 1);
+                colorizer.GetKernelThreadGroupSizes(0, out var gx, out var gy, out var _);
+                colorizer.Dispatch(0, Mathf.CeilToInt((float)map.width / gx), Mathf.CeilToInt((float)map.height / gy), 1);
             }
             // Return
             return destination;
