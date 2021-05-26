@@ -14,7 +14,7 @@ namespace NatSuite.ML.Editor {
     /// NatML model importer.
     /// </summary>
     [ScriptedImporter(1, "onnx")]
-    public class MLImporter : ScriptedImporter {
+    internal sealed class MLImporter : ScriptedImporter {
 
         [Header("Classification")]
         public TextAsset classLabels;
@@ -22,8 +22,11 @@ namespace NatSuite.ML.Editor {
         public override void OnImportAsset (AssetImportContext ctx) {
             // Populate model data
             var modelData = ScriptableObject.CreateInstance<MLModelData>();
-            modelData.data = File.ReadAllBytes(ctx.assetPath);
-            modelData.imageNormalization = new MLModelData.Normalization { mean = Vector3.zero, std = Vector3.one };
+            modelData.graphData = File.ReadAllBytes(ctx.assetPath);
+            modelData.imageNormalization = new MLModelData.Normalization {
+                mean = new [] { 0f, 0f, 0f },
+                std = new [] { 1f, 1f, 1f }
+            };
             if (classLabels)
                 modelData.classLabels = classLabels.text.Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             // Import

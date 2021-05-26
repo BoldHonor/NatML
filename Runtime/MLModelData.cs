@@ -8,11 +8,11 @@ namespace NatSuite.ML {
 
     using System;
     using System.IO;
-    using System.Net.Http;
     using System.Threading.Tasks;
     using UnityEngine;
     using UnityEngine.Networking;
     using Features;
+    using Hub;
 
     /// <summary>
     /// Self-contained archive with ML model and supplemental data needed to make predictions with the model.
@@ -25,9 +25,15 @@ namespace NatSuite.ML {
         /// </summary>
         [Serializable]
         public struct Normalization {
-            [SerializeField] internal Vector3 mean;
-            [SerializeField] internal Vector3 std;
-            public void Deconstruct (out Vector3 mean, out Vector3 std) => (mean, std) = (this.mean, this.std);
+            [SerializeField] internal float[] mean;
+            [SerializeField] internal float[] std;
+            public void Deconstruct (out Vector3 outMean, out Vector3 outStd) {
+                (outMean, outStd) = (Vector3.zero, Vector3.one);
+                if (mean != null)
+                    outMean = new Vector3(mean[0], mean[1], mean[2]);
+                if (std != null)
+                    outStd = new Vector3(std[0], std[1], std[2]);
+            }
         }
 
         /// <summary>
@@ -51,16 +57,20 @@ namespace NatSuite.ML {
         /// You MUST dispose the model once you are done with it.
         /// </summary>
         /// <returns>ML model.</returns>
-        public MLModel Deserialize () => new MLModel(data);
+        public MLModel Deserialize () {
+            if (!string.IsNullOrEmpty(session))
+                return new MLHubModel(session, graphData);
+            return new MLModel(graphData);
+        }
 
         /// <summary>
         /// Fetch ML model data from a local file.
         /// </summary>
         /// <param name="path">Path to ONNX model file.</param>
         /// <returns>ML model data.</returns>
-        public static Task<MLModelData> FromPath (string path) {
+        public static Task<MLModelData> FromFile (string path) {
             var modelData = ScriptableObject.CreateInstance<MLModelData>();
-            modelData.data = File.ReadAllBytes(path);
+            modelData.graphData = File.ReadAllBytes(path);
             return Task.FromResult(modelData);
         }
 
@@ -73,7 +83,7 @@ namespace NatSuite.ML {
             // Check for direct extraction
             var fullPath = Path.Combine(Application.streamingAssetsPath, relativePath);
             if (Application.platform != RuntimePlatform.Android)
-                return await FromPath(fullPath);
+                return await FromFile(fullPath);
             // Extract from app archive
             using (var request = UnityWebRequest.Get(fullPath)) {
                 request.SendWebRequest();
@@ -82,7 +92,7 @@ namespace NatSuite.ML {
                 if (request.isNetworkError || request.isHttpError)
                     throw new ArgumentException($"Failed to create MLModelData from StreamingAssets: {relativePath}");
                 var modelData = ScriptableObject.CreateInstance<MLModelData>();
-                modelData.data = request.downloadHandler.data;
+                modelData.graphData = request.downloadHandler.data;
                 return modelData;
             }
         }
@@ -93,40 +103,24 @@ namespace NatSuite.ML {
         /// <param name="tag">Model tag.</param>
         /// <param name="accessKey">Hub access key.</param>
         /// <returns>ML model data.</returns>
-        public static async Task<MLModelData> FromHub (string tag, string accessKey) { // INCOMPLETE
-            // Check if cached
-            var cachePath = Path.Combine(Application.persistentDataPath, "ML", $"{tag.Replace('/', '_')}.nml");
-            if (File.Exists(cachePath)) {
-                var cachedData = JsonUtility.FromJson<MLCachedData>(File.ReadAllText(cachePath));
-                var modelData = ScriptableObject.CreateInstance<MLModelData>();
-                modelData.data = File.ReadAllBytes(cachedData.data);
-                modelData.classLabels = cachedData.labels.Length != 0 ? cachedData.labels : null;
-                modelData.imageNormalization = cachedData.normalization;
-                modelData.imageAspectMode = cachedData.aspectMode;
-                return modelData;
+        public static async Task<MLModelData> FromHub (string tag, string accessKey = null) {
+            var modelData = await MLHub.LoadFromCache(tag);
+            if (modelData == null) {
+                modelData = await MLHub.LoadFromHub(tag, accessKey);
+                MLHub.SaveToCache(modelData);
             }
-            // Fetch from Hub
-            await Task.Yield(); // Silece warning
-
-            // Cache locally
-            return default;
+            return modelData;
         }
         #endregion
 
 
         #region --Operations--
-        [SerializeField, HideInInspector] internal byte[] data;
+        internal string tag;
+        internal string session;
+        [SerializeField, HideInInspector] internal byte[] graphData;
         [SerializeField, HideInInspector] internal string[] classLabels;
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
         [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;
-
-        [Serializable]
-        private struct MLCachedData {
-            public string data;
-            public string[] labels;
-            public Normalization normalization;
-            public MLImageFeature.AspectMode aspectMode;
-        }
         #endregion
     }
 }

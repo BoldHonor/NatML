@@ -15,7 +15,7 @@ namespace NatSuite.ML {
     /// <summary>
     /// ML model.
     /// </summary>
-    public sealed class MLModel : IMLModel {
+    public class MLModel : IMLModel {
 
         #region --Client API--
         /// <summary>
@@ -50,12 +50,6 @@ namespace NatSuite.ML {
         }
 
         /// <summary>
-        /// Create an ML model.
-        /// </summary>
-        /// <param name="path">Path to ONNX model.</param>
-        public MLModel (string path) : this(Create(path)) { }
-
-        /// <summary>
         /// Dispose the model and release resources.
         /// </summary>
         public void Dispose () => model.ReleaseModel();
@@ -66,11 +60,12 @@ namespace NatSuite.ML {
 
         private readonly IntPtr model;
 
-        internal MLModel (byte[] modelData) : this(Create(modelData)) { } // Devs don't need access to this just yet
-
-        private MLModel (IntPtr model) {
-            // Save
-            this.model = model;
+        unsafe internal MLModel (byte[] graphData) {
+            // Create
+            fixed (void* buffer = graphData)
+                Bridge.CreateModel(buffer, graphData.Length, out model);
+            if (model == IntPtr.Zero)
+                throw new ArgumentException(@"Failed to create MLModel from graph data", nameof(graphData));
             // Marshal input types
             this.inputs = new MLFeatureType[model.InputFeatureCount()];
             for (var i = 0; i < inputs.Length; ++i) {
@@ -87,25 +82,9 @@ namespace NatSuite.ML {
             }
         }
 
-        private static IntPtr Create (string path) {
-            Bridge.CreateModel(path, out var model);
-            if (model != IntPtr.Zero)
-                return model;
-            else
-                throw new ArgumentException($"Failed to create MLModel from path: {path}", nameof(path));
-        }
+        IntPtr[] IMLModel.Predict (params IntPtr[] inputs) => Predict(inputs);
 
-        private static unsafe IntPtr Create (byte[] data) {
-            var model = IntPtr.Zero;
-            fixed (void* buffer = data)
-                Bridge.CreateModel(buffer, data.Length, out model);
-            if (model != IntPtr.Zero)
-                return model;
-            else
-                throw new ArgumentException(@"Failed to create MLModel from data", nameof(data));
-        }
-
-        IntPtr[] IMLModel.Predict (params IntPtr[] inputs) {
+        private protected virtual IntPtr[] Predict (params IntPtr[] inputs) {
             var outputs = new IntPtr[this.outputs.Length];
             model.Predict(inputs, outputs);
             return outputs;
