@@ -10,7 +10,7 @@ namespace NatSuite.ML.Editor {
     using UnityEngine;
 
     [CustomEditor(typeof(MLModelData))]
-    public sealed class MLModelDataEditor : Editor {
+    internal sealed class MLModelDataEditor : Editor {
 
         #region --Inspector--
 

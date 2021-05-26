@@ -14,7 +14,7 @@ namespace NatSuite.ML.Editor {
     /// NatML model importer.
     /// </summary>
     [ScriptedImporter(1, "onnx")]
-    public class MLImporter : ScriptedImporter {
+    internal sealed class MLImporter : ScriptedImporter {
 
         [Header("Classification")]
         public TextAsset classLabels;
