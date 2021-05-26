@@ -53,8 +53,8 @@ namespace NatSuite.ML {
         /// <returns>ML model.</returns>
         public MLModel Deserialize () {
             // Check for Hub model
-            if (hubInfo != default)
-                return new MLHubModel(this);
+            if (id != default)
+                return new MLHubModel(id, data);
             // Create model
             return new MLModel(data);
         }
@@ -101,12 +101,12 @@ namespace NatSuite.ML {
         /// <returns>ML model data.</returns>
         public static async Task<MLModelData> FromHub (string tag, string accessKey) {
             // Check cache
-            var modelData = MLHubCache.LoadModelData(tag);
+            var modelData = MLHub.LoadFromCache(tag);
             if (modelData != null)
                 return modelData;
             // Fetch from Hub
-            modelData = await MLHubModel.LoadModelData(tag, accessKey);
-            MLHubCache.SaveModelData(modelData);
+            modelData = await MLHub.LoadFromHub(tag, accessKey);
+            MLHub.SaveToCache(modelData);
             // Return
             return modelData;
         }
@@ -118,7 +118,7 @@ namespace NatSuite.ML {
         [SerializeField, HideInInspector] internal string[] classLabels;
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
         [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;
-        internal (string tag, string accessKey) hubInfo;
+        internal string id;
         #endregion
     }
 }
