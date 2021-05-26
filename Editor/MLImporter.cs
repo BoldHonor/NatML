@@ -23,7 +23,10 @@ namespace NatSuite.ML.Editor {
             // Populate model data
             var modelData = ScriptableObject.CreateInstance<MLModelData>();
             modelData.graphData = File.ReadAllBytes(ctx.assetPath);
-            modelData.imageNormalization = new MLModelData.Normalization { mean = Vector3.zero, std = Vector3.one };
+            modelData.imageNormalization = new MLModelData.Normalization {
+                mean = new [] { 0f, 0f, 0f },
+                std = new [] { 1f, 1f, 1f }
+            };
             if (classLabels)
                 modelData.classLabels = classLabels.text.Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             // Import

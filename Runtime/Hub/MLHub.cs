@@ -19,22 +19,20 @@ namespace NatSuite.ML.Hub {
 
         public static async Task<MLModelData> LoadFromHub (string tag, string accessKey) {
             // Build payload
-            var mutation = "modelData (tag: $tag, device: $device) { data labels normalization { mean std } aspectMode }";
-            var query = $"mutation ($tag: String!, $device: DeviceInfo!) {{ {mutation} }}";
+            var mutation = "modelData (tag: $tag, device: $device) { session graphData labels normalization { mean std } aspectMode }";
+            var query = $"mutation ($tag: String!, $device: Device!) {{ {mutation} }}";
+            var device = new Device {
+                id = SystemInfo.deviceUniqueIdentifier,
+                model = SystemInfo.deviceModel,
+                os = SystemInfo.operatingSystem,
+                gfx = SystemInfo.graphicsDeviceType.ToString()
+            };
             var payload = JsonUtility.ToJson(new Payload {
                 query = query,
-                variables = new Mutation {
-                    tag = tag,
-                    device = new DeviceInfo {
-                        id = SystemInfo.deviceUniqueIdentifier,
-                        model = SystemInfo.deviceModel,
-                        os = SystemInfo.operatingSystem,
-                        gfx = SystemInfo.graphicsDeviceType.ToString()
-                    }
-                }
+                variables = new Mutation { tag = tag, device = device }
             });
             // Request
-            const string API = @"http://localhost:8000/graph"; //@"https://hub.natsuite.io/graph";
+            const string API = @"http://localhost:8000/graph"; //@"https://api.natsuite.io/graph";
             using (var client = new HttpClient())
                 using (var content = new StringContent(payload, Encoding.UTF8, "application/json")) {
                     // Fetch model data
@@ -51,43 +49,64 @@ namespace NatSuite.ML.Hub {
                         var cachedData = responseDict.data.modelData;
                         using (var modelResponse = await client.GetAsync(cachedData.graphData)) {
                             var graphData = await modelResponse.Content.ReadAsByteArrayAsync();
-                            var modelData = Load(cachedData, graphData);
+                            var modelData = Load(tag, cachedData, graphData);
                             return modelData;
                         }
                     }
             }
         }
 
-        public static MLModelData LoadFromCache (string tag) {
+        public static async Task<MLModelData> LoadFromCache (string tag) {
             // Check
             var cacheName = tag.Replace('/', '_');
             var cachePath = Path.Combine(Application.persistentDataPath, "ML", $"{cacheName}.nml");
             if (!File.Exists(cachePath))
-                return null;
+                return default;
             // Load
             var cachedData = JsonUtility.FromJson<MLCachedData>(File.ReadAllText(cachePath));
-            var graphData = File.ReadAllBytes(cachedData.graphData);
-            var modelData = Load(cachedData, graphData);            
-            return modelData;
+            using (var stream = new FileStream(cachedData.graphData, FileMode.Open, FileAccess.Read)) {
+                var graphData = new byte[stream.Length];
+                await stream.ReadAsync(graphData, 0, graphData.Length);
+                var modelData = Load(tag, cachedData, graphData);            
+                return modelData;
+            }            
         }
 
-        public static void SaveToCache (MLModelData modelData) { // INCOMPLETE
-            
+        public static async void SaveToCache (MLModelData modelData) {
+            // Check
+            if (modelData == null)
+                return;
+            // Build data
+            var cacheName = modelData.tag.Replace('/', '_');
+            var basePath = Path.Combine(Application.persistentDataPath, "ML");
+            var cachePath = Path.Combine(basePath, $"{cacheName}.nml");
+            var graphPath = Path.Combine(basePath, Guid.NewGuid().ToString());
+            var cachedData = new MLCachedData {
+                session = modelData.session,
+                graphData = graphPath,
+                labels = modelData.classLabels,
+                normalization = modelData.imageNormalization,
+                aspectMode = modelData.imageAspectMode.ToString()
+            };
+            // Write
+            Directory.CreateDirectory(basePath);
+            using (var stream = new FileStream(graphPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                await stream.WriteAsync(modelData.graphData, 0, modelData.graphData.Length);
+            using (var stream = new StreamWriter(cachePath))
+                await stream.WriteAsync(JsonUtility.ToJson(cachedData));
         }
         #endregion
 
 
         #region --Operations--
 
-        private static MLModelData Load (MLCachedData cachedData, byte[] graphData) {
-            var (mean, std) = (cachedData.normalization.mean, cachedData.normalization.std);
+        private static MLModelData Load (string tag, MLCachedData cachedData, byte[] graphData) {
             var modelData = ScriptableObject.CreateInstance<MLModelData>();
+            modelData.tag = tag;
+            modelData.session = cachedData.session;
             modelData.graphData = graphData;
             modelData.classLabels = cachedData.labels?.Length != 0 ? cachedData.labels : null;
-            modelData.imageNormalization = new MLModelData.Normalization {
-                mean = mean?.Length > 0 ? new Vector3(mean[0], mean[1], mean[2]) : Vector3.zero,
-                std = std?.Length > 0 ? new Vector3(std[0], std[1], std[2]) : Vector3.one
-            };
+            modelData.imageNormalization = cachedData.normalization;
             modelData.imageAspectMode = GetAspectMode(cachedData.aspectMode);
             return modelData;
         }
@@ -106,18 +125,18 @@ namespace NatSuite.ML.Hub {
 
         [Serializable]
         private struct MLCachedData {
-            public string sid;
+            public string session;
             public string graphData;
             public string[] labels;
-            public Normalization normalization;
+            public MLModelData.Normalization normalization;
             public string aspectMode;
         }
 
         [Serializable]
-        private struct DeviceInfo { public string id; public string model; public string os; public string gfx; }
+        private struct Device { public string id; public string model; public string os; public string gfx; }
 
         [Serializable]
-        private struct Mutation { public string tag; public DeviceInfo device; }
+        private struct Mutation { public string tag; public Device device; }
 
         [Serializable]
         private struct Payload { public string query; public Mutation variables; }
@@ -127,9 +146,6 @@ namespace NatSuite.ML.Hub {
         
         [Serializable]
         private struct ResponseData { public MLCachedData modelData; }
-
-        [Serializable]
-        private struct Normalization { public float[] mean; public float[] std; }
         #endregion
     }
 }

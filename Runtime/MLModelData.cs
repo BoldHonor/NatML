@@ -25,9 +25,15 @@ namespace NatSuite.ML {
         /// </summary>
         [Serializable]
         public struct Normalization {
-            [SerializeField] internal Vector3 mean;
-            [SerializeField] internal Vector3 std;
-            public void Deconstruct (out Vector3 mean, out Vector3 std) => (mean, std) = (this.mean, this.std);
+            [SerializeField] internal float[] mean;
+            [SerializeField] internal float[] std;
+            public void Deconstruct (out Vector3 outMean, out Vector3 outStd) {
+                (outMean, outStd) = (Vector3.zero, Vector3.one);
+                if (mean != null)
+                    outMean = new Vector3(mean[0], mean[1], mean[2]);
+                if (std != null)
+                    outStd = new Vector3(std[0], std[1], std[2]);
+            }
         }
 
         /// <summary>
@@ -52,10 +58,8 @@ namespace NatSuite.ML {
         /// </summary>
         /// <returns>ML model.</returns>
         public MLModel Deserialize () {
-            // Check for Hub model
-            if (sid != default)
-                return new MLHubModel(sid, graphData);
-            // Create model
+            if (!string.IsNullOrEmpty(session))
+                return new MLHubModel(session, graphData);
             return new MLModel(graphData);
         }
 
@@ -99,26 +103,24 @@ namespace NatSuite.ML {
         /// <param name="tag">Model tag.</param>
         /// <param name="accessKey">Hub access key.</param>
         /// <returns>ML model data.</returns>
-        public static async Task<MLModelData> FromHub (string tag, string accessKey) {
-            // Check cache
-            var modelData = MLHub.LoadFromCache(tag);
-            if (modelData != null)
-                return modelData;
-            // Fetch from Hub
-            modelData = await MLHub.LoadFromHub(tag, accessKey);
-            MLHub.SaveToCache(modelData);
-            // Return
+        public static async Task<MLModelData> FromHub (string tag, string accessKey = null) {
+            var modelData = await MLHub.LoadFromCache(tag);
+            if (modelData == null) {
+                modelData = await MLHub.LoadFromHub(tag, accessKey);
+                MLHub.SaveToCache(modelData);
+            }
             return modelData;
         }
         #endregion
 
 
         #region --Operations--
+        internal string tag;
+        internal string session;
         [SerializeField, HideInInspector] internal byte[] graphData;
         [SerializeField, HideInInspector] internal string[] classLabels;
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
         [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;
-        internal string sid;
         #endregion
     }
 }

@@ -6,26 +6,16 @@
 namespace NatSuite.ML.Hub {
 
     using System;
-    using Stopwatch = System.Diagnostics.Stopwatch;
 
     internal sealed class MLHubModel : MLModel {
 
         #region --Operations--
 
-        private readonly string id;
+        private readonly string session;
 
-        internal MLHubModel (string id, byte[] data) : base(data) => this.id = id;
+        internal MLHubModel (string session, byte[] data) : base(data) => this.session = session;
 
-        private protected override IntPtr[] Predict (params IntPtr[] inputs) {
-            var watch = Stopwatch.StartNew();
-            var outputs = base.Predict(inputs);
-            Report(watch.Elapsed.TotalMilliseconds);
-            return outputs;
-        }
-
-        private void Report (double latency) { // INCOMPLETE
-
-        }
+        private protected override IntPtr[] Predict (params IntPtr[] inputs) => base.Predict(inputs);
         #endregion
     }
 }
