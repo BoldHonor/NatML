@@ -22,7 +22,7 @@ namespace NatSuite.ML.Editor {
         public override void OnImportAsset (AssetImportContext ctx) {
             // Populate model data
             var modelData = ScriptableObject.CreateInstance<MLModelData>();
-            modelData.data = File.ReadAllBytes(ctx.assetPath);
+            modelData.graphData = File.ReadAllBytes(ctx.assetPath);
             modelData.imageNormalization = new MLModelData.Normalization { mean = Vector3.zero, std = Vector3.one };
             if (classLabels)
                 modelData.classLabels = classLabels.text.Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);

@@ -13,7 +13,7 @@ namespace NatSuite.ML.Hub {
     using UnityEngine;
     using Features;
     
-    public static class MLHub {
+    internal static class MLHub {
 
         #region --Client API--
 
@@ -21,7 +21,7 @@ namespace NatSuite.ML.Hub {
             // Build payload
             var mutation = "modelData (tag: $tag, device: $device) { data labels normalization { mean std } aspectMode }";
             var query = $"mutation ($tag: String!, $device: DeviceInfo!) {{ {mutation} }}";
-            var payload = new Payload {
+            var payload = JsonUtility.ToJson(new Payload {
                 query = query,
                 variables = new Mutation {
                     tag = tag,
@@ -32,12 +32,11 @@ namespace NatSuite.ML.Hub {
                         gfx = SystemInfo.graphicsDeviceType.ToString()
                     }
                 }
-            };
-            var payloadStr = JsonUtility.ToJson(payload);
+            });
             // Request
             const string API = @"http://localhost:8000/graph"; //@"https://hub.natsuite.io/graph";
             using (var client = new HttpClient())
-                using (var content = new StringContent(payloadStr, Encoding.UTF8, "application/json")) {
+                using (var content = new StringContent(payload, Encoding.UTF8, "application/json")) {
                     // Fetch model data
                     content.Headers.TryAddWithoutValidation(@"Authorization", accessKey);
                     using (var response = await client.PostAsync(API, content)) {
@@ -48,9 +47,9 @@ namespace NatSuite.ML.Hub {
                             Debug.LogError($"Failed to load model from Hub: {tag}");
                             return default;
                         }
-                        // Populate model data
+                        // Create model data
                         var cachedData = responseDict.data.modelData;
-                        using (var modelResponse = await client.GetAsync(cachedData.data)) {
+                        using (var modelResponse = await client.GetAsync(cachedData.graphData)) {
                             var graphData = await modelResponse.Content.ReadAsByteArrayAsync();
                             var modelData = Load(cachedData, graphData);
                             return modelData;
@@ -67,7 +66,7 @@ namespace NatSuite.ML.Hub {
                 return null;
             // Load
             var cachedData = JsonUtility.FromJson<MLCachedData>(File.ReadAllText(cachePath));
-            var graphData = File.ReadAllBytes(cachedData.data);
+            var graphData = File.ReadAllBytes(cachedData.graphData);
             var modelData = Load(cachedData, graphData);            
             return modelData;
         }
@@ -83,7 +82,7 @@ namespace NatSuite.ML.Hub {
         private static MLModelData Load (MLCachedData cachedData, byte[] graphData) {
             var (mean, std) = (cachedData.normalization.mean, cachedData.normalization.std);
             var modelData = ScriptableObject.CreateInstance<MLModelData>();
-            modelData.data = graphData;
+            modelData.graphData = graphData;
             modelData.classLabels = cachedData.labels?.Length != 0 ? cachedData.labels : null;
             modelData.imageNormalization = new MLModelData.Normalization {
                 mean = mean?.Length > 0 ? new Vector3(mean[0], mean[1], mean[2]) : Vector3.zero,
@@ -106,8 +105,9 @@ namespace NatSuite.ML.Hub {
         }
 
         [Serializable]
-        private struct MLCachedData { // INCOMPLETE // Add id
-            public string data;
+        private struct MLCachedData {
+            public string sid;
+            public string graphData;
             public string[] labels;
             public Normalization normalization;
             public string aspectMode;

@@ -53,10 +53,10 @@ namespace NatSuite.ML {
         /// <returns>ML model.</returns>
         public MLModel Deserialize () {
             // Check for Hub model
-            if (id != default)
-                return new MLHubModel(id, data);
+            if (sid != default)
+                return new MLHubModel(sid, graphData);
             // Create model
-            return new MLModel(data);
+            return new MLModel(graphData);
         }
 
         /// <summary>
@@ -64,9 +64,9 @@ namespace NatSuite.ML {
         /// </summary>
         /// <param name="path">Path to ONNX model file.</param>
         /// <returns>ML model data.</returns>
-        public static Task<MLModelData> FromPath (string path) {
+        public static Task<MLModelData> FromFile (string path) {
             var modelData = ScriptableObject.CreateInstance<MLModelData>();
-            modelData.data = File.ReadAllBytes(path);
+            modelData.graphData = File.ReadAllBytes(path);
             return Task.FromResult(modelData);
         }
 
@@ -79,7 +79,7 @@ namespace NatSuite.ML {
             // Check for direct extraction
             var fullPath = Path.Combine(Application.streamingAssetsPath, relativePath);
             if (Application.platform != RuntimePlatform.Android)
-                return await FromPath(fullPath);
+                return await FromFile(fullPath);
             // Extract from app archive
             using (var request = UnityWebRequest.Get(fullPath)) {
                 request.SendWebRequest();
@@ -88,7 +88,7 @@ namespace NatSuite.ML {
                 if (request.isNetworkError || request.isHttpError)
                     throw new ArgumentException($"Failed to create MLModelData from StreamingAssets: {relativePath}");
                 var modelData = ScriptableObject.CreateInstance<MLModelData>();
-                modelData.data = request.downloadHandler.data;
+                modelData.graphData = request.downloadHandler.data;
                 return modelData;
             }
         }
@@ -114,11 +114,11 @@ namespace NatSuite.ML {
 
 
         #region --Operations--
-        [SerializeField, HideInInspector] internal byte[] data;
+        [SerializeField, HideInInspector] internal byte[] graphData;
         [SerializeField, HideInInspector] internal string[] classLabels;
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
         [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;
-        internal string id;
+        internal string sid;
         #endregion
     }
 }
