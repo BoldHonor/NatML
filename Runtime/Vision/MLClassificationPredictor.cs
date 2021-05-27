@@ -29,7 +29,7 @@ namespace NatSuite.ML.Vision {
             // Save
             this.model = model;
             this.labels = labels;
-            this.classes = (model.outputs.First() as MLArrayType).shape.Aggregate(1, (a, b) => a * b);
+            this.classes = (model.outputs[0] as MLArrayType).shape.Aggregate(1, (a, b) => a * b);
             // Check
             if (labels.Length != classes)
                 throw new ArgumentOutOfRangeException(
