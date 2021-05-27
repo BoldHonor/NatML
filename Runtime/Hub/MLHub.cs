@@ -3,7 +3,7 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-#define DEV_HUB
+//#define DEV_HUB
 
 namespace NatSuite.ML.Hub {
 
