@@ -3,7 +3,7 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-#define DEV_HUB
+//#define DEV_HUB
 
 namespace NatSuite.ML.Hub {
 
@@ -34,11 +34,6 @@ namespace NatSuite.ML.Hub {
                 variables = new Mutation { tag = tag, device = device }
             });
             // Request
-            #if !DEV_HUB
-            const string API = @"https://api.natsuite.io/graph";
-            #else
-            const string API = @"http://localhost:8000/graph"; 
-            #endif
             using (var client = new HttpClient())
                 using (var content = new StringContent(payload, Encoding.UTF8, "application/json")) {
                     // Fetch model data
@@ -105,6 +100,13 @@ namespace NatSuite.ML.Hub {
 
 
         #region --Operations--
+
+        private const string API =
+        #if !DEV_HUB
+        @"http://api.natsuite.io/graph";
+        #else
+        @"http://localhost:8000/graph"; 
+        #endif
 
         private static MLModelData Load (string tag, MLCachedData cachedData, byte[] graphData) {
             var modelData = ScriptableObject.CreateInstance<MLModelData>();
