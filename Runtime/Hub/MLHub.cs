@@ -3,6 +3,8 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
+#define DEV_HUB
+
 namespace NatSuite.ML.Hub {
 
     using System;
@@ -32,7 +34,11 @@ namespace NatSuite.ML.Hub {
                 variables = new Mutation { tag = tag, device = device }
             });
             // Request
-            const string API = @"http://localhost:8000/graph"; //@"https://api.natsuite.io/graph";
+            #if !DEV_HUB
+            const string API = @"https://api.natsuite.io/graph";
+            #else
+            const string API = @"http://localhost:8000/graph"; 
+            #endif
             using (var client = new HttpClient())
                 using (var content = new StringContent(payload, Encoding.UTF8, "application/json")) {
                     // Fetch model data

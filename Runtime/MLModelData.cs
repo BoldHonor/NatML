@@ -21,22 +21,6 @@ namespace NatSuite.ML {
         
         #region --Client API--
         /// <summary>
-        /// Image normalization (mean and standard deviation).
-        /// </summary>
-        [Serializable]
-        public struct Normalization {
-            [SerializeField] internal float[] mean;
-            [SerializeField] internal float[] std;
-            public void Deconstruct (out Vector3 outMean, out Vector3 outStd) {
-                (outMean, outStd) = (Vector3.zero, Vector3.one);
-                if (mean != null)
-                    outMean = new Vector3(mean[0], mean[1], mean[2]);
-                if (std != null)
-                    outStd = new Vector3(std[0], std[1], std[2]);
-            }
-        }
-
-        /// <summary>
         /// Model classification labels.
         /// This is `null` if the model does not have any classification labels.
         /// </summary>
@@ -121,6 +105,19 @@ namespace NatSuite.ML {
         [SerializeField, HideInInspector] internal string[] classLabels;
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
         [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;
+
+        [Serializable]
+        public struct Normalization {
+            [SerializeField] internal float[] mean;
+            [SerializeField] internal float[] std;
+            public void Deconstruct (out Vector3 outMean, out Vector3 outStd) {
+                (outMean, outStd) = (Vector3.zero, Vector3.one);
+                if (mean != null)
+                    outMean = new Vector3(mean[0], mean[1], mean[2]);
+                if (std != null)
+                    outStd = new Vector3(std[0], std[1], std[2]);
+            }
+        }
         #endregion
     }
 }
