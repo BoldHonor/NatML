@@ -5,8 +5,6 @@
 
 namespace NatSuite.ML.Features {
 
-    using System;
-
     /// <summary>
     /// ML sequence feature.
     /// </summary>

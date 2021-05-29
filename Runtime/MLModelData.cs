@@ -42,9 +42,15 @@ namespace NatSuite.ML {
         /// </summary>
         /// <returns>ML model.</returns>
         public MLModel Deserialize () {
-            if (!string.IsNullOrEmpty(session))
-                return new MLHubModel(session, graphData);
-            return new MLModel(graphData);
+            var model = new MLModel(graphData);
+            if (!string.IsNullOrEmpty(session)) {
+                (model as INMLReporter).onPrediction += latency => {
+                    #pragma warning disable 4014
+                    NMLHub.ReportPrediction(session, latency);
+                    #pragma warning restore 4014
+                };
+            }
+            return model;
         }
 
         /// <summary>
@@ -86,13 +92,18 @@ namespace NatSuite.ML {
         /// </summary>
         /// <param name="tag">Model tag.</param>
         /// <param name="accessKey">Hub access key.</param>
+        /// <param name="analytics">Enable model performance analytics reporting.</param>
         /// <returns>ML model data.</returns>
-        public static async Task<MLModelData> FromHub (string tag, string accessKey = null) {
-            var modelData = await MLHub.LoadFromCache(tag);
+        public static async Task<MLModelData> FromHub (string tag, string accessKey = null, bool analytics = true) {
+            var modelData = await NMLHub.LoadFromCache(tag);
             if (modelData == null) {
-                modelData = await MLHub.LoadFromHub(tag, accessKey);
-                MLHub.SaveToCache(modelData);
+                modelData = await NMLHub.LoadFromHub(tag, accessKey);
+                #pragma warning disable 4014
+                NMLHub.SaveToCache(modelData);
+                #pragma warning restore 4014
             }
+            if (!analytics)
+                modelData.session = null;
             return modelData;
         }
         #endregion

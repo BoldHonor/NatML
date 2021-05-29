@@ -12,7 +12,7 @@ namespace NatSuite.ML.Vision {
 
     /// <summary>
     /// </summary>
-    public class MLDenseClassificationPredictor : IMLPredictor<(string label, float confidence)[]> {
+    public sealed class MLDenseClassificationPredictor : IMLPredictor<(string label, float confidence)[]> {
 
         #region --Client API--
         /// <summary>

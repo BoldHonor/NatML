@@ -11,11 +11,13 @@ namespace NatSuite.ML {
     using System.Linq;
     using System.Text;
     using Internal;
+    using Hub;
+    using Stopwatch = System.Diagnostics.Stopwatch;
 
     /// <summary>
     /// ML model.
     /// </summary>
-    public class MLModel : IMLModel {
+    public sealed class MLModel : IMLModel, INMLReporter {
 
         #region --Client API--
         /// <summary>
@@ -59,6 +61,7 @@ namespace NatSuite.ML {
         #region --Operations--
 
         private readonly IntPtr model;
+        private MLPredictionHandler predictionHandler;
 
         unsafe internal MLModel (byte[] graphData) {
             // Create
@@ -82,12 +85,18 @@ namespace NatSuite.ML {
             }
         }
 
-        IntPtr[] IMLModel.Predict (params IntPtr[] inputs) => Predict(inputs);
-
-        private protected virtual IntPtr[] Predict (params IntPtr[] inputs) {
+        IntPtr[] IMLModel.Predict (params IntPtr[] inputs) { // CHECK // Invoke handler on separate thread
             var outputs = new IntPtr[this.outputs.Length];
+            var watch = Stopwatch.StartNew();
             model.Predict(inputs, outputs);
+            watch.Stop();
+            predictionHandler?.Invoke(watch.Elapsed.TotalMilliseconds);
             return outputs;
+        }
+
+        event MLPredictionHandler INMLReporter.onPrediction {
+            add => predictionHandler += value;
+            remove => predictionHandler -= value;
         }
 
         IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator () {

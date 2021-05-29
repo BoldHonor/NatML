@@ -15,40 +15,43 @@ namespace NatSuite.ML.Hub {
     using UnityEngine;
     using Features;
     
-    internal static class MLHub {
+    internal static class NMLHub {
 
         #region --Client API--
 
         public static async Task<MLModelData> LoadFromHub (string tag, string accessKey) {
             // Build payload
-            var mutation = "modelData (tag: $tag, device: $device) { session graphData labels normalization { mean std } aspectMode }";
+            var mutation = "createSession (tag: $tag, device: $device) { id modelData { labels normalization { mean std } aspectMode } graphData }";
             var query = $"mutation ($tag: String!, $device: Device!) {{ {mutation} }}";
             var device = new Device {
-                id = SystemInfo.deviceUniqueIdentifier,
                 model = SystemInfo.deviceModel,
-                os = SystemInfo.operatingSystem,
+                os = Application.platform.ToString(),
                 gfx = SystemInfo.graphicsDeviceType.ToString()
             };
-            var payload = JsonUtility.ToJson(new Payload {
+            var payload = JsonUtility.ToJson(new CreateSessionPayload {
                 query = query,
-                variables = new Mutation { tag = tag, device = device }
+                variables = new CreateSessionArgs { tag = tag, device = device }
             });
             // Request
             using (var client = new HttpClient())
                 using (var content = new StringContent(payload, Encoding.UTF8, "application/json")) {
+                    // Authenticate
+                    if (!string.IsNullOrEmpty(accessKey))
+                        content.Headers.TryAddWithoutValidation(@"Authorization", accessKey);
                     // Fetch model data
-                    content.Headers.TryAddWithoutValidation(@"Authorization", accessKey);
                     using (var response = await client.PostAsync(API, content)) {
                         var responseStr = await response.Content.ReadAsStringAsync();
-                        var responseDict = JsonUtility.FromJson<Response>(responseStr);
+                        var responseDict = JsonUtility.FromJson<CreateSessionResponse>(responseStr);
                         // Check
                         if (responseDict.errors != null) {
                             Debug.LogError($"Failed to load model from Hub: {tag}");
                             return default;
                         }
                         // Create model data
-                        var cachedData = responseDict.data.modelData;
-                        using (var modelResponse = await client.GetAsync(cachedData.graphData)) {
+                        var responseData = responseDict.data.createSession;
+                        var cachedData = responseData.modelData;
+                        cachedData.session = responseData.id;
+                        using (var modelResponse = await client.GetAsync(responseData.graphData)) {
                             var graphData = await modelResponse.Content.ReadAsByteArrayAsync();
                             var modelData = Load(tag, cachedData, graphData);
                             return modelData;
@@ -73,7 +76,7 @@ namespace NatSuite.ML.Hub {
             }            
         }
 
-        public static async void SaveToCache (MLModelData modelData) {
+        public static async Task SaveToCache (MLModelData modelData) {
             // Check
             if (modelData == null)
                 return;
@@ -95,6 +98,25 @@ namespace NatSuite.ML.Hub {
                 await stream.WriteAsync(modelData.graphData, 0, modelData.graphData.Length);
             using (var stream = new StreamWriter(cachePath))
                 await stream.WriteAsync(JsonUtility.ToJson(cachedData));
+        }
+
+        public static void ReportPrediction (string session, double latency) {
+            // Check
+            if (session == null)
+                return;
+            // Build payload
+            var mutation = "reportPrediction (session: $session, latency: $latency)";
+            var query = $"mutation ($session: ID!, $latency: Float!) {{ {mutation} }}";
+            var payload = JsonUtility.ToJson(new ReportPredictionPayload {
+                query = query,
+                variables = new ReportPredictionArgs { session = session, latency = latency }
+            });
+            // Request
+            using (var client = new HttpClient())
+                using (var content = new StringContent(payload, Encoding.UTF8, "application/json"))
+                    #pragma warning disable 4014
+                    using (client.PostAsync(API, content)) { }
+                    #pragma warning restore 4014
         }
         #endregion
 
@@ -141,19 +163,28 @@ namespace NatSuite.ML.Hub {
         }
 
         [Serializable]
-        private struct Device { public string id; public string model; public string os; public string gfx; }
+        private struct Device { public string model; public string os; public string gfx; }
 
         [Serializable]
-        private struct Mutation { public string tag; public Device device; }
+        private struct CreateSessionArgs { public string tag; public Device device; }
 
         [Serializable]
-        private struct Payload { public string query; public Mutation variables; }
+        private struct ReportPredictionArgs { public string session; public double latency; }
 
         [Serializable]
-        private struct Response { public ResponseData data; public string[] errors; }
+        private struct CreateSessionPayload { public string query; public CreateSessionArgs variables; }
+
+        [SerializeField]
+        private struct ReportPredictionPayload { public string query; public ReportPredictionArgs variables; }
+
+        [Serializable]
+        private struct CreateSessionResponse { public CreateSessionResponseData data; public string[] errors; }
         
         [Serializable]
-        private struct ResponseData { public MLCachedData modelData; }
+        private struct CreateSessionResponseData { public SessionData createSession; }
+
+        [Serializable]
+        private struct SessionData { public string id; public MLCachedData modelData; public string graphData; }
         #endregion
     }
 }
