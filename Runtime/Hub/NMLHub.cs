@@ -100,7 +100,7 @@ namespace NatSuite.ML.Hub {
                 await stream.WriteAsync(JsonUtility.ToJson(cachedData));
         }
 
-        public static void ReportPrediction (string session, double latency) {
+        public static async Task ReportPrediction (string session, double latency) {
             // Check
             if (session == null)
                 return;
@@ -114,9 +114,7 @@ namespace NatSuite.ML.Hub {
             // Request
             using (var client = new HttpClient())
                 using (var content = new StringContent(payload, Encoding.UTF8, "application/json"))
-                    #pragma warning disable 4014
-                    using (client.PostAsync(API, content)) { }
-                    #pragma warning restore 4014
+                    using (await client.PostAsync(API, content)) { }
         }
         #endregion
 
