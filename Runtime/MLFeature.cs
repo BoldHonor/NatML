@@ -18,28 +18,20 @@ namespace NatSuite.ML {
         /// Feature type.
         /// </summary>
         public readonly MLFeatureType type;
-
-        /// <summary>
-        /// Implicitly convert a float array an ML feature.
-        /// </summary>
-        public static implicit operator MLFeature (float[] array) => new MLArrayFeature<float>(array);
-
-        /// <summary>
-        /// Implicitly convert a Texture2D to an ML feature.
-        /// </summary>
-        public static implicit operator MLFeature (Texture2D texture) => new MLImageFeature(texture);
-
-        /// <summary>
-        /// Implicitly convert a WebCamTexture to an ML feature.
-        /// </summary>
-        public static implicit operator MLFeature (WebCamTexture texture) => new MLImageFeature(texture.GetPixels32(), texture.width, texture.height);
         #endregion
-
 
 
         #region --Operations--
 
         protected MLFeature (MLFeatureType type) => this.type = type;
+
+        public static implicit operator MLFeature (float[] array) => new MLArrayFeature<float>(array);
+
+        public static implicit operator MLFeature (Texture2D texture) => new MLImageFeature(texture);
+
+        public static implicit operator MLFeature (WebCamTexture texture) => new MLImageFeature(texture.GetPixels32(), texture.width, texture.height);
+
+        public static implicit operator MLFeature (AudioClip clip) => new MLAudioFeature(clip);
         #endregion
     }
 }

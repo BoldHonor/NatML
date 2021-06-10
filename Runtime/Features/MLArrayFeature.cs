@@ -76,13 +76,13 @@ namespace NatSuite.ML.Features {
             var shape = bufferType.shape ?? featureType.shape;
             if (data != null)
                 fixed (void* baseAddress = data)
-                    return CreateNativeFeature(baseAddress, shape);
+                    return Create(baseAddress, shape);
             if (nativeBuffer != IntPtr.Zero)
-                return CreateNativeFeature((void*)nativeBuffer, shape);
+                return Create((void*)nativeBuffer, shape);
             return IntPtr.Zero;
         }
 
-        private unsafe IntPtr CreateNativeFeature (void* data, int[] shape) {
+        private unsafe IntPtr Create (void* data, int[] shape) {
             Bridge.CreateFeature(
                 data,
                 shape,

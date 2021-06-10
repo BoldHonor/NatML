@@ -93,16 +93,16 @@ namespace NatSuite.ML.Features {
         unsafe IntPtr IMLFeature.Create (MLFeatureType type) {
             if (pixelBuffer != null)
                 fixed (void* data = pixelBuffer)
-                    return CreateNativeFeature(data, type);
+                    return Create(data, type);
             if (colorBuffer != null)
                 fixed (void* data = colorBuffer)
-                    return CreateNativeFeature(data, type);
+                    return Create(data, type);
             if (nativeBuffer != IntPtr.Zero)
-                return CreateNativeFeature((void*)nativeBuffer, type);
+                return Create((void*)nativeBuffer, type);
             return IntPtr.Zero;
         }
 
-        private unsafe IntPtr CreateNativeFeature (void* data, MLFeatureType type) {
+        private unsafe IntPtr Create (void* data, MLFeatureType type) {
             var featureType = type as MLArrayType;
             var bufferType = this.type as MLImageType;
             Bridge.CreateFeature(

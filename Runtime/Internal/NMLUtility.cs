@@ -7,6 +7,7 @@ namespace NatSuite.ML.Internal {
 
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Text;
     using Types;
 
@@ -65,6 +66,32 @@ namespace NatSuite.ML.Internal {
                 default:
                     return new MLArrayType(name, dtype.ManagedType(), shape);
             }
+        }
+
+        /// <summary>
+        /// Get the feature shape.
+        /// Feature MUST be an array feature.
+        /// </summary>
+        /// <param name="feature">Native feature.</param>
+        /// <returns>Feature shape.</returns>
+        public static int[] FeatureShape (this in IntPtr feature) {
+            feature.FeatureType(out var type);
+            var shape = new int[type.FeatureTypeDimensions()];
+            type.FeatureTypeShape(shape, shape.Length);
+            type.ReleaseFeatureType();
+            return shape;
+        }
+
+        /// <summary>
+        /// Get the element count in a shape.
+        /// </summary>
+        /// <param name="shape"></param>
+        /// <returns>Shape element count.</returns>
+        public static int ElementCount (this IEnumerable<int> shape) {
+            var result = 1;
+            foreach (var s in shape)
+                result *= s;
+            return result;
         }
     }
 }
