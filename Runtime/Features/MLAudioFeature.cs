@@ -6,7 +6,10 @@
 namespace NatSuite.ML.Features {
 
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using UnityEngine;
+    using Unity.Collections.LowLevel.Unsafe;
     using Internal;
     using Types;
 
@@ -23,7 +26,19 @@ namespace NatSuite.ML.Features {
         public MLAudioFeature (
             AudioClip clip,
             float duration = -1
-        ) : this(GetSampleBuffer(clip, duration), clip.frequency, clip.channels) { }
+        ) : this(Extract(clip, duration), clip.frequency, clip.channels) { }
+
+        /// <summary>
+        /// Create an audio feature from a sample buffer list.
+        /// </summary>
+        /// <param name="sampleBuffer">List of linear PCM sample buffers interleaved by channel.</param>
+        /// <param name="sampleRate">Sample rate.</param>
+        /// <param name="channelCount">Channel count.</param>
+        public MLAudioFeature (
+            IEnumerable<float[]> bufferList,
+            int sampleRate,
+            int channelCount
+        ) : this(Flatten(bufferList), sampleRate, channelCount) { }
 
         /// <summary>
         /// Create an audio feature from a sample buffer.
@@ -98,12 +113,25 @@ namespace NatSuite.ML.Features {
             return feature;
         }
 
-        private static float[] GetSampleBuffer (AudioClip clip, float duration = -1) {
+        private static float[] Extract (AudioClip clip, float duration = -1) {
             var frameCount = duration < 0 ? clip.samples : Mathf.RoundToInt(clip.frequency * duration);
             frameCount = Mathf.Min(frameCount, clip.samples);
             var sampleBuffer = new float[frameCount * clip.channels];
             clip.GetData(sampleBuffer, 0);
             return sampleBuffer;
+        }
+
+        private static unsafe float[] Flatten (IEnumerable<float[]> bufferList) {
+            var bufferSize = bufferList.Select(s => s.Length).Sum();
+            var result = new float[bufferSize];
+            var idx = 0;
+            fixed (float* dst = result)
+                foreach (var sampleBuffer in bufferList)
+                    fixed (float* src = sampleBuffer) {
+                        UnsafeUtility.MemCpy(&dst[idx], src, sampleBuffer.Length * sizeof(float));
+                        idx += sampleBuffer.Length;
+                    }
+            return result;
         }
         #endregion
     }
