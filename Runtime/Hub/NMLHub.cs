@@ -63,17 +63,19 @@ namespace NatSuite.ML.Hub {
         public static async Task<MLModelData> LoadFromCache (string tag) {
             // Check
             var cacheName = tag.Replace('/', '_');
-            var cachePath = Path.Combine(Application.persistentDataPath, "ML", $"{cacheName}.nml");
+            var basePath = Path.Combine(Application.persistentDataPath, "ML");
+            var cachePath = Path.Combine(basePath, $"{cacheName}.nml");
             if (!File.Exists(cachePath))
                 return default;
             // Load
             var cachedData = JsonUtility.FromJson<MLCachedData>(File.ReadAllText(cachePath));
-            using (var stream = new FileStream(cachedData.graphData, FileMode.Open, FileAccess.Read)) {
+            var graphPath = Path.Combine(basePath, cachedData.graphData);
+            using (var stream = new FileStream(graphPath, FileMode.Open, FileAccess.Read)) {
                 var graphData = new byte[stream.Length];
                 await stream.ReadAsync(graphData, 0, graphData.Length);
                 var modelData = Load(tag, cachedData, graphData);            
                 return modelData;
-            }            
+            }
         }
 
         public static async Task SaveToCache (MLModelData modelData) {
@@ -84,10 +86,11 @@ namespace NatSuite.ML.Hub {
             var cacheName = modelData.tag.Replace('/', '_');
             var basePath = Path.Combine(Application.persistentDataPath, "ML");
             var cachePath = Path.Combine(basePath, $"{cacheName}.nml");
-            var graphPath = Path.Combine(basePath, Guid.NewGuid().ToString());
+            var graphName = Guid.NewGuid().ToString();
+            var graphPath = Path.Combine(basePath, graphName);
             var cachedData = new MLCachedData {
                 session = modelData.session,
-                graphData = graphPath,
+                graphData = graphName,
                 labels = modelData.classLabels,
                 normalization = modelData.imageNormalization,
                 aspectMode = modelData.imageAspectMode.ToString()
