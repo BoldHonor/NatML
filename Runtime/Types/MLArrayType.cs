@@ -35,7 +35,11 @@ namespace NatSuite.ML.Types {
 
         #region --Operations--
 
-        public override string ToString () => $"{name}: ({string.Join(", ", shape)}) {dataType}";
+        public override string ToString () {
+            var nameStr = name != null ? $"{name}: " : string.Empty;
+            var shapeStr = shape != null ? $"({string.Join(", ", shape)})" : "<shapeless>";
+            return $"{nameStr}s{shapeStr} {dataType}";
+        }
         #endregion
     }
 }

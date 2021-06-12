@@ -83,6 +83,11 @@ namespace NatSuite.ML.Features {
         }
 
         private unsafe IntPtr Create (void* data, int[] shape) {
+            // Check that shape is fully specified
+            var dynamicAxis = Array.IndexOf(shape, -1);
+            if (dynamicAxis != -1)
+                throw new ArgumentException($"Array feature shape has unspecified size at dimension {dynamicAxis}");
+            // Create
             Bridge.CreateFeature(
                 data,
                 shape,
