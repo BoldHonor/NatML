@@ -21,7 +21,12 @@ namespace NatSuite.ML.Internal {
 
         #region --MLModel--
         [DllImport(Assembly, EntryPoint = @"NMLCreateModel")]
-        public static unsafe extern void CreateModel (void* buffer, int bufferSize, out IntPtr model);
+        public static unsafe extern void CreateModel (
+            void* buffer,
+            int bufferSize,
+            void* reserved,
+            out IntPtr model
+        );
         [DllImport(Assembly, EntryPoint = @"NMLReleaseModel")]
         public static extern void ReleaseModel (this IntPtr model);
         [DllImport(Assembly, EntryPoint = @"NMLModelGetMetadataCount")]

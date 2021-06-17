@@ -3,7 +3,9 @@
 *   Copyright (c) 2021 Yusuf Olokoba.
 */
 
-//#define DEV_HUB
+#if UNITY_EDITOR
+    //#define DEV_HUB
+#endif
 
 namespace NatSuite.ML.Hub {
 
@@ -21,7 +23,8 @@ namespace NatSuite.ML.Hub {
 
         public static async Task<MLModelData> LoadFromHub (string tag, string accessKey) {
             // Build payload
-            var mutation = "createSession (tag: $tag, device: $device) { id modelData { labels normalization { mean std } aspectMode } graphData }";
+            var fields = "id modelData { labels normalization { mean std } aspectMode } graphData flags";
+            var mutation = $"createSession (tag: $tag, device: $device) {{ {fields} }}";
             var query = $"mutation ($tag: String!, $device: Device!) {{ {mutation} }}";
             var device = new Device {
                 model = SystemInfo.deviceModel,
@@ -91,6 +94,7 @@ namespace NatSuite.ML.Hub {
             var cachedData = new MLCachedData {
                 session = modelData.session,
                 graphData = graphName,
+                flags = modelData.flags,
                 labels = modelData.classLabels,
                 normalization = modelData.imageNormalization,
                 aspectMode = modelData.imageAspectMode.ToString()
@@ -136,6 +140,7 @@ namespace NatSuite.ML.Hub {
             modelData.tag = tag;
             modelData.session = cachedData.session;
             modelData.graphData = graphData;
+            modelData.flags = cachedData.flags;
             modelData.classLabels = cachedData.labels?.Length != 0 ? cachedData.labels : null;
             modelData.imageNormalization = cachedData.normalization;
             modelData.imageAspectMode = GetAspectMode(cachedData.aspectMode);
@@ -158,6 +163,7 @@ namespace NatSuite.ML.Hub {
         private struct MLCachedData {
             public string session;
             public string graphData;
+            public int flags;
             public string[] labels;
             public MLModelData.Normalization normalization;
             public string aspectMode;
@@ -185,7 +191,12 @@ namespace NatSuite.ML.Hub {
         private struct CreateSessionResponseData { public SessionData createSession; }
 
         [Serializable]
-        private struct SessionData { public string id; public MLCachedData modelData; public string graphData; }
+        private struct SessionData {
+            public string id;
+            public MLCachedData modelData;
+            public string graphData;
+            public int flags;
+        }
         #endregion
     }
 }

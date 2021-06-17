@@ -42,7 +42,7 @@ namespace NatSuite.ML {
         /// </summary>
         /// <returns>ML model.</returns>
         public MLModel Deserialize () {
-            var model = new MLModel(graphData);
+            var model = new MLModel(graphData, flags);
             if (!string.IsNullOrEmpty(session)) {
                 (model as INMLReporter).onPrediction += latency => {
                     #pragma warning disable 4014
@@ -113,6 +113,7 @@ namespace NatSuite.ML {
         internal string tag;
         internal string session;
         [SerializeField, HideInInspector] internal byte[] graphData;
+        [SerializeField, HideInInspector] internal int flags;
         [SerializeField, HideInInspector] internal string[] classLabels;
         [SerializeField, HideInInspector] internal Normalization imageNormalization;
         [SerializeField, HideInInspector] internal MLImageFeature.AspectMode imageAspectMode;

@@ -63,10 +63,10 @@ namespace NatSuite.ML {
         private readonly IntPtr model;
         private MLPredictionHandler predictionHandler;
 
-        unsafe internal MLModel (byte[] graphData) {
+        unsafe internal MLModel (byte[] graphData, int flags = 0) {
             // Create
             fixed (void* buffer = graphData)
-                Bridge.CreateModel(buffer, graphData.Length, out model);
+                Bridge.CreateModel(buffer, graphData.Length, &flags, out model);
             if (model == IntPtr.Zero)
                 throw new ArgumentException(@"Failed to create MLModel from graph data", nameof(graphData));
             // Marshal input types
