@@ -112,6 +112,7 @@ namespace NatSuite.ML.Hub {
             if (session == null)
                 return;
             // Build payload
+            await Task.Yield(); // Force async completion so we don't hold up model prediction
             var mutation = "reportPrediction (session: $session, latency: $latency)";
             var query = $"mutation ($session: ID!, $latency: Float!) {{ {mutation} }}";
             var payload = JsonUtility.ToJson(new ReportPredictionPayload {
