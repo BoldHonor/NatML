@@ -14,6 +14,8 @@ namespace NatSuite.ML.Features {
     using Types;
 
     /// <summary>
+    /// ML audio feature.
+    /// Sample buffers used to create audio features MUST be floating point linear PCM.
     /// </summary>
     public sealed class MLAudioFeature : MLFeature, IMLFeature {
 
@@ -50,11 +52,7 @@ namespace NatSuite.ML.Features {
             float[] sampleBuffer,
             int sampleRate,
             int channelCount
-        ) : base(new MLArrayType(null, typeof(float), new [] { 1, sampleBuffer.Length })) {
-            this.sampleBuffer = sampleBuffer;
-            this.bufferSampleRate = sampleRate;
-            this.bufferChannelCount = channelCount;
-        }
+        ) : base(new MLAudioType(sampleRate, channelCount, sampleBuffer.Length)) => this.sampleBuffer = sampleBuffer;
 
         /// <summary>
         /// Create an audio feature from a sample buffer.
@@ -68,11 +66,7 @@ namespace NatSuite.ML.Features {
             int sampleCount,
             int sampleRate,
             int channelCount
-        ) : base(new MLArrayType(null, typeof(float), new [] { 1, sampleCount })) {
-            this.nativeBuffer = (IntPtr)sampleBuffer;
-            this.bufferSampleRate = sampleRate;
-            this.bufferChannelCount = channelCount;
-        }
+        ) : base(new MLAudioType(sampleRate, channelCount, sampleCount)) => this.nativeBuffer = (IntPtr)sampleBuffer;
         #endregion
 
 
@@ -80,8 +74,6 @@ namespace NatSuite.ML.Features {
 
         private readonly float[] sampleBuffer;
         private readonly IntPtr nativeBuffer;
-        private readonly int bufferSampleRate;
-        private readonly int bufferChannelCount;
 
         unsafe IntPtr IMLFeature.Create (MLFeatureType type) {
             // Check types

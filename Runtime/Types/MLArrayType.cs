@@ -26,9 +26,16 @@ namespace NatSuite.ML.Types {
         /// <summary>
         /// Create an ML array feature type.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="type"></param>
-        /// <param name="shape"></param>
+        /// <param name="type">Array element type.</param>
+        /// <param name="shape">Array feature shape.</param>
+        public MLArrayType (Type type, int[] shape) : this(default, type, shape) { }
+
+        /// <summary>
+        /// Create an ML array feature type.
+        /// </summary>
+        /// <param name="name">Feature name.</param>
+        /// <param name="type">Array element type.</param>
+        /// <param name="shape">Array feature shape.</param>
         public MLArrayType (string name, Type type, int[] shape) : base(name, type) => this.shape = shape;
         #endregion
 
@@ -38,7 +45,7 @@ namespace NatSuite.ML.Types {
         public override string ToString () {
             var nameStr = name != null ? $"{name}: " : string.Empty;
             var shapeStr = shape != null ? $"({string.Join(", ", shape)})" : "<shapeless>";
-            return $"{nameStr}s{shapeStr} {dataType}";
+            return $"{nameStr}{shapeStr} {dataType}";
         }
         #endregion
     }

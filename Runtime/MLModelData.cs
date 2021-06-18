@@ -41,8 +41,9 @@ namespace NatSuite.ML {
         /// You MUST dispose the model once you are done with it.
         /// </summary>
         /// <returns>ML model.</returns>
-        public MLModel Deserialize () {
-            var model = new MLModel(graphData, flags);
+        public unsafe MLModel Deserialize () {
+            var flags = this.flags;
+            var model = new MLModel(graphData, &flags);
             if (!string.IsNullOrEmpty(session)) {
                 (model as INMLReporter).onPrediction += latency => {
                     #pragma warning disable 4014
