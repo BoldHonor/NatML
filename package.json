@@ -5,8 +5,11 @@
     "description": "High performance, cross platform machine learning runtime for Unity Engine.",
     "unity": "2019.3",
     "keywords": [
+        "natml",
         "machine learning",
         "ml",
+        "aritificial intelligence",
+        "ai",
         "computer vision",
         "opencv",
         "android",
