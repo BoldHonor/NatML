@@ -27,6 +27,7 @@ namespace NatSuite.ML.Internal {
 
         /// <summary>
         /// Make a prediction on one or more native input features.
+        /// Input and output features MUST be released when no longer needed.
         /// </summary>
         /// <param name="inputs">Native input features.</param>
         /// <returns>Native output features.</returns>

@@ -8,6 +8,7 @@ namespace NatSuite.ML.Internal {
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
     using Types;
 
@@ -57,14 +58,10 @@ namespace NatSuite.ML.Internal {
             nativeType.FeatureTypeShape(shape, shape.Length);
             // Return
             switch (dtype) {
-                case NMLDataType.Sequence:
-                    return null;
-                case NMLDataType.Dictionary:
-                    return null;
-                case var _ when shape.Length == 4:
-                    return new MLImageType(name, dtype.ManagedType(), shape);
-                default:
-                    return new MLArrayType(name, dtype.ManagedType(), shape);
+                case NMLDataType.Sequence: return default;
+                case NMLDataType.Dictionary: return default;
+                case var _ when shape.Length == 4: return new MLImageType(name, dtype.ManagedType(), shape);
+                default: return new MLArrayType(name, dtype.ManagedType(), shape);
             }
         }
 
@@ -87,11 +84,6 @@ namespace NatSuite.ML.Internal {
         /// </summary>
         /// <param name="shape"></param>
         /// <returns>Shape element count.</returns>
-        public static int ElementCount (this IEnumerable<int> shape) {
-            var result = 1;
-            foreach (var s in shape)
-                result *= s;
-            return result;
-        }
+        public static int ElementCount (this IEnumerable<int> shape) => shape.Aggregate(1, (a, b) => a * b);
     }
 }

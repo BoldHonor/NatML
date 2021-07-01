@@ -10,7 +10,7 @@ namespace NatSuite.ML.Types {
     /// <summary>
     /// ML sequence feature type.
     /// </summary>
-    public sealed class MLSequenceType : MLFeatureType { // INCOMPLETE
+    internal sealed class MLSequenceType : MLFeatureType { // INCOMPLETE // Internal for now
 
         #region --Client API--
         /// <summary>

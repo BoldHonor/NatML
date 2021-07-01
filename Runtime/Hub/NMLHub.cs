@@ -5,6 +5,7 @@
 
 #if UNITY_EDITOR
     //#define DEV_HUB
+    //#define STAGING_HUB
 #endif
 
 namespace NatSuite.ML.Hub {
@@ -130,10 +131,12 @@ namespace NatSuite.ML.Hub {
         #region --Operations--
 
         private const string API =
-        #if !DEV_HUB
-        @"http://api.natsuite.io/graph";
-        #else
+        #if DEV_HUB
         @"http://localhost:8000/graph"; 
+        #elif STAGING_HUB
+        @"https://staging.api.natsuite.io/graph";
+        #else
+        @"https://api.natsuite.io/graph";
         #endif
 
         private static MLModelData Load (string tag, MLCachedData cachedData, byte[] graphData) {

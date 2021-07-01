@@ -19,7 +19,7 @@ namespace NatSuite.ML.Internal {
         #endif
 
 
-        #region --MLModel--
+        #region --NMLModel--
         [DllImport(Assembly, EntryPoint = @"NMLCreateModel")]
         public static unsafe extern void CreateModel (
             void* buffer,
@@ -62,7 +62,7 @@ namespace NatSuite.ML.Internal {
         #endregion
 
 
-        #region --MLFeature--
+        #region --NMLFeature--
         [DllImport(Assembly, EntryPoint = @"NMLReleaseFeature")]
         public static extern void ReleaseFeature (this IntPtr feature);
         [DllImport(Assembly, EntryPoint = @"NMLFeatureGetType")]
@@ -93,7 +93,7 @@ namespace NatSuite.ML.Internal {
         #endregion
 
 
-        #region --MLFeatureType--
+        #region --NMLFeatureType--
         [DllImport(Assembly, EntryPoint = @"NMLReleaseFeatureType")]
         public static extern void ReleaseFeatureType (this IntPtr type);
         [DllImport(Assembly, EntryPoint = @"NMLFeatureTypeGetName")]

@@ -17,6 +17,6 @@ namespace NatSuite.ML.Internal {
         /// </summary>
         /// <param name="featureType">Feature type used to create native feature.</param>
         /// <returns>Prediction-ready native feature.</returns>
-        IntPtr Create (MLFeatureType featureType);
+        IntPtr Create (in MLFeatureType featureType);
     }
 }

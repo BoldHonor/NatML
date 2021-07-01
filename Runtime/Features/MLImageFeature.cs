@@ -90,7 +90,7 @@ namespace NatSuite.ML.Features {
         private readonly Color32[] colorBuffer;
         private readonly IntPtr nativeBuffer;
 
-        unsafe IntPtr IMLFeature.Create (MLFeatureType type) {
+        unsafe IntPtr IMLFeature.Create (in MLFeatureType type) {
             if (pixelBuffer != null)
                 fixed (void* data = pixelBuffer)
                     return Create(data, type);

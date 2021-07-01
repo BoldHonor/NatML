@@ -32,34 +32,6 @@ namespace NatSuite.ML.Extensions {
         }
 
         /// <summary>
-        /// Create an async predictor.
-        /// </summary>
-        /// <param name="predictor">Backing predictor used to make predictions.</param>
-        public MLAsyncPredictor (IMLPredictor<TOutput> predictor) {            
-            // Save
-            this.predictor = predictor;
-            this.queue = new ConcurrentQueue<(MLFeature[], TaskCompletionSource<TOutput>)>();
-            this.fence = new AutoResetEvent(false);
-            this.cts = new CancellationTokenSource();
-            this.task = new Task(() => {
-                while (!cts.Token.IsCancellationRequested) {
-                    if (queue.TryDequeue(out var request)) {
-                        readyForPrediction = false;
-                        request.Item2.SetResult(predictor.Predict(request.Item1));
-                        readyForPrediction = true;
-                    }
-                    else
-                        fence.WaitOne();                    
-                }
-                while (queue.TryDequeue(out var request))
-                    request.Item2.SetCanceled();
-            }, cts.Token, TaskCreationOptions.LongRunning);
-            // Start
-            task.Start();
-            readyForPrediction = true;
-        }
-
-        /// <summary>
         /// Make a prediction on one or more input features.
         /// </summary>
         /// <param name="inputs">Input features.</param>
@@ -97,6 +69,34 @@ namespace NatSuite.ML.Extensions {
         private readonly AutoResetEvent fence;
         private readonly CancellationTokenSource cts;
         private readonly Task task;
+
+        /// <summary>
+        /// Create an async predictor.
+        /// </summary>
+        /// <param name="predictor">Backing predictor used to make predictions.</param>
+        internal MLAsyncPredictor (IMLPredictor<TOutput> predictor) {            
+            // Save
+            this.predictor = predictor;
+            this.queue = new ConcurrentQueue<(MLFeature[], TaskCompletionSource<TOutput>)>();
+            this.fence = new AutoResetEvent(false);
+            this.cts = new CancellationTokenSource();
+            this.task = new Task(() => {
+                while (!cts.Token.IsCancellationRequested) {
+                    if (queue.TryDequeue(out var request)) {
+                        readyForPrediction = false;
+                        request.Item2.SetResult(predictor.Predict(request.Item1));
+                        readyForPrediction = true;
+                    }
+                    else
+                        fence.WaitOne();                    
+                }
+                while (queue.TryDequeue(out var request))
+                    request.Item2.SetCanceled();
+            }, cts.Token, TaskCreationOptions.LongRunning);
+            // Start
+            task.Start();
+            readyForPrediction = true;
+        }
         #endregion
     }
 }
