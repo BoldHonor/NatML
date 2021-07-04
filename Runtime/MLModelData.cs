@@ -55,6 +55,26 @@ namespace NatSuite.ML {
         }
 
         /// <summary>
+        /// Fetch ML model data from NatML hub.
+        /// </summary>
+        /// <param name="tag">Model tag.</param>
+        /// <param name="accessKey">Hub access key.</param>
+        /// <param name="analytics">Enable performance analytics reporting.</param>
+        /// <returns>ML model data.</returns>
+        public static async Task<MLModelData> FromHub (string tag, string accessKey = null, bool analytics = true) {
+            var modelData = await NMLHub.LoadFromCache(tag);
+            if (modelData == null) {
+                modelData = await NMLHub.LoadFromHub(tag, accessKey);
+                #pragma warning disable 4014
+                NMLHub.SaveToCache(modelData);
+                #pragma warning restore 4014
+            }
+            if (!analytics)
+                modelData.session = null;
+            return modelData;
+        }
+
+        /// <summary>
         /// Fetch ML model data from a local file.
         /// </summary>
         /// <param name="path">Path to ONNX model file.</param>
@@ -86,26 +106,6 @@ namespace NatSuite.ML {
                 modelData.graphData = request.downloadHandler.data;
                 return modelData;
             }
-        }
-        
-        /// <summary>
-        /// Fetch ML model data from NatML hub.
-        /// </summary>
-        /// <param name="tag">Model tag.</param>
-        /// <param name="accessKey">Hub access key.</param>
-        /// <param name="analytics">Enable model performance analytics reporting.</param>
-        /// <returns>ML model data.</returns>
-        public static async Task<MLModelData> FromHub (string tag, string accessKey = null, bool analytics = true) {
-            var modelData = await NMLHub.LoadFromCache(tag);
-            if (modelData == null) {
-                modelData = await NMLHub.LoadFromHub(tag, accessKey);
-                #pragma warning disable 4014
-                NMLHub.SaveToCache(modelData);
-                #pragma warning restore 4014
-            }
-            if (!analytics)
-                modelData.session = null;
-            return modelData;
         }
         #endregion
 
