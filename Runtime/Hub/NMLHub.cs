@@ -4,8 +4,9 @@
 */
 
 #if UNITY_EDITOR
-    //#define DEV_HUB
-    //#define STAGING_HUB
+    //#define DISABLE_CACHE
+    //#define HUB_DEV
+    //#define HUB_STAGING
 #endif
 
 namespace NatSuite.ML.Hub {
@@ -26,14 +27,13 @@ namespace NatSuite.ML.Hub {
             // Build payload
             var fields = "id modelData { labels normalization { mean std } aspectMode } graphData flags";
             var mutation = $"createSession (tag: $tag, device: $device) {{ {fields} }}";
-            var query = $"mutation ($tag: String!, $device: Device!) {{ {mutation} }}";
             var device = new Device {
                 model = SystemInfo.deviceModel,
                 os = Application.platform.ToString(),
                 gfx = SystemInfo.graphicsDeviceType.ToString()
             };
             var payload = JsonUtility.ToJson(new CreateSessionPayload {
-                query = query,
+                query = $"mutation ($tag: String!, $device: Device!) {{ {mutation} }}",
                 variables = new CreateSessionArgs { tag = tag, device = device }
             });
             // Request
@@ -47,10 +47,8 @@ namespace NatSuite.ML.Hub {
                         var responseStr = await response.Content.ReadAsStringAsync();
                         var responseDict = JsonUtility.FromJson<CreateSessionResponse>(responseStr);
                         // Check
-                        if (responseDict.errors != null) {
-                            Debug.LogError($"Failed to load model from Hub: {tag}");
-                            return default;
-                        }
+                        if (responseDict.errors != null)
+                            throw new InvalidOperationException(responseDict.errors[0].message);
                         // Create model data
                         var responseData = responseDict.data.createSession;
                         var cachedData = responseData.modelData;
@@ -65,6 +63,10 @@ namespace NatSuite.ML.Hub {
         }
 
         public static async Task<MLModelData> LoadFromCache (string tag) {
+            // Override
+            #if DISABLE_CACHE
+            return default;
+            #endif
             // Check
             var cacheName = tag.Replace('/', '_');
             var basePath = Path.Combine(Application.persistentDataPath, "ML");
@@ -110,14 +112,13 @@ namespace NatSuite.ML.Hub {
 
         public static async Task ReportPrediction (string session, double latency) {
             // Check
-            if (session == null)
+            if (string.IsNullOrEmpty(session))
                 return;
             // Build payload
             await Task.Yield(); // Force async completion so we don't hold up model prediction
-            var mutation = "reportPrediction (session: $session, latency: $latency)";
-            var query = $"mutation ($session: ID!, $latency: Float!) {{ {mutation} }}";
+            var report = "reportPrediction (session: $session, latency: $latency)";
             var payload = JsonUtility.ToJson(new ReportPredictionPayload {
-                query = query,
+                query = $"mutation ($session: ID!, $latency: Float!) {{ {report} }}",
                 variables = new ReportPredictionArgs { session = session, latency = latency }
             });
             // Request
@@ -131,9 +132,9 @@ namespace NatSuite.ML.Hub {
         #region --Operations--
 
         private const string API =
-        #if DEV_HUB
+        #if HUB_DEV
         @"http://localhost:8000/graph"; 
-        #elif STAGING_HUB
+        #elif HUB_STAGING
         @"https://staging.api.natsuite.io/graph";
         #else
         @"https://api.natsuite.io/graph";
@@ -163,44 +164,30 @@ namespace NatSuite.ML.Hub {
             }
         }
 
-        [Serializable]
-        private struct MLCachedData {
-            public string session;
-            public string graphData;
+        [Serializable] struct MLCachedData {
+            public string session, graphData, aspectMode;
             public int flags;
             public string[] labels;
             public MLModelData.Normalization normalization;
-            public string aspectMode;
         }
 
-        [Serializable]
-        private struct Device { public string model; public string os; public string gfx; }
+        [Serializable] struct Device { public string model, os, gfx; }
 
-        [Serializable]
-        private struct CreateSessionArgs { public string tag; public Device device; }
+        [Serializable] struct CreateSessionArgs { public string tag; public Device device; }
 
-        [Serializable]
-        private struct ReportPredictionArgs { public string session; public double latency; }
+        [Serializable] struct ReportPredictionArgs { public string session; public double latency; }
 
-        [Serializable]
-        private struct CreateSessionPayload { public string query; public CreateSessionArgs variables; }
+        [Serializable] struct CreateSessionPayload { public string query; public CreateSessionArgs variables; }
 
-        [SerializeField]
-        private struct ReportPredictionPayload { public string query; public ReportPredictionArgs variables; }
+        [Serializable] struct ReportPredictionPayload { public string query; public ReportPredictionArgs variables; }
 
-        [Serializable]
-        private struct CreateSessionResponse { public CreateSessionResponseData data; public string[] errors; }
+        [Serializable] struct ResponseError { public string message; }
+
+        [Serializable] struct CreateSessionResponse { public CreateSessionResponseData data; public ResponseError[] errors; }
         
-        [Serializable]
-        private struct CreateSessionResponseData { public SessionData createSession; }
+        [Serializable] struct CreateSessionResponseData { public SessionData createSession; }
 
-        [Serializable]
-        private struct SessionData {
-            public string id;
-            public MLCachedData modelData;
-            public string graphData;
-            public int flags;
-        }
+        [Serializable] struct SessionData { public string id, graphData; public MLCachedData modelData; public int flags; }
         #endregion
     }
 }
