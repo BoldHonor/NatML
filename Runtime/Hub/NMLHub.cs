@@ -4,7 +4,6 @@
 */
 
 #if UNITY_EDITOR
-    //#define DISABLE_CACHE
     //#define HUB_DEV
     //#define HUB_STAGING
 #endif
@@ -13,7 +12,9 @@ namespace NatSuite.ML.Hub {
 
     using System;
     using System.IO;
+    using System.Net;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Text;
     using System.Threading.Tasks;
     using UnityEngine;
@@ -39,10 +40,8 @@ namespace NatSuite.ML.Hub {
             // Request
             using (var client = new HttpClient())
                 using (var content = new StringContent(payload, Encoding.UTF8, "application/json")) {
-                    // Authenticate
-                    if (!string.IsNullOrEmpty(accessKey))
-                        content.Headers.TryAddWithoutValidation(@"Authorization", accessKey);
-                    // Fetch model data
+                    var authHeader = !string.IsNullOrEmpty(accessKey) ? new AuthenticationHeaderValue("Bearer", accessKey) : null;
+                    client.DefaultRequestHeaders.Authorization = authHeader;
                     using (var response = await client.PostAsync(API, content)) {
                         var responseStr = await response.Content.ReadAsStringAsync();
                         var responseDict = JsonUtility.FromJson<CreateSessionResponse>(responseStr);
@@ -53,8 +52,9 @@ namespace NatSuite.ML.Hub {
                         var responseData = responseDict.data.createSession;
                         var cachedData = responseData.modelData;
                         cachedData.session = responseData.id;
-                        using (var modelResponse = await client.GetAsync(responseData.graphData)) {
-                            var graphData = await modelResponse.Content.ReadAsByteArrayAsync();
+                        // Download graph data
+                        using (var graphClient = new WebClient()) {
+                            var graphData = await graphClient.DownloadDataTaskAsync(responseData.graphData);
                             var modelData = Load(tag, cachedData, graphData);
                             return modelData;
                         }
@@ -63,10 +63,6 @@ namespace NatSuite.ML.Hub {
         }
 
         public static async Task<MLModelData> LoadFromCache (string tag) {
-            // Override
-            #if DISABLE_CACHE
-            return default;
-            #endif
             // Check
             var cacheName = tag.Replace('/', '_');
             var basePath = Path.Combine(Application.persistentDataPath, "ML");

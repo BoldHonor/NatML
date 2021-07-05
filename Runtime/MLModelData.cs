@@ -60,14 +60,21 @@ namespace NatSuite.ML {
         /// <param name="tag">Model tag.</param>
         /// <param name="accessKey">Hub access key.</param>
         /// <param name="analytics">Enable performance analytics reporting.</param>
+        /// <param name="cache">Cache model data on the device.</param>
         /// <returns>ML model data.</returns>
-        public static async Task<MLModelData> FromHub (string tag, string accessKey = null, bool analytics = true) {
-            var modelData = await NMLHub.LoadFromCache(tag);
+        public static async Task<MLModelData> FromHub (
+            string tag,
+            string accessKey = null,
+            bool analytics = true,
+            bool cache = true
+        ) {
+            var modelData = cache ? await NMLHub.LoadFromCache(tag) : default;
             if (modelData == null) {
                 modelData = await NMLHub.LoadFromHub(tag, accessKey);
-                #pragma warning disable 4014
-                NMLHub.SaveToCache(modelData);
-                #pragma warning restore 4014
+                if (cache)
+                    #pragma warning disable 4014
+                    NMLHub.SaveToCache(modelData);
+                    #pragma warning restore 4014
             }
             if (!analytics)
                 modelData.session = null;
