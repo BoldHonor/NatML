@@ -1,5 +1,5 @@
 {
-    "name": "com.natsuite.natml",
+    "name": "@natsuite/natml",
     "version": "1.0.0",
     "displayName": "NatML",
     "description": "High performance, cross platform machine learning runtime for Unity Engine.",
@@ -29,5 +29,7 @@
         "name": "NatSuite Framework",
         "email": "hi@natsuite.io",
         "url": "https://github.com/natsuite"
-    }
+    },
+    "license": "Apache-2.0",
+    "repository": "github:natsuite/NatML"
 }
