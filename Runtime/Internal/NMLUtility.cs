@@ -44,7 +44,7 @@ namespace NatSuite.ML.Internal {
             }
         }
 
-        public static MLFeatureType MarshalFeatureType (this in IntPtr nativeType) { // INCOMPLETE // Nested types
+        public static MLFeatureType MarshalFeatureType (this in IntPtr nativeType) { // CHECK // Nested types
             // Get dtype
             var dtype = nativeType.FeatureTypeDataType();
             if (dtype == NMLDataType.Undefined)

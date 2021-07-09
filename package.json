@@ -1,5 +1,5 @@
 {
-    "name": "@natsuite/natml",
+    "name": "api.natsuite.natml",
     "version": "1.0.0",
     "displayName": "NatML",
     "description": "High performance, cross platform machine learning runtime for Unity Engine.",
